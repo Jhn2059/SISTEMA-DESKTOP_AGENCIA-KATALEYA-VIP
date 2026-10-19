@@ -1,0 +1,210 @@
+:root {
+    --tinta: #17233b;
+    --tinta-suave: #55617a;
+    --marino: #14213d;
+    --marino-claro: #20325a;
+    --dorado: #c9a227;
+    --dorado-claro: #eadb9a;
+    --fondo: #eef1f6;
+    --superficie: #ffffff;
+    --borde: #d7dce6;
+    --error: #b3261e;
+    --error-fondo: #fdecea;
+    --aviso: #7a4d00;
+    --aviso-fondo: #fff4d6;
+    --sombra: 0 24px 60px rgba(20, 33, 61, 0.18);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    background:
+        radial-gradient(circle at 15% 20%, rgba(201, 162, 39, 0.16), transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(32, 50, 90, 0.22), transparent 50%),
+        var(--marino);
+    color: var(--tinta);
+    font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.marca {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.marca__linea {
+    display: block;
+    width: 56px;
+    height: 3px;
+    margin: 0 auto 18px;
+    border-radius: 999px;
+    background: var(--dorado);
+}
+
+.marca__nombre {
+    display: block;
+    margin: 0;
+    color: var(--marino);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.marca__detalle {
+    display: block;
+    margin-top: 6px;
+    color: var(--tinta-suave);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.formulario {
+    display: grid;
+    gap: 18px;
+}
+
+.campo {
+    display: grid;
+    gap: 6px;
+}
+
+.campo__etiqueta {
+    color: var(--tinta);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.campo__entrada {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    background: #fbfcfe;
+    color: var(--tinta);
+    font: inherit;
+    transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.campo__entrada:hover {
+    border-color: #b8c0cf;
+}
+
+.campo__entrada:focus {
+    border-color: var(--marino-claro);
+    background: var(--superficie);
+    box-shadow: 0 0 0 3px rgba(32, 50, 90, 0.16);
+    outline: none;
+}
+
+.campo__entrada[aria-invalid="true"] {
+    border-color: var(--error);
+    background: #fffafa;
+}
+
+.campo__error {
+    min-height: 0;
+    margin: 0;
+    color: var(--error);
+    font-size: 13px;
+}
+
+.campo__error:empty {
+    display: none;
+}
+
+.aviso {
+    margin: 0;
+    padding: 10px 14px;
+    border: 1px solid #ecd28a;
+    border-radius: 10px;
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+    font-size: 14px;
+}
+
+.mensaje {
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid #f2b8b5;
+    border-radius: 10px;
+    background: var(--error-fondo);
+    color: var(--error);
+    font-size: 14px;
+}
+
+.boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 20px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.boton:focus-visible {
+    outline: 3px solid rgba(201, 162, 39, 0.55);
+    outline-offset: 2px;
+}
+
+.boton:disabled {
+    cursor: progress;
+    opacity: 0.7;
+}
+
+.boton--principal {
+    background: var(--marino);
+    color: #ffffff;
+}
+
+.boton--principal:hover:not(:disabled) {
+    background: var(--marino-claro);
+}
+
+.boton--secundario {
+    border-color: var(--borde);
+    background: transparent;
+    color: var(--marino);
+}
+
+.boton--secundario:hover:not(:disabled) {
+    border-color: var(--marino-claro);
+    background: #f2f5fa;
+}
+
+.pie {
+    margin: 28px 0 0;
+    color: var(--tinta-suave);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
+}

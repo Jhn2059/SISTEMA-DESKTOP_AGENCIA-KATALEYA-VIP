@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kataleya VIP | Panel principal</title>
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="./panel.css">
+</head>
+<body>
+    <section class="pantalla pantalla--panel">
+        <header class="panel-encabezado">
+            <div class="marca marca--panel">
+                <span class="marca__linea"></span>
+                <span class="marca__nombre">Kataleya VIP</span>
+                <span class="marca__detalle">Reservas y venta de pasajes</span>
+            </div>
+
+            <div class="sesion">
+                <div class="sesion__datos">
+                    <p class="sesion__nombre" id="panel-usuario"></p>
+                    <p class="sesion__rol" id="panel-rol"></p>
+                    <p class="sesion__sede" id="panel-sede"></p>
+                </div>
+                <button class="boton boton--secundario" id="boton-cerrar-sesion" type="button">
+                    Cerrar sesión
+                </button>
+            </div>
+        </header>
+
+        <main class="panel-contenido">
+            <h2 class="panel-titulo" id="panel-titulo" tabindex="-1">Panel principal</h2>
+            <p class="panel-texto">Elija una opción para comenzar.</p>
+            <ul class="opciones" id="lista-opciones"></ul>
+        </main>
+    </section>
+
+    <script type="module" src="./panel.js"></script>
+</body>
+</html>

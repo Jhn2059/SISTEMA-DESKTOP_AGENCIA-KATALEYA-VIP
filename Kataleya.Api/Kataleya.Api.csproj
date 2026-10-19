@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kataleya.Aplicacion\Kataleya.Aplicacion.csproj" />
+    <ProjectReference Include="..\Kataleya.Contratos\Kataleya.Contratos.csproj" />
+    <ProjectReference Include="..\Kataleya.Datos\Kataleya.Datos.csproj" />
+    <ProjectReference Include="..\Kataleya.Dominio\Kataleya.Dominio.csproj" />
+  </ItemGroup>
+
+</Project>
