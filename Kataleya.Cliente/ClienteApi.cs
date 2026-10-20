@@ -18,16 +18,43 @@ public sealed class ClienteApi
         Converters = { new JsonStringEnumConverter() }
     };
 
+    private const int ReintentosPredeterminados = 3;
+    private static readonly TimeSpan EsperaEntreReintentos = TimeSpan.FromMilliseconds(250);
+
     private readonly HttpClient _http;
     private readonly IRegistroTecnico _registro;
+    private readonly int _reintentosMaximos;
     private readonly Dictionary<string, Guid> _clavesDeOperacion = [];
     private string? _llave;
     private DateTime? _venceLlave;
 
-    public ClienteApi(HttpClient http, IRegistroTecnico registro)
+    public ClienteApi(
+        HttpClient http,
+        IRegistroTecnico registro,
+        int reintentosMaximos = ReintentosPredeterminados,
+        bool permitirHttpSinTls = false)
     {
         _http = http ?? throw new ArgumentNullException(nameof(http));
         _registro = registro ?? throw new ArgumentNullException(nameof(registro));
+
+        if (reintentosMaximos < 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(reintentosMaximos),
+                "El número de reintentos no puede ser negativo.");
+        }
+
+        _reintentosMaximos = reintentosMaximos;
+
+        var direccion = _http.BaseAddress;
+        if (direccion is not null &&
+            !direccion.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase) &&
+            !direccion.IsLoopback &&
+            !permitirHttpSinTls)
+        {
+            throw new InvalidOperationException(
+                "La Web API debe usar HTTPS. Configure KATALEYA_API con https:// o, solo para desarrollo, KATALEYA_PERMITIR_HTTP=true.");
+        }
     }
 
     public DatosDeCuenta? CuentaActual { get; private set; }
@@ -47,14 +74,16 @@ public sealed class ClienteApi
     {
         try
         {
-            using var respuesta = await _http.PostAsJsonAsync(
-                "sesiones",
-                new SolicitudDeInicioDeSesion
-                {
-                    NombreUsuario = nombreUsuario,
-                    Contrasena = contrasena
-                },
-                Formato);
+            using var respuesta = await EnviarConReintentosAsync(
+                () => CrearSolicitud(
+                    HttpMethod.Post,
+                    "sesiones",
+                    new SolicitudDeInicioDeSesion
+                    {
+                        NombreUsuario = nombreUsuario,
+                        Contrasena = contrasena
+                    },
+                    null));
 
             if (!respuesta.IsSuccessStatusCode)
             {
@@ -87,7 +116,10 @@ public sealed class ClienteApi
         }
         catch (TaskCanceledException)
         {
-            await RegistrarAsync("CON-02", "Iniciar sesión", "El servidor no respondió en 10 segundos.");
+            await RegistrarAsync(
+                "CON-02",
+                "Iniciar sesión",
+                "El servidor no respondió tras agotar los reintentos.");
             return Rechazo(MotivoDeRechazo.ServidorNoResponde);
         }
         catch (HttpRequestException ex)
@@ -199,8 +231,8 @@ public sealed class ClienteApi
 
         try
         {
-            using var solicitud = CrearSolicitud(metodo, ruta, contenido, clave);
-            using var respuesta = await _http.SendAsync(solicitud);
+            using var respuesta = await EnviarConReintentosAsync(
+                () => CrearSolicitud(metodo, ruta, contenido, clave));
 
             if (respuesta.IsSuccessStatusCode)
             {
@@ -235,7 +267,10 @@ public sealed class ClienteApi
         }
         catch (TaskCanceledException)
         {
-            await RegistrarAsync("CON-02", operacion, "El servidor no respondió en 10 segundos.");
+            await RegistrarAsync(
+                "CON-02",
+                operacion,
+                "El servidor no respondió tras agotar los reintentos.");
             return Error<T>("CON-02");
         }
         catch (HttpRequestException ex)
@@ -260,6 +295,47 @@ public sealed class ClienteApi
             return Error<T>("SERVIDOR");
         }
     }
+
+    private async Task<HttpResponseMessage> EnviarConReintentosAsync(
+        Func<HttpRequestMessage> crearSolicitud)
+    {
+        for (var intento = 0; ; intento++)
+        {
+            try
+            {
+                using var solicitud = crearSolicitud();
+                var respuesta = await _http.SendAsync(solicitud);
+
+                if (intento >= _reintentosMaximos || !EsTransitorio(respuesta.StatusCode))
+                {
+                    return respuesta;
+                }
+
+                respuesta.Dispose();
+            }
+            catch (Exception ex) when (intento < _reintentosMaximos && EsTransitorio(ex))
+            {
+            }
+
+            await Task.Delay(EsperaEntreReintentos * (intento + 1));
+        }
+    }
+
+    private static bool EsTransitorio(HttpStatusCode estado) =>
+        estado == HttpStatusCode.RequestTimeout ||
+        estado == HttpStatusCode.TooManyRequests ||
+        (int)estado >= 500;
+
+    private static bool EsTransitorio(Exception ex) =>
+        ex is TaskCanceledException ||
+        ex is HttpRequestException
+        {
+            HttpRequestError:
+                HttpRequestError.ConnectionError or
+                HttpRequestError.NameResolutionError or
+                HttpRequestError.ResponseEnded or
+                HttpRequestError.HttpProtocolError
+        };
 
     private async Task<ResultadoDeLaApi> EnviarSinDatosAsync(
         HttpMethod metodo,

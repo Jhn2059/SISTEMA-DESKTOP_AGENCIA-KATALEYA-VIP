@@ -22,4 +22,16 @@ public static class Configuracion
                 : new Uri(DireccionPredeterminada);
         }
     }
+
+    public static int Reintentos =>
+        int.TryParse(Environment.GetEnvironmentVariable("KATALEYA_REINTENTOS"), out var valor) &&
+        valor >= 0
+            ? valor
+            : 3;
+
+    public static bool PermitirHttpSinTls =>
+        string.Equals(
+            Environment.GetEnvironmentVariable("KATALEYA_PERMITIR_HTTP"),
+            "true",
+            StringComparison.OrdinalIgnoreCase);
 }

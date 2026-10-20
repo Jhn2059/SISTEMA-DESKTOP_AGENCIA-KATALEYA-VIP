@@ -101,7 +101,7 @@ public sealed class ClienteApiPruebas
                 }
                 """);
 
-        var cliente = CrearCliente(manejador);
+        var cliente = CrearCliente(manejador, reintentos: 0);
         var solicitud = Solicitud("vendedor1");
 
         var primera = await cliente.CrearCuentaAsync(solicitud);
@@ -116,14 +116,116 @@ public sealed class ClienteApiPruebas
             manejador.Envios[1].ClaveDeIdempotencia);
     }
 
-    private static ClienteApi CrearCliente(ManejadorFalso manejador)
+    [Fact]
+    public async Task Reintenta_automaticamente_un_error_transitorio()
+    {
+        var manejador = new ManejadorFalso()
+            .Encolar(HttpStatusCode.InternalServerError, """{"title":"Error"}""")
+            .Encolar(HttpStatusCode.OK, "[]");
+
+        var resultado = await CrearCliente(manejador).ObtenerCuentasAsync();
+
+        Assert.True(resultado.Exito);
+        Assert.Equal(2, manejador.Envios.Count);
+    }
+
+    [Fact]
+    public async Task Agota_los_tres_reintentos_ante_errores_transitorios()
+    {
+        var manejador = new ManejadorFalso()
+            .Encolar(HttpStatusCode.InternalServerError, """{"title":"Error"}""")
+            .Encolar(HttpStatusCode.InternalServerError, """{"title":"Error"}""")
+            .Encolar(HttpStatusCode.InternalServerError, """{"title":"Error"}""")
+            .Encolar(HttpStatusCode.InternalServerError, """{"title":"Error"}""");
+
+        var resultado = await CrearCliente(manejador).ObtenerCuentasAsync();
+
+        Assert.False(resultado.Exito);
+        Assert.Equal(4, manejador.Envios.Count);
+    }
+
+    [Fact]
+    public async Task No_reintenta_un_error_de_validacion()
+    {
+        var manejador = new ManejadorFalso().Encolar(
+            HttpStatusCode.BadRequest,
+            """{"title":"Datos inválidos","errors":{"nombre":["Escriba el nombre."]}}""");
+
+        var resultado = await CrearCliente(manejador).CrearCuentaAsync(Solicitud("vendedor1"));
+
+        Assert.False(resultado.Exito);
+        Assert.Single(manejador.Envios);
+    }
+
+    [Fact]
+    public async Task Reintento_automatico_reutiliza_la_clave_de_idempotencia()
+    {
+        var manejador = new ManejadorFalso()
+            .Encolar(HttpStatusCode.InternalServerError, """{"title":"Error"}""")
+            .Encolar(
+                HttpStatusCode.OK,
+                """
+                {
+                  "id": 2,
+                  "nombre": "Vendedor Uno",
+                  "nombreUsuario": "vendedor1",
+                  "rol": "Encargado de ventas",
+                  "sede": "Huancayo",
+                  "estado": "Activa",
+                  "finBloqueo": null
+                }
+                """);
+
+        var resultado = await CrearCliente(manejador).CrearCuentaAsync(Solicitud("vendedor1"));
+
+        Assert.True(resultado.Exito);
+        Assert.Equal(2, manejador.Envios.Count);
+        Assert.False(string.IsNullOrWhiteSpace(manejador.Envios[0].ClaveDeIdempotencia));
+        Assert.Equal(
+            manejador.Envios[0].ClaveDeIdempotencia,
+            manejador.Envios[1].ClaveDeIdempotencia);
+    }
+
+    [Fact]
+    public void Rechaza_http_sin_tls_fuera_de_localhost()
+    {
+        var http = new HttpClient(new ManejadorFalso())
+        {
+            BaseAddress = new Uri("http://ejemplo.com/")
+        };
+
+        var excepcion = Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = new ClienteApi(http, new RegistroTecnicoFalso());
+        });
+
+        Assert.Contains("HTTPS", excepcion.Message);
+    }
+
+    [Fact]
+    public void Permite_http_sin_tls_configurado_para_desarrollo()
+    {
+        var http = new HttpClient(new ManejadorFalso())
+        {
+            BaseAddress = new Uri("http://ejemplo.com/")
+        };
+
+        var cliente = new ClienteApi(
+            http,
+            new RegistroTecnicoFalso(),
+            permitirHttpSinTls: true);
+
+        Assert.NotNull(cliente);
+    }
+
+    private static ClienteApi CrearCliente(ManejadorFalso manejador, int reintentos = 3)
     {
         var http = new HttpClient(manejador)
         {
             BaseAddress = new Uri("http://localhost/")
         };
 
-        return new ClienteApi(http, new RegistroTecnicoFalso());
+        return new ClienteApi(http, new RegistroTecnicoFalso(), reintentos);
     }
 
     private static SolicitudDeCuenta Solicitud(string nombreUsuario) =>

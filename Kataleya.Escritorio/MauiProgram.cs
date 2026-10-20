@@ -21,7 +21,11 @@ public static class MauiProgram
             Timeout = TimeSpan.FromSeconds(10)
         });
         builder.Services.AddSingleton<IRegistroTecnico, RegistroTecnico>();
-        builder.Services.AddSingleton<ClienteApi>();
+        builder.Services.AddSingleton(sp => new ClienteApi(
+            sp.GetRequiredService<HttpClient>(),
+            sp.GetRequiredService<IRegistroTecnico>(),
+            Configuracion.Reintentos,
+            Configuracion.PermitirHttpSinTls));
         builder.Services.AddSingleton<INavegacion, Navegacion>();
         builder.Services.AddSingleton<IDialogos, DialogosDeMaui>();
 
