@@ -33,7 +33,7 @@ jobs:
       - name: Compilar escritorio
         run: dotnet build Kataleya.Escritorio/Kataleya.Escritorio.csproj -c Release -r win-x64 --no-restore
       - name: Publicar carpeta sin empaquetar
-        run: dotnet publish Kataleya.Escritorio/Kataleya.Escritorio.csproj -c Release -r win-x64 --self-contained true -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true -o publicacion/win-x64
+        run: dotnet publish Kataleya.Escritorio/Kataleya.Escritorio.csproj -c Release -f net10.0-windows10.0.19041.0 -r win-x64 --self-contained true -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true -o publicacion/win-x64
       - name: Guardar artefacto
         uses: actions/upload-artifact@v4
         with:
