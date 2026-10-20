@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Kataleya.Escritorio.Paginas.Dialogos.DialogoDeContrasenaPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Restablecer contraseña"
+    Shell.NavBarIsVisible="False">
+    <VerticalStackLayout Padding="24" Spacing="10">
+        <Label Text="Restablecer contraseña" FontSize="22" FontAttributes="Bold" />
+        <Label x:Name="EtiquetaUsuario" TextColor="{StaticResource TextoSuave}" />
+
+        <Label Text="Contraseña nueva" Margin="0,10,0,0" />
+        <Entry x:Name="EntradaContrasena" Placeholder="Mínimo 8 caracteres" IsPassword="True" />
+        <Label x:Name="ErrorContrasena" TextColor="{StaticResource Error}" FontSize="12" IsVisible="False" />
+
+        <Label
+            Text="Entregue la contraseña nueva al usuario."
+            TextColor="{StaticResource TextoSuave}"
+            FontSize="12" />
+
+        <HorizontalStackLayout HorizontalOptions="End" Spacing="8" Margin="0,8,0,0">
+            <Button Text="Cancelar" Clicked="Cancelar_Clicked" />
+            <Button Text="Restablecer" Clicked="Aceptar_Clicked" />
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>

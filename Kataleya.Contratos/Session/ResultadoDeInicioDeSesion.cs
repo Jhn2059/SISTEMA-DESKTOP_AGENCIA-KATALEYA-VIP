@@ -1,3 +1,5 @@
+using Kataleya.Contratos.Cuentas;
+
 namespace Kataleya.Contratos.Session;
 
 public sealed class ResultadoDeInicioDeSesion

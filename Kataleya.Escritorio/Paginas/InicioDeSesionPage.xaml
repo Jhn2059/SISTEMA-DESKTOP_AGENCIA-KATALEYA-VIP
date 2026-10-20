@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Kataleya.Escritorio.Paginas.InicioDeSesionPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.ModelosDeVista"
+    x:DataType="vm:InicioDeSesionViewModel"
+    Shell.NavBarIsVisible="False">
+    <ScrollView>
+        <Grid Padding="32" RowDefinitions="*,Auto,*">
+            <VerticalStackLayout
+                Grid.Row="1"
+                WidthRequest="420"
+                HorizontalOptions="Center"
+                Spacing="10">
+                <Label
+                    Text="Kataleya"
+                    FontSize="34"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center" />
+                <Label
+                    Text="Agencia de viajes"
+                    TextColor="{StaticResource TextoSuave}"
+                    HorizontalOptions="Center" />
+                <Label
+                    Text="Iniciar sesión"
+                    FontSize="22"
+                    FontAttributes="Bold"
+                    Margin="0,18,0,6" />
+
+                <Label Text="Usuario" />
+                <Entry
+                    Text="{Binding NombreUsuario}"
+                    Placeholder="Escriba su usuario"
+                    MaxLength="30"
+                    ReturnType="Next" />
+                <Label
+                    Text="{Binding ErrorNombreUsuario}"
+                    TextColor="{StaticResource Error}"
+                    FontSize="12"
+                    IsVisible="{Binding TieneErrorNombre}" />
+
+                <Label Text="Contraseña" />
+                <Entry
+                    x:Name="EntradaContrasena"
+                    Text="{Binding Contrasena}"
+                    Placeholder="Escriba su contraseña"
+                    IsPassword="True"
+                    ReturnType="Done"
+                    TextChanged="Contrasena_TextChanged"
+                    Focused="Contrasena_Focused" />
+                <Label
+                    Text="{Binding ErrorContrasena}"
+                    TextColor="{StaticResource Error}"
+                    FontSize="12"
+                    IsVisible="{Binding TieneErrorContrasena}" />
+                <Label
+                    x:Name="EtiquetaBloqMayus"
+                    Text="Bloq Mayús está activado."
+                    TextColor="#B45309"
+                    FontSize="12"
+                    IsVisible="False" />
+
+                <Button
+                    Text="Ingresar"
+                    Command="{Binding IngresarCommand}"
+                    IsEnabled="{Binding PuedeIngresar}"
+                    Margin="0,10,0,0" />
+
+                <ActivityIndicator
+                    IsRunning="{Binding EstaCargando}"
+                    IsVisible="{Binding EstaCargando}"
+                    HorizontalOptions="Center" />
+
+                <Label
+                    Text="{Binding MensajeDeError}"
+                    TextColor="{StaticResource Error}"
+                    HorizontalTextAlignment="Center"
+                    IsVisible="{Binding TieneMensajeDeError}" />
+            </VerticalStackLayout>
+        </Grid>
+    </ScrollView>
+</ContentPage>

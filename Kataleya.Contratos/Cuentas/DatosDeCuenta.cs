@@ -1,0 +1,20 @@
+using Kataleya.Dominio.Enums;
+
+namespace Kataleya.Contratos.Cuentas;
+
+public sealed class DatosDeCuenta
+{
+    public int Id { get; set; }
+
+    public string Nombre { get; set; } = string.Empty;
+
+    public string NombreUsuario { get; set; } = string.Empty;
+
+    public string Rol { get; set; } = string.Empty;
+
+    public string Sede { get; set; } = string.Empty;
+
+    public EstadoCuenta Estado { get; set; }
+
+    public DateTime? FinBloqueo { get; set; }
+}

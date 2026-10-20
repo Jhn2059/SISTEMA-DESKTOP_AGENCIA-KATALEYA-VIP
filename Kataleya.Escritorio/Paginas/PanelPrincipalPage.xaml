@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Kataleya.Escritorio.Paginas.PanelPrincipalPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.ModelosDeVista"
+    x:DataType="vm:PanelPrincipalViewModel"
+    Shell.NavBarIsVisible="False">
+    <Grid RowDefinitions="Auto,*">
+        <Grid
+            Grid.Row="0"
+            Padding="24,16"
+            ColumnDefinitions="*,Auto"
+            BackgroundColor="{StaticResource Superficie}">
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Panel principal" FontSize="22" FontAttributes="Bold" />
+                <Label Text="{Binding Nombre}" FontAttributes="Bold" />
+                <Label Text="{Binding Rol}" TextColor="{StaticResource TextoSuave}" />
+                <Label Text="{Binding Sede}" TextColor="{StaticResource TextoSuave}" />
+            </VerticalStackLayout>
+            <Button
+                Grid.Column="1"
+                Text="Cerrar sesión"
+                Command="{Binding CerrarSesionCommand}"
+                VerticalOptions="Start" />
+        </Grid>
+
+        <VerticalStackLayout
+            Grid.Row="1"
+            Padding="24"
+            Spacing="14">
+            <Label Text="Opciones" FontSize="20" FontAttributes="Bold" />
+            <Button
+                Text="Gestión de usuarios"
+                Command="{Binding AbrirGestionDeUsuariosCommand}"
+                IsVisible="{Binding EsAdministrador}"
+                HorizontalOptions="Start" />
+            <Label
+                Text="Las demás pantallas del sistema se implementarán en la siguiente entrega."
+                TextColor="{StaticResource TextoSuave}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

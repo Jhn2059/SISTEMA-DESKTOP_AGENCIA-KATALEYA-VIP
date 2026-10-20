@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Kataleya.Escritorio.Paginas.Dialogos.DialogoDeCuentaPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Nueva cuenta"
+    Shell.NavBarIsVisible="False">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="10">
+            <Label Text="Nueva cuenta" FontSize="22" FontAttributes="Bold" />
+
+            <Label Text="Nombre completo" />
+            <Entry x:Name="EntradaNombre" Placeholder="Nombre y apellidos" MaxLength="100" />
+            <Label x:Name="ErrorNombre" TextColor="{StaticResource Error}" FontSize="12" IsVisible="False" />
+
+            <Label Text="Nombre de usuario" />
+            <Entry x:Name="EntradaNombreUsuario" Placeholder="Usuario para ingresar" MaxLength="30" />
+            <Label x:Name="ErrorNombreUsuario" TextColor="{StaticResource Error}" FontSize="12" IsVisible="False" />
+
+            <Label Text="Contraseña inicial" />
+            <Entry x:Name="EntradaContrasena" Placeholder="Mínimo 8 caracteres" IsPassword="True" />
+            <Label x:Name="ErrorContrasena" TextColor="{StaticResource Error}" FontSize="12" IsVisible="False" />
+
+            <Label Text="Rol" />
+            <Picker x:Name="SelectorRol" Title="Seleccione un rol" />
+            <Label x:Name="ErrorRol" TextColor="{StaticResource Error}" FontSize="12" IsVisible="False" />
+
+            <Label Text="Sede" />
+            <Picker x:Name="SelectorSede" Title="Seleccione una sede" />
+            <Label x:Name="ErrorSede" TextColor="{StaticResource Error}" FontSize="12" IsVisible="False" />
+
+            <Label x:Name="ErrorGeneral" TextColor="{StaticResource Error}" IsVisible="False" />
+
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="8" Margin="0,8,0,0">
+                <Button Text="Cancelar" Clicked="Cancelar_Clicked" />
+                <Button Text="Crear cuenta" Clicked="Crear_Clicked" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Session;
 using Kataleya.Dominio.Interfaces;
 using Microsoft.Extensions.Options;

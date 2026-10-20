@@ -35,5 +35,8 @@ public sealed class RegistroDeBitacora
 
     public string? ValorNuevo { get; }
 
-    public Guid? ClaveDeOperacion { get; }
+    public Guid? ClaveDeOperacion { get; private set; }
+
+    public void FijarClaveDeOperacion(Guid? clave) =>
+        ClaveDeOperacion = clave;
 }

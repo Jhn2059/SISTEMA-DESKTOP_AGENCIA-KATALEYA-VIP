@@ -1,0 +1,41 @@
+name: Compilar Kataleya
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Restaurar pruebas
+        run: dotnet restore Kataleya.Pruebas/Kataleya.Pruebas.csproj
+      - name: Ejecutar pruebas
+        run: dotnet test Kataleya.Pruebas/Kataleya.Pruebas.csproj --no-restore
+      - name: Compilar API
+        run: dotnet build Kataleya.Api/Kataleya.Api.csproj
+
+  escritorio:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Instalar MAUI
+        run: dotnet workload install maui
+      - name: Restaurar escritorio
+        run: dotnet restore Kataleya.Escritorio/Kataleya.Escritorio.csproj -r win-x64
+      - name: Compilar escritorio
+        run: dotnet build Kataleya.Escritorio/Kataleya.Escritorio.csproj -c Release -r win-x64 --no-restore
+      - name: Publicar carpeta sin empaquetar
+        run: dotnet publish Kataleya.Escritorio/Kataleya.Escritorio.csproj -c Release -r win-x64 --self-contained true -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true -o publicacion/win-x64
+      - name: Guardar artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: kataleya-win-x64
+          path: publicacion/win-x64

@@ -1,3 +1,4 @@
+using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Session;
 using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Enums;

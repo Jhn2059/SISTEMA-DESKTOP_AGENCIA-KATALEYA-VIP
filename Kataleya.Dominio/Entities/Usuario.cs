@@ -6,7 +6,9 @@ public sealed class Usuario
 {
     private const int IntentosParaBloquear = 5;
     private const int MinutosDeBloqueo = 3;
-    private const int LongitudMinimaDeContrasena = 8;
+    public const int LongitudMinimaDeContrasena = 8;
+    public const int LongitudMaximaDelNombre = 100;
+    public const int LongitudMaximaDelNombreUsuario = 30;
 
     public Usuario(
         int id,
@@ -91,6 +93,32 @@ public sealed class Usuario
 
     public void RegistrarAccesoExitoso()
     {
+        Estado = EstadoCuenta.Activa;
+        IntentosFallidos = 0;
+        FinBloqueo = null;
+    }
+
+    public void Desactivar()
+    {
+        Estado = EstadoCuenta.Desactivada;
+        IntentosFallidos = 0;
+        FinBloqueo = null;
+    }
+
+    public void Reactivar()
+    {
+        Estado = EstadoCuenta.Activa;
+        IntentosFallidos = 0;
+        FinBloqueo = null;
+    }
+
+    public void Desbloquear()
+    {
+        if (Estado == EstadoCuenta.Desactivada)
+        {
+            return;
+        }
+
         Estado = EstadoCuenta.Activa;
         IntentosFallidos = 0;
         FinBloqueo = null;

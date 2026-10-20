@@ -41,4 +41,19 @@ public sealed class RepositorioBitacora : IRepositorioBitacora
 
         await comando.ExecuteNonQueryAsync();
     }
+
+    public async Task<bool> ExisteClaveAsync(Guid clave)
+    {
+        var conexion = await _contexto.ObtenerConexionAsync();
+        await using var comando = new NpgsqlCommand(
+            "SELECT EXISTS (SELECT 1 FROM registro_bitacora WHERE clave_de_operacion = @clave)",
+            conexion)
+        {
+            Transaction = _contexto.TransaccionActual
+        };
+        comando.Parameters.Add("clave", NpgsqlDbType.Uuid).Value = clave;
+
+        var resultado = await comando.ExecuteScalarAsync();
+        return resultado is true;
+    }
 }

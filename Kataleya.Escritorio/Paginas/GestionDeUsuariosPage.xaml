@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Kataleya.Escritorio.Paginas.GestionDeUsuariosPage"
+    x:Name="PaginaActiva"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.ModelosDeVista"
+    x:DataType="vm:GestionDeUsuariosViewModel"
+    Shell.NavBarIsVisible="False">
+    <Grid Padding="24" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Gestión de usuarios" FontSize="22" FontAttributes="Bold" />
+                <Label
+                    Text="Cree cuentas y administre su estado."
+                    TextColor="{StaticResource TextoSuave}" />
+            </VerticalStackLayout>
+            <Button
+                Grid.Column="1"
+                Text="Crear cuenta"
+                Command="{Binding CrearCuentaCommand}" />
+            <Button
+                Grid.Column="2"
+                Text="Volver"
+                Command="{Binding VolverCommand}" />
+        </Grid>
+
+        <VerticalStackLayout Grid.Row="2" Spacing="4">
+            <Label
+                Text="{Binding MensajeDeError}"
+                TextColor="{StaticResource Error}"
+                IsVisible="{Binding TieneMensajeDeError}" />
+            <Label
+                Text="{Binding MensajeDeExito}"
+                TextColor="{StaticResource Exito}"
+                IsVisible="{Binding TieneMensajeDeExito}" />
+            <ActivityIndicator
+                IsRunning="{Binding EstaCargando}"
+                IsVisible="{Binding EstaCargando}"
+                HorizontalOptions="Start" />
+        </VerticalStackLayout>
+
+        <CollectionView
+            Grid.Row="3"
+            ItemsSource="{Binding Cuentas}"
+            x:Name="ListaDeCuentas">
+            <CollectionView.Header>
+                <Grid
+                    Padding="10,8"
+                    ColumnDefinitions="2*,1.5*,1.2*,1.2*,2*"
+                    ColumnSpacing="8"
+                    BackgroundColor="{StaticResource Superficie}">
+                    <Label Text="Nombre" FontAttributes="Bold" />
+                    <Label Grid.Column="1" Text="Usuario" FontAttributes="Bold" />
+                    <Label Grid.Column="2" Text="Rol" FontAttributes="Bold" />
+                    <Label Grid.Column="3" Text="Estado" FontAttributes="Bold" />
+                    <Label
+                        Grid.Column="4"
+                        Text="Acciones"
+                        FontAttributes="Bold"
+                        HorizontalTextAlignment="End" />
+                </Grid>
+            </CollectionView.Header>
+            <CollectionView.EmptyView>
+                <Label
+                    Text="No hay cuentas para mostrar."
+                    TextColor="{StaticResource TextoSuave}"
+                    Padding="10,20" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:CuentaEnLista">
+                    <VerticalStackLayout Padding="10,8" Spacing="4">
+                        <Grid ColumnDefinitions="2*,1.5*,1.2*,1.2*,2*" ColumnSpacing="8">
+                            <Label
+                                Text="{Binding Nombre}"
+                                VerticalOptions="Center" />
+                            <Label
+                                Grid.Column="1"
+                                Text="{Binding NombreUsuario}"
+                                VerticalOptions="Center" />
+                            <Label
+                                Grid.Column="2"
+                                Text="{Binding Rol}"
+                                VerticalOptions="Center" />
+                            <Label
+                                Grid.Column="3"
+                                Text="{Binding Estado}"
+                                VerticalOptions="Center" />
+                            <FlexLayout
+                                Grid.Column="4"
+                                Direction="Row"
+                                Wrap="Wrap"
+                                JustifyContent="End"
+                                AlignItems="Center">
+                                <Button
+                                    Text="Desactivar"
+                                    FontSize="12"
+                                    HeightRequest="32"
+                                    Padding="8,0"
+                                    Margin="2"
+                                    IsVisible="{Binding MostrarDesactivar}"
+                                    IsEnabled="{Binding PuedeDesactivarse}"
+                                    Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.DesactivarCommand}"
+                                    CommandParameter="{Binding .}" />
+                                <Button
+                                    Text="Reactivar"
+                                    FontSize="12"
+                                    HeightRequest="32"
+                                    Padding="8,0"
+                                    Margin="2"
+                                    IsVisible="{Binding MostrarReactivar}"
+                                    Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.ReactivarCommand}"
+                                    CommandParameter="{Binding .}" />
+                                <Button
+                                    Text="Desbloquear"
+                                    FontSize="12"
+                                    HeightRequest="32"
+                                    Padding="8,0"
+                                    Margin="2"
+                                    IsVisible="{Binding MostrarDesbloquear}"
+                                    Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.DesbloquearCommand}"
+                                    CommandParameter="{Binding .}" />
+                                <Button
+                                    Text="Restablecer"
+                                    FontSize="12"
+                                    HeightRequest="32"
+                                    Padding="8,0"
+                                    Margin="2"
+                                    Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.RestablecerContrasenaCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </FlexLayout>
+                        </Grid>
+                        <Label
+                            Text="{Binding Advertencia}"
+                            TextColor="{StaticResource Error}"
+                            FontSize="12"
+                            IsVisible="{Binding TieneAdvertencia}" />
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Label
+            Grid.Row="4"
+            Text="La cuenta de la administradora no puede desactivarse."
+            TextColor="{StaticResource TextoSuave}"
+            FontSize="12" />
+    </Grid>
+</ContentPage>

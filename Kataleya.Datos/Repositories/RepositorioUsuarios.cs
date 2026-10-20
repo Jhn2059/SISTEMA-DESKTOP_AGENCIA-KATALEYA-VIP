@@ -34,33 +34,52 @@ public sealed class RepositorioUsuarios : IRepositorioUsuarios
     public async Task<Usuario?> BuscarPorNombreUsuarioAsync(string nombreUsuario)
     {
         var conexion = await _contexto.ObtenerConexionAsync();
-        await using var comando = new NpgsqlCommand($"{SeleccionarUsuario} WHERE u.nombre_usuario = @nombre_usuario", conexion)
+        await using var comando = new NpgsqlCommand(
+            $"{SeleccionarUsuario} WHERE u.nombre_usuario = @nombre_usuario",
+            conexion)
         {
             Transaction = _contexto.TransaccionActual
         };
         comando.Parameters.Add("nombre_usuario", NpgsqlDbType.Varchar).Value = nombreUsuario;
 
         await using var lector = await comando.ExecuteReaderAsync();
-        if (!await lector.ReadAsync())
+        return await lector.ReadAsync() ? LeerUsuario(lector) : null;
+    }
+
+    public async Task<Usuario?> BuscarPorIdAsync(int id)
+    {
+        var conexion = await _contexto.ObtenerConexionAsync();
+        await using var comando = new NpgsqlCommand(
+            $"{SeleccionarUsuario} WHERE u.id = @id",
+            conexion)
         {
-            return null;
+            Transaction = _contexto.TransaccionActual
+        };
+        comando.Parameters.Add("id", NpgsqlDbType.Integer).Value = id;
+
+        await using var lector = await comando.ExecuteReaderAsync();
+        return await lector.ReadAsync() ? LeerUsuario(lector) : null;
+    }
+
+    public async Task<IReadOnlyList<Usuario>> ListarAsync()
+    {
+        var conexion = await _contexto.ObtenerConexionAsync();
+        await using var comando = new NpgsqlCommand(
+            $"{SeleccionarUsuario} ORDER BY u.nombre_usuario",
+            conexion)
+        {
+            Transaction = _contexto.TransaccionActual
+        };
+
+        var usuarios = new List<Usuario>();
+        await using var lector = await comando.ExecuteReaderAsync();
+
+        while (await lector.ReadAsync())
+        {
+            usuarios.Add(LeerUsuario(lector));
         }
 
-        var finBloqueo = lector.IsDBNull(7) ? (DateTime?)null : lector.GetDateTime(7);
-        var rol = new Rol(lector.GetInt16(8), lector.GetString(9));
-        var sede = new Sede(lector.GetInt16(10), lector.GetString(11));
-
-        return new Usuario(
-            lector.GetInt32(0),
-            lector.GetString(1),
-            lector.GetString(2),
-            lector.GetString(3),
-            lector.GetString(4),
-            Enum.Parse<EstadoCuenta>(lector.GetString(5)),
-            lector.GetInt16(6),
-            finBloqueo,
-            rol,
-            sede);
+        return usuarios;
     }
 
     public async Task<bool> ExisteNombreUsuarioAsync(string nombreUsuario)
@@ -152,5 +171,24 @@ public sealed class RepositorioUsuarios : IRepositorioUsuarios
         {
             throw new InvalidOperationException("No se encontró la cuenta que se quería actualizar.");
         }
+    }
+
+    private static Usuario LeerUsuario(NpgsqlDataReader lector)
+    {
+        var finBloqueo = lector.IsDBNull(7) ? (DateTime?)null : lector.GetDateTime(7);
+        var rol = new Rol(lector.GetInt16(8), lector.GetString(9));
+        var sede = new Sede(lector.GetInt16(10), lector.GetString(11));
+
+        return new Usuario(
+            lector.GetInt32(0),
+            lector.GetString(1),
+            lector.GetString(2),
+            lector.GetString(3),
+            lector.GetString(4),
+            Enum.Parse<EstadoCuenta>(lector.GetString(5)),
+            lector.GetInt16(6),
+            finBloqueo,
+            rol,
+            sede);
     }
 }
