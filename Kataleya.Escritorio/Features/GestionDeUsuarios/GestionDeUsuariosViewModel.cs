@@ -6,7 +6,7 @@ using Kataleya.Contratos.Cuentas;
 using Kataleya.Dominio.DataObjects;
 using Kataleya.Escritorio.Servicios;
 
-namespace Kataleya.Escritorio.ModelosDeVista;
+namespace Kataleya.Escritorio.Features.GestionDeUsuarios;
 
 public partial class GestionDeUsuariosViewModel : ObservableObject
 {
@@ -18,11 +18,9 @@ public partial class GestionDeUsuariosViewModel : ObservableObject
     private IReadOnlyList<DatosDeSede> _sedes = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TieneMensajeDeError))]
     private string mensajeDeError = string.Empty;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TieneMensajeDeExito))]
     private string mensajeDeExito = string.Empty;
 
     [ObservableProperty]
@@ -40,10 +38,6 @@ public partial class GestionDeUsuariosViewModel : ObservableObject
     }
 
     public ObservableCollection<CuentaEnLista> Cuentas { get; } = [];
-
-    public bool TieneMensajeDeError => !string.IsNullOrWhiteSpace(MensajeDeError);
-
-    public bool TieneMensajeDeExito => !string.IsNullOrWhiteSpace(MensajeDeExito);
 
     public bool PuedeOperar => !EstaCargando;
 

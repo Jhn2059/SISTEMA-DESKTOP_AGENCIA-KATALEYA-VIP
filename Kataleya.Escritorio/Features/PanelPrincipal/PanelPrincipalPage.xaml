@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage
-    x:Class="Kataleya.Escritorio.Paginas.PanelPrincipalPage"
+    x:Class="Kataleya.Escritorio.Features.PanelPrincipal.PanelPrincipalPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:Kataleya.Escritorio.ModelosDeVista"
+    xmlns:ui="clr-namespace:Kataleya.Escritorio.UIHelpers.Behaviors"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.PanelPrincipal"
     x:DataType="vm:PanelPrincipalViewModel"
+    ui:CicloDeVidaDePagina.AlAparecer="{Binding ActualizarCommand}"
     Shell.NavBarIsVisible="False">
     <Grid RowDefinitions="Auto,*">
         <Grid

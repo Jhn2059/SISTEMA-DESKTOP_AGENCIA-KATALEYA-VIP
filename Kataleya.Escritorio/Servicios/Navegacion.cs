@@ -1,4 +1,5 @@
-using Kataleya.Escritorio.Paginas;
+using Kataleya.Escritorio.Features.GestionDeUsuarios;
+using Kataleya.Escritorio.Features.PanelPrincipal;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kataleya.Escritorio.Servicios;
@@ -33,4 +34,7 @@ public sealed class Navegacion : INavegacion
 
     public Task VolverAsync() =>
         Shell.Current.Navigation.PopAsync();
+
+    public Task CerrarModalAsync() =>
+        Shell.Current.Navigation.PopModalAsync();
 }

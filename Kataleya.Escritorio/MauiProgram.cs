@@ -1,8 +1,7 @@
 using Kataleya.Cliente;
 using Kataleya.Dominio.Interfaces;
-using Kataleya.Escritorio.ModelosDeVista;
-using Kataleya.Escritorio.Paginas;
 using Kataleya.Escritorio.Servicios;
+using Kataleya.Escritorio.UIHelpers.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kataleya.Escritorio;
@@ -29,13 +28,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<INavegacion, Navegacion>();
         builder.Services.AddSingleton<IDialogos, DialogosDeMaui>();
 
-        builder.Services.AddTransient<InicioDeSesionViewModel>();
-        builder.Services.AddTransient<InicioDeSesionPage>();
-        builder.Services.AddTransient<PanelPrincipalViewModel>();
-        builder.Services.AddTransient<PanelPrincipalPage>();
-        builder.Services.AddTransient<GestionDeUsuariosViewModel>();
-        builder.Services.AddTransient<GestionDeUsuariosPage>();
-        builder.Services.AddSingleton<AppShell>();
+        builder.Services.AgregarVistasDeKataleya();
 
         return builder.Build();
     }

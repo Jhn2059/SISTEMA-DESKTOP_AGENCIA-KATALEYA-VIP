@@ -9,4 +9,6 @@ public interface INavegacion
     Task IrAGestionDeUsuariosAsync();
 
     Task VolverAsync();
+
+    Task CerrarModalAsync();
 }

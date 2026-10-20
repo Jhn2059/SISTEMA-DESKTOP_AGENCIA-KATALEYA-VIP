@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Kataleya.Escritorio.Features.GestionDeUsuarios.CrearCuenta.DialogoDeCuentaPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:contratos="clr-namespace:Kataleya.Contratos.Cuentas;assembly=Kataleya.Contratos"
+    xmlns:ui="clr-namespace:Kataleya.Escritorio.UIHelpers.Behaviors"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.GestionDeUsuarios.CrearCuenta"
+    x:DataType="vm:DialogoDeCuentaViewModel"
+    ui:CicloDeVidaDePagina.AlDesaparecer="{Binding AlDesaparecerCommand}"
+    Title="Nueva cuenta"
+    Shell.NavBarIsVisible="False">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="10">
+            <Label Text="Nueva cuenta" FontSize="22" FontAttributes="Bold" />
+
+            <Label Text="Nombre completo" />
+            <Entry
+                Text="{Binding Nombre}"
+                Placeholder="Nombre y apellidos"
+                MaxLength="100" />
+            <Label
+                Text="{Binding ErrorNombre}"
+                TextColor="{StaticResource Error}"
+                FontSize="12"
+                IsVisible="{Binding ErrorNombre, Converter={StaticResource TextoNoVacio}}" />
+
+            <Label Text="Nombre de usuario" />
+            <Entry
+                Text="{Binding NombreUsuario}"
+                Placeholder="Usuario para ingresar"
+                MaxLength="30" />
+            <Label
+                Text="{Binding ErrorNombreUsuario}"
+                TextColor="{StaticResource Error}"
+                FontSize="12"
+                IsVisible="{Binding ErrorNombreUsuario, Converter={StaticResource TextoNoVacio}}" />
+
+            <Label Text="Contraseña inicial" />
+            <Entry
+                Text="{Binding Contrasena}"
+                Placeholder="Mínimo 8 caracteres"
+                IsPassword="True" />
+            <Label
+                Text="{Binding ErrorContrasena}"
+                TextColor="{StaticResource Error}"
+                FontSize="12"
+                IsVisible="{Binding ErrorContrasena, Converter={StaticResource TextoNoVacio}}" />
+
+            <Label Text="Rol" />
+            <Picker
+                ItemsSource="{Binding Roles}"
+                SelectedItem="{Binding RolSeleccionado, Mode=TwoWay}"
+                ItemDisplayBinding="{Binding Nombre, x:DataType=contratos:DatosDeRol}"
+                Title="Seleccione un rol" />
+            <Label
+                Text="{Binding ErrorRol}"
+                TextColor="{StaticResource Error}"
+                FontSize="12"
+                IsVisible="{Binding ErrorRol, Converter={StaticResource TextoNoVacio}}" />
+
+            <Label Text="Sede" />
+            <Picker
+                ItemsSource="{Binding Sedes}"
+                SelectedItem="{Binding SedeSeleccionada, Mode=TwoWay}"
+                ItemDisplayBinding="{Binding Nombre, x:DataType=contratos:DatosDeSede}"
+                Title="Seleccione una sede" />
+            <Label
+                Text="{Binding ErrorSede}"
+                TextColor="{StaticResource Error}"
+                FontSize="12"
+                IsVisible="{Binding ErrorSede, Converter={StaticResource TextoNoVacio}}" />
+
+            <Label
+                Text="{Binding ErrorGeneral}"
+                TextColor="{StaticResource Error}"
+                IsVisible="{Binding ErrorGeneral, Converter={StaticResource TextoNoVacio}}" />
+
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="8" Margin="0,8,0,0">
+                <Button Text="Cancelar" Command="{Binding CancelarCommand}" />
+                <Button Text="Crear cuenta" Command="{Binding CrearCommand}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

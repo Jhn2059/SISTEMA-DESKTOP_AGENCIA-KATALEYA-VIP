@@ -1,4 +1,4 @@
-using Kataleya.Escritorio.Paginas;
+using Kataleya.Escritorio.Features.Autenticacion.InicioDeSesion;
 
 namespace Kataleya.Escritorio;
 

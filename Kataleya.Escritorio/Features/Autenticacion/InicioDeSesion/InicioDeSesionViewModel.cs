@@ -4,7 +4,7 @@ using Kataleya.Cliente;
 using Kataleya.Contratos.Session;
 using Kataleya.Escritorio.Servicios;
 
-namespace Kataleya.Escritorio.ModelosDeVista;
+namespace Kataleya.Escritorio.Features.Autenticacion.InicioDeSesion;
 
 public partial class InicioDeSesionViewModel : ObservableObject
 {
@@ -18,15 +18,12 @@ public partial class InicioDeSesionViewModel : ObservableObject
     private string contrasena = string.Empty;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TieneErrorNombre))]
     private string errorNombreUsuario = string.Empty;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TieneErrorContrasena))]
     private string errorContrasena = string.Empty;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TieneMensajeDeError))]
     private string mensajeDeError = string.Empty;
 
     [ObservableProperty]
@@ -39,15 +36,10 @@ public partial class InicioDeSesionViewModel : ObservableObject
         _navegacion = navegacion ?? throw new ArgumentNullException(nameof(navegacion));
     }
 
-    public bool TieneErrorNombre => !string.IsNullOrWhiteSpace(ErrorNombreUsuario);
-
-    public bool TieneErrorContrasena => !string.IsNullOrWhiteSpace(ErrorContrasena);
-
-    public bool TieneMensajeDeError => !string.IsNullOrWhiteSpace(MensajeDeError);
-
     public bool PuedeIngresar => !EstaCargando;
 
-    public void Limpiar()
+    [RelayCommand]
+    private void Limpiar()
     {
         NombreUsuario = string.Empty;
         Contrasena = string.Empty;
@@ -74,7 +66,8 @@ public partial class InicioDeSesionViewModel : ObservableObject
             ErrorContrasena = "Escriba su contraseña.";
         }
 
-        if (TieneErrorNombre || TieneErrorContrasena)
+        if (!string.IsNullOrWhiteSpace(ErrorNombreUsuario) ||
+            !string.IsNullOrWhiteSpace(ErrorContrasena))
         {
             return;
         }

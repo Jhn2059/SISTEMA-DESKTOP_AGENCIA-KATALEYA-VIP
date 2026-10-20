@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Kataleya.Cliente;
 using Kataleya.Escritorio.Servicios;
 
-namespace Kataleya.Escritorio.ModelosDeVista;
+namespace Kataleya.Escritorio.Features.PanelPrincipal;
 
 public partial class PanelPrincipalViewModel : ObservableObject
 {
@@ -24,7 +24,8 @@ public partial class PanelPrincipalViewModel : ObservableObject
 
     public bool EsAdministrador => _cliente.EsAdministrador;
 
-    public void Actualizar()
+    [RelayCommand]
+    private void Actualizar()
     {
         OnPropertyChanged(nameof(Nombre));
         OnPropertyChanged(nameof(Rol));

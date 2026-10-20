@@ -1,7 +1,7 @@
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Dominio.Enums;
 
-namespace Kataleya.Escritorio.ModelosDeVista;
+namespace Kataleya.Escritorio.Features.GestionDeUsuarios;
 
 public sealed class CuentaEnLista
 {

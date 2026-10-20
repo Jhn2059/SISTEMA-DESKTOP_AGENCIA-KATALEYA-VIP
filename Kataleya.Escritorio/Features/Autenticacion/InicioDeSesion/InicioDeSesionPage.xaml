@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage
-    x:Class="Kataleya.Escritorio.Paginas.InicioDeSesionPage"
+    x:Class="Kataleya.Escritorio.Features.Autenticacion.InicioDeSesion.InicioDeSesionPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:Kataleya.Escritorio.ModelosDeVista"
+    xmlns:common="clr-namespace:Kataleya.Escritorio.Components.Common"
+    xmlns:ui="clr-namespace:Kataleya.Escritorio.UIHelpers.Behaviors"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.Autenticacion.InicioDeSesion"
     x:DataType="vm:InicioDeSesionViewModel"
+    ui:CicloDeVidaDePagina.AlAparecer="{Binding LimpiarCommand}"
     Shell.NavBarIsVisible="False">
     <ScrollView>
         <Grid Padding="32" RowDefinitions="*,Auto,*">
@@ -38,28 +41,20 @@
                     Text="{Binding ErrorNombreUsuario}"
                     TextColor="{StaticResource Error}"
                     FontSize="12"
-                    IsVisible="{Binding TieneErrorNombre}" />
+                    IsVisible="{Binding ErrorNombreUsuario, Converter={StaticResource TextoNoVacio}}" />
 
                 <Label Text="Contraseña" />
                 <Entry
-                    x:Name="EntradaContrasena"
                     Text="{Binding Contrasena}"
                     Placeholder="Escriba su contraseña"
                     IsPassword="True"
-                    ReturnType="Done"
-                    TextChanged="Contrasena_TextChanged"
-                    Focused="Contrasena_Focused" />
+                    ReturnType="Done" />
                 <Label
                     Text="{Binding ErrorContrasena}"
                     TextColor="{StaticResource Error}"
                     FontSize="12"
-                    IsVisible="{Binding TieneErrorContrasena}" />
-                <Label
-                    x:Name="EtiquetaBloqMayus"
-                    Text="Bloq Mayús está activado."
-                    TextColor="#B45309"
-                    FontSize="12"
-                    IsVisible="False" />
+                    IsVisible="{Binding ErrorContrasena, Converter={StaticResource TextoNoVacio}}" />
+                <common:IndicadorBloqMayus />
 
                 <Button
                     Text="Ingresar"
@@ -76,7 +71,7 @@
                     Text="{Binding MensajeDeError}"
                     TextColor="{StaticResource Error}"
                     HorizontalTextAlignment="Center"
-                    IsVisible="{Binding TieneMensajeDeError}" />
+                    IsVisible="{Binding MensajeDeError, Converter={StaticResource TextoNoVacio}}" />
             </VerticalStackLayout>
         </Grid>
     </ScrollView>
