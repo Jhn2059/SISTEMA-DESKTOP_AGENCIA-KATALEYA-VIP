@@ -47,7 +47,7 @@ public partial class IndicadorBloqMayus : ContentView
     private void ActualizarEstado()
     {
         var estado = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.CapitalLock);
-        Etiqueta.IsVisible = estado.HasFlag(CoreVirtualKeyStates.Locked);
+        Contenido.IsVisible = estado.HasFlag(CoreVirtualKeyStates.Locked);
     }
 #endif
 }

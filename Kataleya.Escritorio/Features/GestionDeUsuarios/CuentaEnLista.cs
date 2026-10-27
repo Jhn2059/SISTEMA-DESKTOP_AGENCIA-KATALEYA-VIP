@@ -1,9 +1,10 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Dominio.Enums;
 
 namespace Kataleya.Escritorio.Features.GestionDeUsuarios;
 
-public sealed class CuentaEnLista
+public partial class CuentaEnLista : ObservableObject
 {
     public CuentaEnLista(DatosDeCuenta cuenta) =>
         Cuenta = cuenta ?? throw new ArgumentNullException(nameof(cuenta));
@@ -28,6 +29,28 @@ public sealed class CuentaEnLista
         _ => Cuenta.Estado.ToString()
     };
 
+    public bool EsActiva => Cuenta.Estado == EstadoCuenta.Activa;
+
+    public bool EsBloqueada => Cuenta.Estado == EstadoCuenta.Bloqueada;
+
+    public bool EsDesactivada => Cuenta.Estado == EstadoCuenta.Desactivada;
+
+    public bool TieneDetalleEstado => EsBloqueada && Cuenta.FinBloqueo is not null;
+
+    public string DetalleEstado
+    {
+        get
+        {
+            if (!TieneDetalleEstado)
+            {
+                return string.Empty;
+            }
+
+            var hora = Cuenta.FinBloqueo!.Value.ToLocalTime();
+            return $"Se desbloquea sola a las {hora:HH:mm}";
+        }
+    }
+
     public bool EsAdministradora =>
         Cuenta.NombreUsuario.Equals("admin", StringComparison.OrdinalIgnoreCase);
 
@@ -43,4 +66,9 @@ public sealed class CuentaEnLista
 
     public string Advertencia =>
         TieneAdvertencia ? "La cuenta de la administradora no puede desactivarse." : string.Empty;
+
+    public bool EsFilaAlterna { get; set; }
+
+    [ObservableProperty]
+    private bool esSeleccionada;
 }

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView
+    x:Class="Kataleya.Escritorio.Components.Layout.BarraSuperior"
+    x:Name="RaizBarra"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    HeightRequest="58">
+    <Grid
+        BackgroundColor="{StaticResource Superficie}"
+        ColumnDefinitions="Auto,*,Auto"
+        Padding="12,0,184,0">
+
+        <Border
+            x:Name="BotonMenu"
+            WidthRequest="40"
+            HeightRequest="40"
+            BackgroundColor="Transparent"
+            StrokeThickness="0"
+            StrokeShape="RoundRectangle 6"
+            VerticalOptions="Center">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="AlTocarMenu" />
+                <PointerGestureRecognizer PointerEntered="AlEntrarMenu" PointerExited="AlSalirMenu" />
+            </Border.GestureRecognizers>
+            <Path
+                Data="{StaticResource IconoMenu}"
+                WidthRequest="20"
+                HeightRequest="20"
+                Aspect="Uniform"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Border>
+
+        <Grid
+            x:Name="ZonaArrastre"
+            Grid.Column="1"
+            BackgroundColor="{StaticResource Superficie}">
+            <Label
+                Text="Sistema de la Agencia Kataleya VIP"
+                FontFamily="InterSemiBold"
+                FontSize="14"
+                TextColor="{StaticResource Texto}"
+                VerticalOptions="Center"
+                LineBreakMode="TailTruncation"
+                MaxLines="1" />
+        </Grid>
+
+        <Border
+            x:Name="BloqueUsuario"
+            Grid.Column="2"
+            BackgroundColor="Transparent"
+            StrokeThickness="0"
+            StrokeShape="RoundRectangle 8"
+            Padding="8,0"
+            VerticalOptions="Center">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="AlTocarUsuario" />
+                <PointerGestureRecognizer PointerEntered="AlEntrarUsuario" PointerExited="AlSalirUsuario" />
+            </Border.GestureRecognizers>
+            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                <Border
+                    WidthRequest="26"
+                    HeightRequest="26"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource SuperficieActiva}"
+                    StrokeShape="RoundRectangle 13"
+                    VerticalOptions="Center">
+                    <Path
+                        Data="{StaticResource IconoPersona}"
+                        WidthRequest="16"
+                        HeightRequest="16"
+                        Aspect="Uniform"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" />
+                </Border>
+                <VerticalStackLayout Spacing="1" VerticalOptions="Center">
+                    <Label
+                        x:Name="LblNombre"
+                        FontFamily="InterSemiBold"
+                        FontSize="13"
+                        TextColor="{StaticResource Texto}"
+                        LineHeight="1" />
+                    <Label
+                        x:Name="LblRol"
+                        FontSize="11"
+                        TextColor="{StaticResource TextoSuave}"
+                        LineHeight="1" />
+                    <Label
+                        x:Name="LblSede"
+                        FontSize="11"
+                        TextColor="{StaticResource TextoSuave}"
+                        LineHeight="1" />
+                </VerticalStackLayout>
+                <Path
+                    Data="{StaticResource IconoChevron}"
+                    WidthRequest="14"
+                    HeightRequest="14"
+                    Aspect="Uniform"
+                    Margin="4,0,0,0"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Border>
+    </Grid>
+</ContentView>

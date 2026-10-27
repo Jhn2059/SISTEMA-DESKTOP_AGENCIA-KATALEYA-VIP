@@ -7,26 +7,109 @@
     </ResourceDictionary.MergedDictionaries>
 
     <Style TargetType="ContentPage">
-        <Setter Property="BackgroundColor" Value="White" />
+        <Setter Property="BackgroundColor" Value="{StaticResource Fondo}" />
     </Style>
 
     <Style TargetType="Label">
+        <Setter Property="FontFamily" Value="InterRegular" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="TextColor" Value="{StaticResource Texto}" />
     </Style>
 
-    <Style TargetType="Entry">
-        <Setter Property="HeightRequest" Value="36" />
+    <Style x:Key="TituloDePagina" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterSemiBold" />
+        <Setter Property="FontSize" Value="22" />
         <Setter Property="TextColor" Value="{StaticResource Texto}" />
     </Style>
 
+    <Style x:Key="EtiquetaDeCampo" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterMedium" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextColor" Value="{StaticResource TextoSuave}" />
+    </Style>
+
+    <Style x:Key="TextoDeError" TargetType="Label">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="TextColor" Value="{StaticResource PeligroTexto}" />
+    </Style>
+
+    <Style TargetType="Entry">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor" Value="{StaticResource Texto}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource TextoTenue}" />
+        <Setter Property="FontFamily" Value="InterRegular" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="HeightRequest" Value="34" />
+        <Setter Property="Margin" Value="0" />
+    </Style>
+
     <Style TargetType="Picker">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor" Value="{StaticResource Texto}" />
+        <Setter Property="TitleColor" Value="{StaticResource TextoTenue}" />
+        <Setter Property="FontFamily" Value="InterRegular" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="HeightRequest" Value="36" />
+        <Setter Property="Margin" Value="0" />
     </Style>
 
     <Style TargetType="Button">
-        <Setter Property="HeightRequest" Value="40" />
+        <Setter Property="FontFamily" Value="InterSemiBold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="HeightRequest" Value="36" />
         <Setter Property="CornerRadius" Value="6" />
-        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="BackgroundColor" Value="{StaticResource BotonOscuro}" />
+        <Setter Property="TextColor" Value="{StaticResource Texto}" />
+        <Setter Property="BorderColor" Value="{StaticResource BordeControl}" />
+        <Setter Property="BorderWidth" Value="1" />
+    </Style>
+
+    <Style x:Key="EstiloBotonClaro" TargetType="Button">
+        <Setter Property="FontFamily" Value="InterSemiBold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="HeightRequest" Value="36" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="BackgroundColor" Value="{StaticResource BotonClaro}" />
+        <Setter Property="TextColor" Value="{StaticResource BotonClaroTexto}" />
+        <Setter Property="BorderWidth" Value="0" />
+    </Style>
+
+    <Style x:Key="BotonSecundario" TargetType="Button">
+        <Setter Property="FontFamily" Value="InterSemiBold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="HeightRequest" Value="36" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="BackgroundColor" Value="{StaticResource BotonOscuro}" />
+        <Setter Property="TextColor" Value="{StaticResource Texto}" />
+        <Setter Property="BorderColor" Value="{StaticResource BordeControl}" />
+        <Setter Property="BorderWidth" Value="1" />
+    </Style>
+
+    <Style x:Key="BotonPeligro" TargetType="Button">
+        <Setter Property="FontFamily" Value="InterSemiBold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="HeightRequest" Value="36" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="BackgroundColor" Value="{StaticResource BotonOscuro}" />
+        <Setter Property="TextColor" Value="{StaticResource PeligroTexto}" />
+        <Setter Property="BorderColor" Value="{StaticResource Peligro}" />
+        <Setter Property="BorderWidth" Value="1" />
+    </Style>
+
+    <Style TargetType="ActivityIndicator">
+        <Setter Property="Color" Value="{StaticResource TextoSuave}" />
+    </Style>
+
+    <Style TargetType="Path">
+        <Setter Property="Fill" Value="Transparent" />
+        <Setter Property="Stroke" Value="{StaticResource TextoSuave}" />
+        <Setter Property="StrokeThickness" Value="1.75" />
+        <Setter Property="StrokeLineCap" Value="Round" />
+        <Setter Property="StrokeLineJoin" Value="Round" />
+        <Setter Property="Aspect" Value="Uniform" />
     </Style>
 </ResourceDictionary>

@@ -1,13 +1,17 @@
+using Kataleya.Escritorio.UIHelpers;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Kataleya.Escritorio;
 
 public partial class App : Application
 {
     private readonly AppShell _shell;
 
-    public App(AppShell shell)
+    public App(IServiceProvider servicios)
     {
         InitializeComponent();
-        _shell = shell ?? throw new ArgumentNullException(nameof(shell));
+        UserAppTheme = AppTheme.Dark;
+        _shell = servicios.GetRequiredService<AppShell>();
     }
 
     protected override Window CreateWindow(IActivationState? activationState) =>
@@ -17,6 +21,7 @@ public partial class App : Application
             Width = 1366,
             Height = 768,
             MinimumWidth = 1024,
-            MinimumHeight = 768
+            MinimumHeight = 768,
+            TitleBar = BarraDeTitulo.Crear()
         };
 }

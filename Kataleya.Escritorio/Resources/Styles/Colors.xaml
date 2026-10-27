@@ -2,10 +2,49 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
-    <Color x:Key="Texto">#1F2937</Color>
-    <Color x:Key="TextoSuave">#4B5563</Color>
-    <Color x:Key="Error">#B91C1C</Color>
-    <Color x:Key="Exito">#15803D</Color>
-    <Color x:Key="Borde">#D1D5DB</Color>
-    <Color x:Key="Superficie">#F9FAFB</Color>
+
+    <Color x:Key="Fondo">#0D0F13</Color>
+    <Color x:Key="Superficie">#161A21</Color>
+    <Color x:Key="SuperficieElevada">#1A1E25</Color>
+    <Color x:Key="SuperficieActiva">#22262E</Color>
+    <Color x:Key="SuperficieHover">#1C2028</Color>
+    <Color x:Key="SuperficieAlterna">#191D24</Color>
+
+    <Color x:Key="Borde">#2A2F38</Color>
+    <Color x:Key="BordeControl">#646B78</Color>
+    <Color x:Key="BordeControlHover">#8A909A</Color>
+
+    <Color x:Key="Texto">#F1F2F4</Color>
+    <Color x:Key="TextoSuave">#A9AFB9</Color>
+    <Color x:Key="TextoTenue">#646B78</Color>
+
+    <Color x:Key="Acento">#ED1C24</Color>
+    <Color x:Key="AcentoFondo">#2E0F11</Color>
+    <Color x:Key="AcentoBorde">#7F1D22</Color>
+
+    <Color x:Key="Peligro">#EF4444</Color>
+    <Color x:Key="PeligroTexto">#FCA5A5</Color>
+    <Color x:Key="Error">#FCA5A5</Color>
+
+    <Color x:Key="Exito">#86EFAC</Color>
+    <Color x:Key="ExitoFondo">#0F2A1A</Color>
+    <Color x:Key="ExitoBorde">#1F6B3D</Color>
+
+    <Color x:Key="Advertencia">#F59E0B</Color>
+    <Color x:Key="AdvertenciaTexto">#FCD38D</Color>
+    <Color x:Key="AdvertenciaFondo">#2D1F08</Color>
+    <Color x:Key="AdvertenciaBorde">#7A5312</Color>
+
+    <Color x:Key="Info">#3B82F6</Color>
+    <Color x:Key="InfoFondo">#0E1D36</Color>
+    <Color x:Key="InfoBorde">#1E4A8C</Color>
+
+    <Color x:Key="BotonClaro">#F1F2F4</Color>
+    <Color x:Key="BotonClaroHover">#FFFFFF</Color>
+    <Color x:Key="BotonClaroTexto">#16181D</Color>
+    <Color x:Key="BotonOscuro">#1A1E25</Color>
+    <Color x:Key="BotonOscuroHover">#232935</Color>
+
+    <Color x:Key="Seleccion">#0E1D36</Color>
+    <Color x:Key="SeleccionBorde">#4C8DFF</Color>
 </ResourceDictionary>

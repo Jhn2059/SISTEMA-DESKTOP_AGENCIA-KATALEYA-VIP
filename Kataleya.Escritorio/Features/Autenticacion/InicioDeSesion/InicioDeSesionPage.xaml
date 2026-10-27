@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage
     x:Class="Kataleya.Escritorio.Features.Autenticacion.InicioDeSesion.InicioDeSesionPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -9,70 +9,200 @@
     x:DataType="vm:InicioDeSesionViewModel"
     ui:CicloDeVidaDePagina.AlAparecer="{Binding LimpiarCommand}"
     Shell.NavBarIsVisible="False">
-    <ScrollView>
-        <Grid Padding="32" RowDefinitions="*,Auto,*">
-            <VerticalStackLayout
-                Grid.Row="1"
-                WidthRequest="420"
-                HorizontalOptions="Center"
-                Spacing="10">
-                <Label
-                    Text="Kataleya"
-                    FontSize="34"
-                    FontAttributes="Bold"
-                    HorizontalOptions="Center" />
-                <Label
-                    Text="Agencia de viajes"
-                    TextColor="{StaticResource TextoSuave}"
-                    HorizontalOptions="Center" />
-                <Label
-                    Text="Iniciar sesión"
-                    FontSize="22"
-                    FontAttributes="Bold"
-                    Margin="0,18,0,6" />
+    <Grid BackgroundColor="{StaticResource Fondo}">
+        <Image
+            Source="fondo_oscuro.png"
+            Aspect="AspectFill"
+            InputTransparent="True"
+            SemanticProperties.Description="" />
 
-                <Label Text="Usuario" />
-                <Entry
-                    Text="{Binding NombreUsuario}"
-                    Placeholder="Escriba su usuario"
-                    MaxLength="30"
-                    ReturnType="Next" />
-                <Label
-                    Text="{Binding ErrorNombreUsuario}"
-                    TextColor="{StaticResource Error}"
-                    FontSize="12"
-                    IsVisible="{Binding ErrorNombreUsuario, Converter={StaticResource TextoNoVacio}}" />
-
-                <Label Text="Contraseña" />
-                <Entry
-                    Text="{Binding Contrasena}"
-                    Placeholder="Escriba su contraseña"
-                    IsPassword="True"
-                    ReturnType="Done" />
-                <Label
-                    Text="{Binding ErrorContrasena}"
-                    TextColor="{StaticResource Error}"
-                    FontSize="12"
-                    IsVisible="{Binding ErrorContrasena, Converter={StaticResource TextoNoVacio}}" />
-                <common:IndicadorBloqMayus />
-
-                <Button
-                    Text="Ingresar"
-                    Command="{Binding IngresarCommand}"
-                    IsEnabled="{Binding PuedeIngresar}"
-                    Margin="0,10,0,0" />
-
-                <ActivityIndicator
-                    IsRunning="{Binding EstaCargando}"
-                    IsVisible="{Binding EstaCargando}"
-                    HorizontalOptions="Center" />
-
-                <Label
-                    Text="{Binding MensajeDeError}"
-                    TextColor="{StaticResource Error}"
-                    HorizontalTextAlignment="Center"
-                    IsVisible="{Binding MensajeDeError, Converter={StaticResource TextoNoVacio}}" />
-            </VerticalStackLayout>
+        <Grid
+            WidthRequest="640"
+            HeightRequest="433"
+            Margin="0,0,-30,24"
+            HorizontalOptions="End"
+            VerticalOptions="End"
+            IsClippedToBounds="True"
+            InputTransparent="True">
+            <Image
+                Source="camioneta.png"
+                WidthRequest="640"
+                HeightRequest="480"
+                Aspect="Fill"
+                Opacity="0.35"
+                TranslationY="-36.3"
+                VerticalOptions="Start"
+                InputTransparent="True" />
         </Grid>
-    </ScrollView>
+
+        <Border
+            WidthRequest="440"
+            Padding="40,32,40,36"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            BackgroundColor="{StaticResource Superficie}"
+            Stroke="{StaticResource Acento}"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 14">
+            <Border.Shadow>
+                <Shadow
+                    Brush="#ED1C24"
+                    Offset="0,0"
+                    Radius="18"
+                    Opacity="0.35" />
+            </Border.Shadow>
+
+            <VerticalStackLayout Spacing="0">
+                <Image
+                    Source="logo_kataleya.png"
+                    WidthRequest="250"
+                    HeightRequest="146"
+                    Aspect="AspectFit"
+                    HorizontalOptions="Center"
+                    SemanticProperties.Description="Empresa Turismo VIP Kataleya S.V. E.I.R.L." />
+
+                <BoxView
+                    WidthRequest="48"
+                    HeightRequest="3"
+                    Margin="0,16,0,0"
+                    Color="{StaticResource Acento}"
+                    HorizontalOptions="Center" />
+
+                <Label
+                    Text="Sistema de la Agencia&#10;Kataleya VIP"
+                    FontFamily="InterSemiBold"
+                    FontSize="24"
+                    LineHeight="1.2"
+                    TextColor="{StaticResource Texto}"
+                    HorizontalTextAlignment="Center"
+                    Margin="0,16,0,0" />
+
+                <VerticalStackLayout
+                    Spacing="16"
+                    Margin="0,16,0,0">
+                    <Border
+                        MinimumHeightRequest="87"
+                        Padding="12,12,14,12"
+                        BackgroundColor="{StaticResource AcentoFondo}"
+                        Stroke="{StaticResource AcentoBorde}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        IsVisible="{Binding MensajeDeError, Converter={StaticResource TextoNoVacio}}">
+                        <Grid ColumnDefinitions="18,*" ColumnSpacing="10">
+                            <Path
+                                Grid.Column="0"
+                                WidthRequest="18"
+                                HeightRequest="18"
+                                Margin="0,1,0,0"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Start"
+                                Data="{StaticResource IconoAlerta}"
+                                Stroke="{StaticResource Peligro}"
+                                StrokeThickness="1.75"
+                                Aspect="Uniform" />
+                            <Label
+                                Grid.Column="1"
+                                Text="{Binding MensajeDeError}"
+                                TextColor="{StaticResource PeligroTexto}"
+                                FontFamily="InterMedium"
+                                FontSize="13"
+                                LineHeight="1.55"
+                                LineBreakMode="WordWrap" />
+                        </Grid>
+                    </Border>
+
+                    <common:CampoDeTexto
+                        x:Name="CampoUsuario"
+                        Etiqueta="Usuario"
+                        Texto="{Binding NombreUsuario}"
+                        Placeholder="Escriba su usuario"
+                        Icono="{StaticResource IconoPersona}"
+                        LongitudMaxima="30"
+                        TipoDeRetorno="Next"
+                        Siguiente="{x:Reference CampoContrasena}"
+                        MensajeDeError="{Binding ErrorNombreUsuario}" />
+
+                    <common:CampoDeTexto
+                        x:Name="CampoContrasena"
+                        Etiqueta="Contraseña"
+                        Texto="{Binding Contrasena}"
+                        Placeholder="Escriba su contraseña"
+                        Icono="{StaticResource IconoCandado}"
+                        EsContrasena="True"
+                        MuestraAvisoBloqMayus="True"
+                        LongitudMaxima="128"
+                        TipoDeRetorno="Done"
+                        MensajeDeError="{Binding ErrorContrasena}"
+                        ComandoAlCompletar="{Binding IngresarCommand}"
+                        EstaOcupado="{Binding EstaCargando}" />
+
+                    <Border
+                        x:Name="BotonIngresar"
+                        HeightRequest="44"
+                        Margin="0,18,0,0"
+                        Padding="20,0"
+                        BackgroundColor="{StaticResource BotonClaro}"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 6"
+                        IsEnabled="{Binding PuedeIngresar}"
+                        AutomationProperties.Name="Ingresar">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding IngresarCommand}" />
+                            <PointerGestureRecognizer
+                                PointerEntered="AlEntrarBoton"
+                                PointerExited="AlSalirBoton" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger
+                                TargetType="Border"
+                                Binding="{Binding PuedeIngresar}"
+                                Value="False">
+                                <Setter Property="Opacity" Value="0.65" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Grid>
+                            <HorizontalStackLayout
+                                x:Name="ContenidoBoton"
+                                Spacing="8"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center">
+                                <HorizontalStackLayout.Triggers>
+                                    <DataTrigger
+                                        TargetType="HorizontalStackLayout"
+                                        Binding="{Binding EstaCargando}"
+                                        Value="True">
+                                        <Setter Property="Opacity" Value="0" />
+                                    </DataTrigger>
+                                </HorizontalStackLayout.Triggers>
+                                <Path
+                                    WidthRequest="20"
+                                    HeightRequest="20"
+                                    Data="{StaticResource IconoIngresar}"
+                                    Stroke="{StaticResource BotonClaroTexto}"
+                                    StrokeThickness="1.75"
+                                    Aspect="Uniform"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    Text="Ingresar"
+                                    TextColor="{StaticResource BotonClaroTexto}"
+                                    FontFamily="InterSemiBold"
+                                    FontSize="16"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+
+                            <ActivityIndicator
+                                WidthRequest="20"
+                                HeightRequest="20"
+                                Color="{StaticResource BotonClaroTexto}"
+                                IsRunning="{Binding EstaCargando}"
+                                IsVisible="{Binding EstaCargando}"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
 </ContentPage>
+

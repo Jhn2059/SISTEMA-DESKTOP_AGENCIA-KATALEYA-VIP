@@ -22,20 +22,3 @@ CROSS JOIN sede s
 WHERE r.nombre = 'Administrador'
   AND s.nombre = 'Huancayo'
 ON CONFLICT (nombre_usuario) DO NOTHING;
-
-INSERT INTO usuario
-    (nombre, nombre_usuario, resumen_contrasena, sal, rol_id, sede_id, estado, intentos_fallidos)
-SELECT
-    'Encargado de ventas',
-    'ventas',
-    '/CfYyB78BkZ2aIDK6/+VFJKm4zhGiqpdvFRxJmvbF1c=',
-    'caqXNaioHiQIS0JHMmjBHg==',
-    r.id,
-    s.id,
-    'Activa',
-    0
-FROM rol r
-CROSS JOIN sede s
-WHERE r.nombre = 'Encargado de ventas'
-  AND s.nombre = 'Huancayo'
-ON CONFLICT (nombre_usuario) DO NOTHING;

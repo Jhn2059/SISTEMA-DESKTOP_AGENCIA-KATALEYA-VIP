@@ -8,6 +8,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Iconos.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <converters:TextoNoVacioABoolConverter x:Key="TextoNoVacio" />
         </ResourceDictionary>

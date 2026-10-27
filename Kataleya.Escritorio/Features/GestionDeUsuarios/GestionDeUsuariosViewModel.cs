@@ -27,6 +27,9 @@ public partial class GestionDeUsuariosViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(PuedeOperar))]
     private bool estaCargando;
 
+    [ObservableProperty]
+    private CuentaEnLista? cuentaSeleccionada;
+
     public GestionDeUsuariosViewModel(
         ClienteApi cliente,
         IDialogos dialogos,
@@ -40,6 +43,23 @@ public partial class GestionDeUsuariosViewModel : ObservableObject
     public ObservableCollection<CuentaEnLista> Cuentas { get; } = [];
 
     public bool PuedeOperar => !EstaCargando;
+
+    public bool EsAdministrador => _cliente.EsAdministrador;
+
+    public bool TieneSeleccion => CuentaSeleccionada is not null;
+
+    public bool PuedeReactivarSeleccionada => CuentaSeleccionada?.EsDesactivada == true;
+
+    public bool PuedeDesbloquearSeleccionada => CuentaSeleccionada?.EsBloqueada == true;
+
+    public bool PuedeRestablecerSeleccionada => TieneSeleccion;
+
+    public bool PuedeDesactivarSeleccionada => CuentaSeleccionada?.PuedeDesactivarse == true;
+
+    public bool MostrarNotaAdministradora => CuentaSeleccionada?.EsAdministradora == true;
+
+    public string NotaAdministradora =>
+        "La cuenta de la administradora no puede desactivarse.";
 
     [RelayCommand]
     public async Task CargarAsync()
@@ -68,11 +88,24 @@ public partial class GestionDeUsuariosViewModel : ObservableObject
                 }
             }
 
+            var idSeleccionado = CuentaSeleccionada?.Id;
             Cuentas.Clear();
+
+            var indice = 0;
             foreach (var cuenta in resultado.Datos)
             {
-                Cuentas.Add(new CuentaEnLista(cuenta));
+                Cuentas.Add(new CuentaEnLista(cuenta)
+                {
+                    EsFilaAlterna = indice % 2 == 1
+                });
+
+                indice++;
             }
+
+            CuentaSeleccionada =
+                Cuentas.FirstOrDefault(cuenta => cuenta.Id == idSeleccionado) ??
+                Cuentas.FirstOrDefault(cuenta => !cuenta.EsAdministradora) ??
+                Cuentas.FirstOrDefault();
         }
         finally
         {
@@ -234,8 +267,39 @@ public partial class GestionDeUsuariosViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void Seleccionar(CuentaEnLista? cuenta) =>
+        CuentaSeleccionada = cuenta;
+
+    [RelayCommand]
     private Task VolverAsync() =>
         _navegacion.VolverAsync();
+
+    [RelayCommand]
+    private async Task CerrarSesionAsync()
+    {
+        _cliente.CerrarSesion();
+        await _navegacion.IrAlInicioDeSesionAsync();
+    }
+
+    partial void OnCuentaSeleccionadaChanged(CuentaEnLista? valorAnterior, CuentaEnLista? valorNuevo)
+    {
+        if (valorAnterior is not null)
+        {
+            valorAnterior.EsSeleccionada = false;
+        }
+
+        if (valorNuevo is not null)
+        {
+            valorNuevo.EsSeleccionada = true;
+        }
+
+        OnPropertyChanged(nameof(TieneSeleccion));
+        OnPropertyChanged(nameof(PuedeReactivarSeleccionada));
+        OnPropertyChanged(nameof(PuedeDesbloquearSeleccionada));
+        OnPropertyChanged(nameof(PuedeRestablecerSeleccionada));
+        OnPropertyChanged(nameof(PuedeDesactivarSeleccionada));
+        OnPropertyChanged(nameof(MostrarNotaAdministradora));
+    }
 
     private async Task<bool> AsegurarCatalogosAsync()
     {
