@@ -6,7 +6,7 @@ public sealed class DatosDeCuenta
 {
     public int Id { get; set; }
 
-    public string Nombre { get; set; } = string.Empty;
+    public string NombrePersona { get; set; } = string.Empty;
 
     public string NombreUsuario { get; set; } = string.Empty;
 
@@ -17,4 +17,6 @@ public sealed class DatosDeCuenta
     public EstadoCuenta Estado { get; set; }
 
     public DateTime? FinBloqueo { get; set; }
+
+    public bool PuedeDesactivarse { get; set; }
 }

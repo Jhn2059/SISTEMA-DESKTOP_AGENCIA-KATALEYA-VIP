@@ -13,7 +13,6 @@ public sealed class ServicioReporteAnual
     private readonly IRepositorioPasajes _pasajes;
     private readonly IRepositorioBitacora _historia;
     private readonly IRepositorioReportesAnuales _reportes;
-    private readonly IRepositorioUsuarios _usuarios;
     private readonly RegistradorDeBitacora _bitacora;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
     private readonly IReloj _reloj;
@@ -23,7 +22,6 @@ public sealed class ServicioReporteAnual
         IRepositorioPasajes pasajes,
         IRepositorioBitacora historia,
         IRepositorioReportesAnuales reportes,
-        IRepositorioUsuarios usuarios,
         RegistradorDeBitacora bitacora,
         IUnidadDeTrabajo unidadDeTrabajo,
         IReloj reloj,
@@ -32,7 +30,6 @@ public sealed class ServicioReporteAnual
         _pasajes = pasajes ?? throw new ArgumentNullException(nameof(pasajes));
         _historia = historia ?? throw new ArgumentNullException(nameof(historia));
         _reportes = reportes ?? throw new ArgumentNullException(nameof(reportes));
-        _usuarios = usuarios ?? throw new ArgumentNullException(nameof(usuarios));
         _bitacora = bitacora ?? throw new ArgumentNullException(nameof(bitacora));
         _unidadDeTrabajo = unidadDeTrabajo ?? throw new ArgumentNullException(nameof(unidadDeTrabajo));
         _reloj = reloj ?? throw new ArgumentNullException(nameof(reloj));
@@ -55,7 +52,7 @@ public sealed class ServicioReporteAnual
 
         var pasajes = await _pasajes.BuscarDelAnioAsync(anio);
         var historia = await _historia.BuscarHistoriaDeAsync(pasajes.Select(pasaje => pasaje.Id).ToList());
-        var usuario = await ObtenerUsuarioAsync();
+        var usuario = _contexto.Usuario;
 
         return new ArchivoProtegido
         {
@@ -81,7 +78,7 @@ public sealed class ServicioReporteAnual
 
         await ValidarAnioAsync(anio);
 
-        var usuario = await ObtenerUsuarioAsync();
+        var usuario = _contexto.Usuario;
         var reporte = new ReporteAnual
         {
             Anio = anio,
@@ -132,8 +129,4 @@ public sealed class ServicioReporteAnual
             throw new ReglaDeNegocioException($"El reporte de {anio} ya se generó.", "anio");
         }
     }
-
-    private async Task<Usuario> ObtenerUsuarioAsync() =>
-        await _usuarios.BuscarPorIdAsync(_contexto.IdUsuario)
-        ?? throw new InvalidOperationException("No se encontró el usuario de la sesión.");
 }

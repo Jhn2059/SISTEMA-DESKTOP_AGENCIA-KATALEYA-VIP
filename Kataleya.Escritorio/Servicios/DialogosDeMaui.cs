@@ -1,6 +1,7 @@
 using Kataleya.Contratos.Configuracion;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Pasajes;
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.CrearCuenta;
 using Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.RestablecerContrasena;
 using Kataleya.Escritorio.Features.Configuracion.TarifasYParametros;

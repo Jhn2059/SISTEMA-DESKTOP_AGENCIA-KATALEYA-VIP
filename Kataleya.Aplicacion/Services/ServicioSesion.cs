@@ -1,5 +1,6 @@
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Session;
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Enums;
 using Kataleya.Dominio.Interfaces;
@@ -14,17 +15,20 @@ public sealed class ServicioSesion
     private readonly ServicioBitacora _servicioBitacora;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
     private readonly IReloj _reloj;
+    private readonly ContextoDeOperacion _contexto;
 
     public ServicioSesion(
         IRepositorioUsuarios repositorioUsuarios,
         ServicioBitacora servicioBitacora,
         IUnidadDeTrabajo unidadDeTrabajo,
-        IReloj reloj)
+        IReloj reloj,
+        ContextoDeOperacion contexto)
     {
         _repositorioUsuarios = repositorioUsuarios ?? throw new ArgumentNullException(nameof(repositorioUsuarios));
         _servicioBitacora = servicioBitacora ?? throw new ArgumentNullException(nameof(servicioBitacora));
         _unidadDeTrabajo = unidadDeTrabajo ?? throw new ArgumentNullException(nameof(unidadDeTrabajo));
         _reloj = reloj ?? throw new ArgumentNullException(nameof(reloj));
+        _contexto = contexto ?? throw new ArgumentNullException(nameof(contexto));
     }
 
     public async Task<ResultadoDeInicioDeSesion> IniciarSesionAsync(string nombreUsuario, string contrasena)
@@ -58,13 +62,13 @@ public sealed class ServicioSesion
         }
 
         usuario.RegistrarAccesoExitoso();
-
-        var acceso = new RegistroDeBitacora(0, ahora, OperacionDeAcceso, usuario);
+        _contexto.Usuario = usuario;
 
         await _unidadDeTrabajo.EjecutarEnTransaccionAsync(async () =>
         {
             await _repositorioUsuarios.ActualizarAsync(usuario);
-            await _servicioBitacora.RegistrarAsync(acceso);
+            await _servicioBitacora.RegistrarAsync(
+                new MovimientoDeBitacora(OperacionDeAcceso, null, null, null));
         });
 
         return new ResultadoDeInicioDeSesion
@@ -72,12 +76,13 @@ public sealed class ServicioSesion
             Cuenta = new DatosDeCuenta
             {
                 Id = usuario.Id,
-                Nombre = usuario.Nombre,
+                NombrePersona = usuario.NombrePersona,
                 NombreUsuario = usuario.NombreUsuario,
                 Rol = usuario.Rol.Nombre,
                 Sede = usuario.Sede.Nombre,
                 Estado = usuario.Estado,
-                FinBloqueo = usuario.FinBloqueo
+                FinBloqueo = usuario.FinBloqueo,
+                PuedeDesactivarse = usuario.PuedeDesactivarse()
             }
         };
     }

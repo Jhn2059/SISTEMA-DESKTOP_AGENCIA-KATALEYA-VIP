@@ -97,7 +97,7 @@ public sealed class ServicioConfiguracion
         tarifa.VigenciaDesde = solicitud.Tipo == TipoDeTarifa.Programada ? solicitud.VigenciaDesde : null;
         tarifa.VigenciaHasta = solicitud.Tipo == TipoDeTarifa.Programada ? solicitud.VigenciaHasta : null;
         tarifa.Sentido = solicitud.Sentido;
-        tarifa.UsuarioId = _contexto.IdUsuario;
+        tarifa.UsuarioId = _contexto.Usuario.Id;
         tarifa.FechaHora = _reloj.Ahora;
 
         await _unidadDeTrabajo.EjecutarEnTransaccionAsync(async () =>
@@ -264,7 +264,7 @@ public sealed class ServicioConfiguracion
         {
             Nombre = nombre,
             Valor = valor,
-            UsuarioId = _contexto.IdUsuario,
+            UsuarioId = _contexto.Usuario.Id,
             FechaHora = _reloj.Ahora
         };
 

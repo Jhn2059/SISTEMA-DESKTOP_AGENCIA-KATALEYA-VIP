@@ -1,6 +1,6 @@
 using Kataleya.Aplicacion.Excepciones;
-using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Session;
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Enums;
 
 namespace Kataleya.Pruebas;
@@ -39,13 +39,12 @@ public sealed class ServicioCuentasPruebas
     public async Task Crear_cuenta_con_nombre_demasiado_largo_devuelve_campo()
     {
         var escenario = new Escenario();
-        var solicitud = Solicitud("vendedor1");
-        solicitud.Nombre = new string('A', 101);
+        var solicitud = Solicitud("vendedor1") with { NombrePersona = new string('A', 101) };
 
         var excepcion = await Assert.ThrowsAsync<ReglaDeNegocioException>(
             () => escenario.Cuentas.CrearCuentaAsync(solicitud));
 
-        Assert.Equal("nombre", excepcion.Campo);
+        Assert.Equal("nombrePersona", excepcion.Campo);
         Assert.Contains("100", excepcion.Message);
     }
 
@@ -115,7 +114,7 @@ public sealed class ServicioCuentasPruebas
         await escenario.Cuentas.DesbloquearAsync(cuenta);
 
         Assert.Equal(EstadoCuenta.Activa, cuenta.Estado);
-        Assert.Equal(0, cuenta.IntentosFallidos);
+        Assert.Equal(0, cuenta.CantidadDeIntentosFallidos);
         Assert.Null(cuenta.FinBloqueo);
     }
 
@@ -204,26 +203,67 @@ public sealed class ServicioCuentasPruebas
         var cuenta = escenario.AgregarUsuario("vendedor1", "Clave1234");
 
         await escenario.Sesion.IniciarSesionAsync("vendedor1", "incorrecta");
-        Assert.Equal(1, cuenta.IntentosFallidos);
+        Assert.Equal(1, cuenta.CantidadDeIntentosFallidos);
 
         var inicio = await escenario.Sesion.IniciarSesionAsync("vendedor1", "Clave1234");
 
         Assert.NotNull(inicio.Cuenta);
-        Assert.Equal(0, cuenta.IntentosFallidos);
+        Assert.Equal(0, cuenta.CantidadDeIntentosFallidos);
         Assert.Contains(
             escenario.Bitacora.Registros,
             registro => registro.Operacion == "Iniciar sesión");
     }
 
+    [Fact]
+    public async Task La_cuenta_principal_no_se_desactiva()
+    {
+        var escenario = new Escenario();
+
+        var excepcion = await Assert.ThrowsAsync<ReglaDeNegocioException>(
+            () => escenario.Cuentas.DesactivarAsync(escenario.Administradora));
+
+        Assert.Equal("La cuenta de la administradora no puede desactivarse.", excepcion.Message);
+        Assert.Equal(EstadoCuenta.Activa, escenario.Administradora.Estado);
+        Assert.Throws<InvalidOperationException>(() => escenario.Administradora.Desactivar());
+    }
+
+    [Fact]
+    public async Task Una_cuenta_nueva_se_puede_desactivar()
+    {
+        var escenario = new Escenario();
+        var cuenta = await escenario.Cuentas.CrearCuentaAsync(Solicitud("vendedor1"));
+
+        Assert.True(cuenta.PuedeDesactivarse());
+
+        await escenario.Cuentas.DesactivarAsync(cuenta);
+
+        Assert.Equal(EstadoCuenta.Desactivada, cuenta.Estado);
+    }
+
+    [Fact]
+    public void EstaBloqueada_solo_pregunta_y_el_intento_siguiente_vuelve_a_contar()
+    {
+        var escenario = new Escenario();
+        var cuenta = escenario.AgregarUsuario("vendedor1", "Clave1234");
+        var ahora = escenario.Reloj.Ahora;
+
+        for (var intento = 0; intento < 5; intento++)
+        {
+            cuenta.RegistrarIntentoFallido(ahora);
+        }
+
+        Assert.True(cuenta.EstaBloqueada(ahora.AddMinutes(2)));
+        Assert.False(cuenta.EstaBloqueada(ahora.AddMinutes(4)));
+        Assert.Equal(EstadoCuenta.Bloqueada, cuenta.Estado);
+
+        cuenta.RegistrarIntentoFallido(ahora.AddMinutes(4));
+
+        Assert.Equal(EstadoCuenta.Activa, cuenta.Estado);
+        Assert.Equal(1, cuenta.CantidadDeIntentosFallidos);
+    }
+
     private static SolicitudDeCuenta Solicitud(
         string nombreUsuario,
         string contrasena = "Clave1234") =>
-        new()
-        {
-            Nombre = "Vendedor Uno",
-            NombreUsuario = nombreUsuario,
-            ContrasenaInicial = contrasena,
-            IdRol = 2,
-            IdSede = 1
-        };
+        new("Vendedor Uno", nombreUsuario, contrasena, IdRol: 2, IdSede: 1);
 }

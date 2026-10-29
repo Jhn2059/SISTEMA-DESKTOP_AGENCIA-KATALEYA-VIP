@@ -1,3 +1,4 @@
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Interfaces;
 using Npgsql;
@@ -27,7 +28,7 @@ public sealed class RepositorioCatalogos : IRepositorioCatalogos
 
         while (await lector.ReadAsync())
         {
-            roles.Add(new Rol(lector.GetInt16(0), lector.GetString(1)));
+            roles.Add(Rol.Reconstruir(new RolGuardado(lector.GetInt16(0), lector.GetString(1))));
         }
 
         return roles;
@@ -48,7 +49,7 @@ public sealed class RepositorioCatalogos : IRepositorioCatalogos
 
         while (await lector.ReadAsync())
         {
-            sedes.Add(new Sede(lector.GetInt16(0), lector.GetString(1)));
+            sedes.Add(Sede.Reconstruir(new SedeGuardada(lector.GetInt16(0), lector.GetString(1))));
         }
 
         return sedes;
@@ -67,7 +68,7 @@ public sealed class RepositorioCatalogos : IRepositorioCatalogos
 
         await using var lector = await comando.ExecuteReaderAsync();
         return await lector.ReadAsync()
-            ? new Rol(lector.GetInt16(0), lector.GetString(1))
+            ? Rol.Reconstruir(new RolGuardado(lector.GetInt16(0), lector.GetString(1)))
             : null;
     }
 
@@ -84,7 +85,7 @@ public sealed class RepositorioCatalogos : IRepositorioCatalogos
 
         await using var lector = await comando.ExecuteReaderAsync();
         return await lector.ReadAsync()
-            ? new Sede(lector.GetInt16(0), lector.GetString(1))
+            ? Sede.Reconstruir(new SedeGuardada(lector.GetInt16(0), lector.GetString(1)))
             : null;
     }
 }

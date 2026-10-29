@@ -1,3 +1,4 @@
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Enums;
 using Kataleya.Dominio.Interfaces;
@@ -10,17 +11,18 @@ public sealed class RepositorioUsuarios : IRepositorioUsuarios
 {
     private const string SeleccionarUsuario = """
         SELECT u.id,
-               u.nombre,
+               u.nombre_persona,
                u.nombre_usuario,
                u.resumen_contrasena,
                u.sal,
                u.estado,
-               u.intentos_fallidos,
+               u.cantidad_intentos_fallidos,
                u.fin_bloqueo,
                r.id,
                r.nombre,
                s.id,
-               s.nombre
+               s.nombre,
+               u.es_cuenta_principal
         FROM usuario u
         INNER JOIN rol r ON r.id = u.rol_id
         INNER JOIN sede s ON s.id = u.sede_id
@@ -105,25 +107,26 @@ public sealed class RepositorioUsuarios : IRepositorioUsuarios
         await using var comando = new NpgsqlCommand(
             """
             INSERT INTO usuario
-                (nombre, nombre_usuario, resumen_contrasena, sal, rol_id, sede_id,
-                 estado, intentos_fallidos, fin_bloqueo)
+                (nombre_persona, nombre_usuario, resumen_contrasena, sal, rol_id, sede_id,
+                 estado, cantidad_intentos_fallidos, fin_bloqueo)
             VALUES
-                (@nombre, @nombre_usuario, @resumen_contrasena, @sal, @rol_id, @sede_id,
-                 @estado, @intentos_fallidos, @fin_bloqueo)
+                (@nombre_persona, @nombre_usuario, @resumen_contrasena, @sal, @rol_id, @sede_id,
+                 @estado, @cantidad_intentos_fallidos, @fin_bloqueo)
             """,
             conexion)
         {
             Transaction = _contexto.TransaccionActual
         };
 
-        comando.Parameters.Add("nombre", NpgsqlDbType.Varchar).Value = usuario.Nombre;
+        comando.Parameters.Add("nombre_persona", NpgsqlDbType.Varchar).Value = usuario.NombrePersona;
         comando.Parameters.Add("nombre_usuario", NpgsqlDbType.Varchar).Value = usuario.NombreUsuario;
         comando.Parameters.Add("resumen_contrasena", NpgsqlDbType.Text).Value = usuario.ResumenContrasena;
         comando.Parameters.Add("sal", NpgsqlDbType.Text).Value = usuario.Sal;
         comando.Parameters.Add("rol_id", NpgsqlDbType.Smallint).Value = usuario.Rol.Id;
         comando.Parameters.Add("sede_id", NpgsqlDbType.Smallint).Value = usuario.Sede.Id;
         comando.Parameters.Add("estado", NpgsqlDbType.Varchar).Value = usuario.Estado.ToString();
-        comando.Parameters.Add("intentos_fallidos", NpgsqlDbType.Smallint).Value = usuario.IntentosFallidos;
+        comando.Parameters.Add("cantidad_intentos_fallidos", NpgsqlDbType.Smallint).Value =
+            (short)usuario.CantidadDeIntentosFallidos;
         comando.Parameters.Add("fin_bloqueo", NpgsqlDbType.TimestampTz).Value =
             usuario.FinBloqueo is null ? DBNull.Value : usuario.FinBloqueo.Value;
 
@@ -138,14 +141,14 @@ public sealed class RepositorioUsuarios : IRepositorioUsuarios
         await using var comando = new NpgsqlCommand(
             """
             UPDATE usuario
-            SET nombre = @nombre,
+            SET nombre_persona = @nombre_persona,
                 nombre_usuario = @nombre_usuario,
                 resumen_contrasena = @resumen_contrasena,
                 sal = @sal,
                 rol_id = @rol_id,
                 sede_id = @sede_id,
                 estado = @estado,
-                intentos_fallidos = @intentos_fallidos,
+                cantidad_intentos_fallidos = @cantidad_intentos_fallidos,
                 fin_bloqueo = @fin_bloqueo
             WHERE id = @id
             """,
@@ -154,14 +157,15 @@ public sealed class RepositorioUsuarios : IRepositorioUsuarios
             Transaction = _contexto.TransaccionActual
         };
 
-        comando.Parameters.Add("nombre", NpgsqlDbType.Varchar).Value = usuario.Nombre;
+        comando.Parameters.Add("nombre_persona", NpgsqlDbType.Varchar).Value = usuario.NombrePersona;
         comando.Parameters.Add("nombre_usuario", NpgsqlDbType.Varchar).Value = usuario.NombreUsuario;
         comando.Parameters.Add("resumen_contrasena", NpgsqlDbType.Text).Value = usuario.ResumenContrasena;
         comando.Parameters.Add("sal", NpgsqlDbType.Text).Value = usuario.Sal;
         comando.Parameters.Add("rol_id", NpgsqlDbType.Smallint).Value = usuario.Rol.Id;
         comando.Parameters.Add("sede_id", NpgsqlDbType.Smallint).Value = usuario.Sede.Id;
         comando.Parameters.Add("estado", NpgsqlDbType.Varchar).Value = usuario.Estado.ToString();
-        comando.Parameters.Add("intentos_fallidos", NpgsqlDbType.Smallint).Value = usuario.IntentosFallidos;
+        comando.Parameters.Add("cantidad_intentos_fallidos", NpgsqlDbType.Smallint).Value =
+            (short)usuario.CantidadDeIntentosFallidos;
         comando.Parameters.Add("fin_bloqueo", NpgsqlDbType.TimestampTz).Value =
             usuario.FinBloqueo is null ? DBNull.Value : usuario.FinBloqueo.Value;
         comando.Parameters.Add("id", NpgsqlDbType.Integer).Value = usuario.Id;
@@ -173,22 +177,17 @@ public sealed class RepositorioUsuarios : IRepositorioUsuarios
         }
     }
 
-    private static Usuario LeerUsuario(NpgsqlDataReader lector)
-    {
-        var finBloqueo = lector.IsDBNull(7) ? (DateTime?)null : lector.GetDateTime(7).ToUniversalTime();
-        var rol = new Rol(lector.GetInt16(8), lector.GetString(9));
-        var sede = new Sede(lector.GetInt16(10), lector.GetString(11));
-
-        return new Usuario(
-            lector.GetInt32(0),
-            lector.GetString(1),
-            lector.GetString(2),
-            lector.GetString(3),
-            lector.GetString(4),
-            Enum.Parse<EstadoCuenta>(lector.GetString(5)),
-            lector.GetInt16(6),
-            finBloqueo,
-            rol,
-            sede);
-    }
+    private static Usuario LeerUsuario(NpgsqlDataReader lector) =>
+        Usuario.Reconstruir(new UsuarioGuardado(
+            Id: lector.GetInt32(0),
+            NombrePersona: lector.GetString(1),
+            NombreUsuario: lector.GetString(2),
+            ResumenContrasena: lector.GetString(3),
+            Sal: lector.GetString(4),
+            EsCuentaPrincipal: lector.GetBoolean(12),
+            Rol: new RolGuardado(lector.GetInt16(8), lector.GetString(9)),
+            Sede: new SedeGuardada(lector.GetInt16(10), lector.GetString(11)),
+            Estado: Enum.Parse<EstadoCuenta>(lector.GetString(5)),
+            CantidadDeIntentosFallidos: lector.GetInt16(6),
+            FinBloqueo: lector.IsDBNull(7) ? null : lector.GetDateTime(7).ToUniversalTime()));
 }

@@ -38,7 +38,7 @@ public partial class PanelPrincipalViewModel : ObservableObject
         _registroTecnico = registroTecnico ?? throw new ArgumentNullException(nameof(registroTecnico));
     }
 
-    public string Nombre => _cliente.CuentaActual?.Nombre ?? string.Empty;
+    public string Nombre => _cliente.CuentaActual?.NombrePersona ?? string.Empty;
 
     public string Rol => _cliente.CuentaActual?.Rol ?? string.Empty;
 

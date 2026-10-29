@@ -1,15 +1,31 @@
+using Kataleya.Dominio.DataObjects;
+
 namespace Kataleya.Dominio.Entities;
 
 public sealed class Rol
 {
-    public Rol(short id, string nombre)
+    public Rol(string nombre)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(nombre);
-        Id = id;
-        Nombre = nombre;
+        Nombre = nombre.Trim();
     }
 
-    public short Id { get; }
+    private Rol()
+    {
+    }
 
-    public string Nombre { get; }
+    public short Id { get; private set; }
+
+    public string Nombre { get; private set; } = string.Empty;
+
+    public static Rol Reconstruir(RolGuardado guardado)
+    {
+        ArgumentNullException.ThrowIfNull(guardado);
+
+        return new Rol
+        {
+            Id = guardado.Id,
+            Nombre = guardado.Nombre
+        };
+    }
 }

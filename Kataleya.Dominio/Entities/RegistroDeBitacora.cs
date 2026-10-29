@@ -1,33 +1,22 @@
+using Kataleya.Dominio.DataObjects;
+
 namespace Kataleya.Dominio.Entities;
 
+// La fecha y hora la pone la base al guardar (IS-BD-07).
 public sealed class RegistroDeBitacora
 {
-    public RegistroDeBitacora(
-        long id,
-        DateTime fechaHora,
-        string operacion,
-        Usuario usuario,
-        string? valorAnterior = null,
-        string? valorNuevo = null,
-        Guid? claveDeOperacion = null,
-        long? pasajeId = null)
+    public RegistroDeBitacora(MovimientoDeBitacora movimiento, Usuario usuario, Guid? claveDeOperacion)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(operacion);
-        ArgumentNullException.ThrowIfNull(usuario);
+        ArgumentNullException.ThrowIfNull(movimiento);
+        ArgumentException.ThrowIfNullOrWhiteSpace(movimiento.Operacion);
 
-        Id = id;
-        FechaHora = fechaHora;
-        Operacion = operacion;
-        Usuario = usuario;
-        ValorAnterior = valorAnterior;
-        ValorNuevo = valorNuevo;
+        Operacion = movimiento.Operacion;
+        PasajeId = movimiento.IdPasaje;
+        ValorAnterior = movimiento.ValorAnterior;
+        ValorNuevo = movimiento.ValorNuevo;
+        Usuario = usuario ?? throw new ArgumentNullException(nameof(usuario));
         ClaveDeOperacion = claveDeOperacion;
-        PasajeId = pasajeId;
     }
-
-    public long Id { get; }
-
-    public DateTime FechaHora { get; }
 
     public string Operacion { get; }
 
@@ -37,10 +26,7 @@ public sealed class RegistroDeBitacora
 
     public string? ValorNuevo { get; }
 
-    public Guid? ClaveDeOperacion { get; private set; }
+    public Guid? ClaveDeOperacion { get; }
 
     public long? PasajeId { get; }
-
-    public void FijarClaveDeOperacion(Guid? clave) =>
-        ClaveDeOperacion = clave;
 }

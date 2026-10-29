@@ -164,10 +164,10 @@ public partial class CuentasDeUsuarioViewModel : ObservableObject
         }
 
         var confirmado = await _dialogos.ConfirmarAsync(
-            "Desactivar cuenta",
-            $"¿Desactivar la cuenta {cuenta.NombreUsuario}? No podrá ingresar hasta que la reactiven.",
-            "Sí",
-            "No");
+            $"¿Desactivar la cuenta {cuenta.NombreUsuario}?",
+            "No podrá ingresar hasta que la reactiven.",
+            "Sí, desactivar",
+            "No, volver");
 
         if (!confirmado)
         {

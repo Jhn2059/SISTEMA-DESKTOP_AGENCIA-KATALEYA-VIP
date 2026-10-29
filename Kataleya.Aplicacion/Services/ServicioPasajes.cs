@@ -12,7 +12,6 @@ public sealed class ServicioPasajes
 {
     private readonly IRepositorioPasajes _pasajes;
     private readonly IRepositorioUnidades _unidades;
-    private readonly IRepositorioUsuarios _usuarios;
     private readonly IRepositorioConfiguracion _configuracion;
     private readonly ServicioConfiguracion _servicioConfiguracion;
     private readonly ServicioBitacora _bitacora;
@@ -21,12 +20,9 @@ public sealed class ServicioPasajes
     private readonly IReloj _reloj;
     private readonly ContextoDeOperacion _contexto;
 
-    private Usuario? _emisor;
-
     public ServicioPasajes(
         IRepositorioPasajes pasajes,
         IRepositorioUnidades unidades,
-        IRepositorioUsuarios usuarios,
         IRepositorioConfiguracion configuracion,
         ServicioConfiguracion servicioConfiguracion,
         ServicioBitacora bitacora,
@@ -37,7 +33,6 @@ public sealed class ServicioPasajes
     {
         _pasajes = pasajes ?? throw new ArgumentNullException(nameof(pasajes));
         _unidades = unidades ?? throw new ArgumentNullException(nameof(unidades));
-        _usuarios = usuarios ?? throw new ArgumentNullException(nameof(usuarios));
         _configuracion = configuracion ?? throw new ArgumentNullException(nameof(configuracion));
         _servicioConfiguracion = servicioConfiguracion ?? throw new ArgumentNullException(nameof(servicioConfiguracion));
         _bitacora = bitacora ?? throw new ArgumentNullException(nameof(bitacora));
@@ -55,7 +50,7 @@ public sealed class ServicioPasajes
             return repetida;
         }
 
-        var emisor = await ObtenerEmisorAsync();
+        var emisor = _contexto.Usuario;
         var preparado = await PrepararAsync(solicitud, emisor, permitirPasado: false);
         var monto = solicitud.Monto ?? 0m;
 
@@ -113,7 +108,7 @@ public sealed class ServicioPasajes
             return repetida;
         }
 
-        var emisor = await ObtenerEmisorAsync();
+        var emisor = _contexto.Usuario;
         var preparado = await PrepararAsync(solicitud, emisor, permitirPasado: false);
         var monto = solicitud.Monto ?? preparado.Importe;
 
@@ -195,7 +190,7 @@ public sealed class ServicioPasajes
                 "horaEmisionReal");
         }
 
-        var emisor = await ObtenerEmisorAsync();
+        var emisor = _contexto.Usuario;
         var preparado = await PrepararAsync(solicitud, emisor, permitirPasado: true);
         var monto = solicitud.Monto ?? preparado.Importe;
 
@@ -337,7 +332,7 @@ public sealed class ServicioPasajes
                 "monto");
         }
 
-        var emisor = await ObtenerEmisorAsync();
+        var emisor = _contexto.Usuario;
         var estado = CalcularEstado(monto, solicitud.PrecioAcordado);
         Grupo? creado = null;
         long responsableId = 0;
@@ -469,7 +464,7 @@ public sealed class ServicioPasajes
                 "estado");
         }
 
-        var emisor = await ObtenerEmisorAsync();
+        var emisor = _contexto.Usuario;
         var grupo = pasaje.GrupoId is null ? null : await _pasajes.BuscarGrupoAsync(pasaje.GrupoId.Value);
         var importe = grupo?.PrecioAcordado ?? pasaje.Importe;
         var pagado = await _pasajes.TotalPagadoAsync(grupo is null ? pasaje.Id : null, grupo?.Id);
@@ -600,7 +595,7 @@ public sealed class ServicioPasajes
             throw new ReglaDeNegocioException("El pasaje ya está anulado.", "estado");
         }
 
-        var emisor = await ObtenerEmisorAsync();
+        var emisor = _contexto.Usuario;
         var grupo = pasaje.GrupoId is null ? null : await _pasajes.BuscarGrupoAsync(pasaje.GrupoId.Value);
         var pagado = await _pasajes.TotalPagadoAsync(grupo is null ? pasaje.Id : null, grupo?.Id);
         var horas = (FechasLocales.Combinar(pasaje.FechaSalida, pasaje.HoraSalida) - _reloj.Ahora).TotalHours;
@@ -670,7 +665,7 @@ public sealed class ServicioPasajes
                 "salida");
         }
 
-        var emisor = await ObtenerEmisorAsync();
+        var emisor = _contexto.Usuario;
 
         await _unidadDeTrabajo.EjecutarEnTransaccionAsync(async () =>
         {
@@ -722,7 +717,7 @@ public sealed class ServicioPasajes
                 "estado");
         }
 
-        var emisor = await ObtenerEmisorAsync();
+        var emisor = _contexto.Usuario;
         var anterior = JsonSerializer.Serialize(new
         {
             pasaje.PasajeroNombre,
@@ -882,7 +877,7 @@ public sealed class ServicioPasajes
                 "No se encontró el boleto indicado.",
                 "boleto");
 
-        var emisor = await ObtenerEmisorAsync();
+        var emisor = _contexto.Usuario;
 
         await _unidadDeTrabajo.EjecutarEnTransaccionAsync(async () =>
         {
@@ -1128,19 +1123,6 @@ public sealed class ServicioPasajes
     private async Task<Pasaje> ObtenerEntidadAsync(long id) =>
         await _pasajes.BuscarPorIdAsync(id)
         ?? throw new ReglaDeNegocioException("El pasaje ya no existe.", "id");
-
-    private async Task<Usuario> ObtenerEmisorAsync()
-    {
-        if (_emisor is not null)
-        {
-            return _emisor;
-        }
-
-        _emisor = await _usuarios.BuscarPorIdAsync(_contexto.IdUsuario)
-            ?? throw new InvalidOperationException("No se encontró el usuario de la sesión.");
-
-        return _emisor;
-    }
 
     public Task<int> ContarPasajesDelHorarioAsync(TimeOnly hora) =>
         _pasajes.ContarDelHorarioAsync(hora, FechasLocales.EnHoraDePeru(_reloj.Ahora));

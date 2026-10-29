@@ -51,7 +51,7 @@ public sealed class MiddlewareDeSesion
             return;
         }
 
-        operacion.IdUsuario = usuario.Id;
+        operacion.Usuario = usuario;
 
         if (contexto.Request.Headers.TryGetValue("Idempotency-Key", out var valor) &&
             Guid.TryParse(valor.ToString(), out var clave))

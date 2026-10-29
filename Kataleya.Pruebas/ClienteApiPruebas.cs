@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using Kataleya.Cliente;
 using Kataleya.Contratos.Cuentas;
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Interfaces;
 
 namespace Kataleya.Pruebas;
@@ -229,14 +230,7 @@ public sealed class ClienteApiPruebas
     }
 
     private static SolicitudDeCuenta Solicitud(string nombreUsuario) =>
-        new()
-        {
-            Nombre = "Vendedor Uno",
-            NombreUsuario = nombreUsuario,
-            ContrasenaInicial = "Clave1234",
-            IdRol = 2,
-            IdSede = 1
-        };
+        new("Vendedor Uno", nombreUsuario, "Clave1234", IdRol: 2, IdSede: 1);
 
     private sealed class RegistroTecnicoFalso : IRegistroTecnico
     {

@@ -1,4 +1,5 @@
 using Kataleya.Aplicacion;
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Interfaces;
 
@@ -17,16 +18,15 @@ public sealed class ServicioBitacora
         _contexto = contexto ?? throw new ArgumentNullException(nameof(contexto));
     }
 
-    public Task RegistrarAsync(RegistroDeBitacora registro)
+    // El autor y la clave salen del contexto de la operación; la fecha la pone la base.
+    public Task RegistrarAsync(MovimientoDeBitacora movimiento)
     {
-        ArgumentNullException.ThrowIfNull(registro);
+        ArgumentNullException.ThrowIfNull(movimiento);
 
-        if (registro.ClaveDeOperacion is null && _contexto.ClaveDeOperacion is not null)
-        {
-            registro.FijarClaveDeOperacion(_contexto.ClaveDeOperacion);
-        }
-
-        return _repositorio.AgregarAsync(registro);
+        return _repositorio.AgregarAsync(new RegistroDeBitacora(
+            movimiento,
+            _contexto.Usuario,
+            _contexto.ClaveDeOperacion));
     }
 
     public Task<bool> ExisteAsync(Guid clave) =>

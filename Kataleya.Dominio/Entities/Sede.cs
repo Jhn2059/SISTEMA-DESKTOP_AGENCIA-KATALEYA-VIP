@@ -1,15 +1,31 @@
+using Kataleya.Dominio.DataObjects;
+
 namespace Kataleya.Dominio.Entities;
 
 public sealed class Sede
 {
-    public Sede(short id, string nombre)
+    public Sede(string nombre)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(nombre);
-        Id = id;
-        Nombre = nombre;
+        Nombre = nombre.Trim();
     }
 
-    public short Id { get; }
+    private Sede()
+    {
+    }
 
-    public string Nombre { get; }
+    public short Id { get; private set; }
+
+    public string Nombre { get; private set; } = string.Empty;
+
+    public static Sede Reconstruir(SedeGuardada guardado)
+    {
+        ArgumentNullException.ThrowIfNull(guardado);
+
+        return new Sede
+        {
+            Id = guardado.Id,
+            Nombre = guardado.Nombre
+        };
+    }
 }

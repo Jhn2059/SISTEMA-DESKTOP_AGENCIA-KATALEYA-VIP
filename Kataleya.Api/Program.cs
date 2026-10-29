@@ -11,6 +11,7 @@ using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Session;
 using Kataleya.Datos;
 using Kataleya.Datos.Repositories;
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Interfaces;
 using Microsoft.AspNetCore.Diagnostics;
@@ -68,6 +69,7 @@ builder.Services.AddScoped<ServicioBitacora>();
 builder.Services.AddScoped<RegistradorDeBitacora>();
 builder.Services.AddScoped<ServicioSesion>();
 builder.Services.AddScoped<ServicioCuentas>();
+builder.Services.AddScoped<ServicioCatalogos>();
 builder.Services.AddScoped<ServicioConfiguracion>();
 builder.Services.AddScoped<ServicioInventario>();
 builder.Services.AddScoped<ServicioPasajes>();
@@ -254,7 +256,7 @@ cuentas.MapPut("/{id:int}/contrasena", async (
 var roles = app.MapGroup("/roles")
     .AddEndpointFilter<FiltroDeAdministrador>();
 
-roles.MapGet("", async (IRepositorioCatalogos catalogos) =>
+roles.MapGet("", async (ServicioCatalogos catalogos) =>
 {
     var lista = await catalogos.ListarRolesAsync();
     return Results.Ok(lista.Select(MapearRol).ToList());
@@ -263,7 +265,7 @@ roles.MapGet("", async (IRepositorioCatalogos catalogos) =>
 var sedes = app.MapGroup("/sedes")
     .AddEndpointFilter<FiltroDeAdministrador>();
 
-sedes.MapGet("", async (IRepositorioCatalogos catalogos) =>
+sedes.MapGet("", async (ServicioCatalogos catalogos) =>
 {
     var lista = await catalogos.ListarSedesAsync();
     return Results.Ok(lista.Select(MapearSede).ToList());
@@ -523,13 +525,13 @@ static Dictionary<string, string[]> ValidarCuenta(SolicitudDeCuenta solicitud)
 {
     var errores = new Dictionary<string, string[]>();
 
-    if (string.IsNullOrWhiteSpace(solicitud.Nombre))
+    if (string.IsNullOrWhiteSpace(solicitud.NombrePersona))
     {
-        errores["nombre"] = ["Escriba el nombre."];
+        errores["nombrePersona"] = ["Escriba el nombre."];
     }
-    else if (solicitud.Nombre.Trim().Length > Usuario.LongitudMaximaDelNombre)
+    else if (solicitud.NombrePersona.Trim().Length > Usuario.LongitudMaximaDelNombre)
     {
-        errores["nombre"] =
+        errores["nombrePersona"] =
             [$"El nombre no puede superar los {Usuario.LongitudMaximaDelNombre} caracteres."];
     }
 
@@ -577,12 +579,13 @@ static DatosDeCuenta MapearCuenta(Usuario usuario) =>
     new()
     {
         Id = usuario.Id,
-        Nombre = usuario.Nombre,
+        NombrePersona = usuario.NombrePersona,
         NombreUsuario = usuario.NombreUsuario,
         Rol = usuario.Rol.Nombre,
         Sede = usuario.Sede.Nombre,
         Estado = usuario.Estado,
-        FinBloqueo = usuario.FinBloqueo
+        FinBloqueo = usuario.FinBloqueo,
+        PuedeDesactivarse = usuario.PuedeDesactivarse()
     };
 
 static DatosDeRol MapearRol(Rol rol) =>

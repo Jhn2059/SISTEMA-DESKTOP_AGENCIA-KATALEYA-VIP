@@ -759,11 +759,7 @@ public sealed class ClienteApi
         }
 
         var errores = problema?.Errors?
-            .SelectMany(campo => campo.Value.Select(mensaje => new ErrorDeCampo
-            {
-                Campo = campo.Key,
-                Mensaje = mensaje
-            }))
+            .SelectMany(campo => campo.Value.Select(mensaje => new ErrorDeCampo(campo.Key, mensaje)))
             .ToList() ?? [];
 
         return new ResultadoDeLaApi<T>

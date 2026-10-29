@@ -20,9 +20,9 @@ public sealed class RepositorioBitacora : IRepositorioBitacora
         await using var comando = new NpgsqlCommand(
             """
             INSERT INTO registro_bitacora
-                (usuario_id, fecha_hora, operacion, pasaje_id, valor_anterior, valor_nuevo, clave_de_operacion)
+                (usuario_id, operacion, pasaje_id, valor_anterior, valor_nuevo, clave_de_operacion)
             VALUES
-                (@usuario_id, @fecha_hora, @operacion, @pasaje_id, @valor_anterior, @valor_nuevo, @clave_de_operacion)
+                (@usuario_id, @operacion, @pasaje_id, @valor_anterior, @valor_nuevo, @clave_de_operacion)
             """,
             conexion)
         {
@@ -30,7 +30,6 @@ public sealed class RepositorioBitacora : IRepositorioBitacora
         };
 
         comando.Parameters.Add("usuario_id", NpgsqlDbType.Integer).Value = registro.Usuario.Id;
-        comando.Parameters.Add("fecha_hora", NpgsqlDbType.TimestampTz).Value = registro.FechaHora;
         comando.Parameters.Add("operacion", NpgsqlDbType.Varchar).Value = registro.Operacion;
         comando.Parameters.Add("pasaje_id", NpgsqlDbType.Bigint).Value =
             registro.PasajeId is null ? DBNull.Value : registro.PasajeId.Value;

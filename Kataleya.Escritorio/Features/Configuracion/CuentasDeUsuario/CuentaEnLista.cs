@@ -13,7 +13,7 @@ public partial class CuentaEnLista : ObservableObject
 
     public int Id => Cuenta.Id;
 
-    public string Nombre => Cuenta.Nombre;
+    public string NombrePersona => Cuenta.NombrePersona;
 
     public string NombreUsuario => Cuenta.NombreUsuario;
 
@@ -51,8 +51,8 @@ public partial class CuentaEnLista : ObservableObject
         }
     }
 
-    public bool EsAdministradora =>
-        Cuenta.NombreUsuario.Equals("admin", StringComparison.OrdinalIgnoreCase);
+    // La cuenta principal, la de la administradora, no puede desactivarse (RF-28).
+    public bool EsAdministradora => !Cuenta.PuedeDesactivarse;
 
     public bool MostrarDesactivar => Cuenta.Estado != EstadoCuenta.Desactivada;
 

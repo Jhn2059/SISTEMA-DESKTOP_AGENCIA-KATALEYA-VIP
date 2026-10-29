@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Kataleya.Contratos.Cuentas;
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Escritorio.Servicios;
 
 namespace Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.CrearCuenta;
@@ -64,7 +65,7 @@ public partial class DialogoDeCuentaViewModel : ObservableObject
         Roles = roles ?? throw new ArgumentNullException(nameof(roles));
         Sedes = sedes ?? throw new ArgumentNullException(nameof(sedes));
 
-        Nombre = anterior?.Nombre ?? string.Empty;
+        Nombre = anterior?.NombrePersona ?? string.Empty;
         NombreUsuario = anterior?.NombreUsuario ?? string.Empty;
         Contrasena = anterior?.ContrasenaInicial ?? string.Empty;
         RolSeleccionado = anterior is null
@@ -87,7 +88,7 @@ public partial class DialogoDeCuentaViewModel : ObservableObject
 
         if (string.IsNullOrWhiteSpace(Nombre))
         {
-            errores["nombre"] = "Escriba el nombre completo.";
+            errores["nombrePersona"] = "Escriba el nombre completo.";
         }
 
         if (string.IsNullOrWhiteSpace(NombreUsuario))
@@ -120,14 +121,12 @@ public partial class DialogoDeCuentaViewModel : ObservableObject
             return;
         }
 
-        var solicitud = new SolicitudDeCuenta
-        {
-            Nombre = Nombre.Trim(),
-            NombreUsuario = NombreUsuario.Trim(),
-            ContrasenaInicial = Contrasena,
-            IdRol = RolSeleccionado!.Id,
-            IdSede = SedeSeleccionada!.Id
-        };
+        var solicitud = new SolicitudDeCuenta(
+            Nombre.Trim(),
+            NombreUsuario.Trim(),
+            Contrasena,
+            RolSeleccionado!.Id,
+            SedeSeleccionada!.Id);
 
         _resultado.TrySetResult(solicitud);
         await _navegacion.CerrarModalAsync();
@@ -156,7 +155,7 @@ public partial class DialogoDeCuentaViewModel : ObservableObject
 
     private void AplicarErrores(IReadOnlyDictionary<string, string>? errores)
     {
-        ErrorNombre = ObtenerError(errores, "nombre");
+        ErrorNombre = ObtenerError(errores, "nombrePersona");
         ErrorNombreUsuario = ObtenerError(errores, "nombreUsuario");
         ErrorContrasena = ObtenerError(errores, "contrasenaInicial");
         ErrorRol = ObtenerError(errores, "idRol");
@@ -164,7 +163,7 @@ public partial class DialogoDeCuentaViewModel : ObservableObject
 
         var conocidos = new[]
         {
-            "nombre", "nombreUsuario", "contrasenaInicial", "idRol", "idSede"
+            "nombrePersona", "nombreUsuario", "contrasenaInicial", "idRol", "idSede"
         };
 
         ErrorGeneral = errores is null

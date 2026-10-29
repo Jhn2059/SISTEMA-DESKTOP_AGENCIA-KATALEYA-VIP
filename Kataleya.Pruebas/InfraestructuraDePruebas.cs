@@ -1,5 +1,6 @@
 using Kataleya.Aplicacion;
 using Kataleya.Aplicacion.Services;
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Enums;
 using Kataleya.Dominio.Interfaces;
@@ -33,17 +34,18 @@ internal sealed class RepositorioUsuariosFalso : IRepositorioUsuarios
     {
         var siguienteId = _usuarios.Count == 0 ? 1 : _usuarios.Max(item => item.Id) + 1;
 
-        _usuarios.Add(new Usuario(
+        _usuarios.Add(Usuario.Reconstruir(new UsuarioGuardado(
             siguienteId,
-            usuario.Nombre,
+            usuario.NombrePersona,
             usuario.NombreUsuario,
             usuario.ResumenContrasena,
             usuario.Sal,
+            usuario.EsCuentaPrincipal,
+            new RolGuardado(usuario.Rol.Id, usuario.Rol.Nombre),
+            new SedeGuardada(usuario.Sede.Id, usuario.Sede.Nombre),
             usuario.Estado,
-            usuario.IntentosFallidos,
-            usuario.FinBloqueo,
-            usuario.Rol,
-            usuario.Sede));
+            usuario.CantidadDeIntentosFallidos,
+            usuario.FinBloqueo)));
 
         return Task.CompletedTask;
     }
@@ -56,13 +58,13 @@ internal sealed class RepositorioCatalogosFalso : IRepositorioCatalogos
 {
     public List<Rol> Roles { get; } =
     [
-        new(1, "Administrador"),
-        new(2, "Vendedor")
+        Rol.Reconstruir(new RolGuardado(1, "Administrador")),
+        Rol.Reconstruir(new RolGuardado(2, "Vendedor"))
     ];
 
     public List<Sede> Sedes { get; } =
     [
-        new(1, "Central")
+        Sede.Reconstruir(new SedeGuardada(1, "Central"))
     ];
 
     public Task<IReadOnlyList<Rol>> ListarRolesAsync() =>
@@ -116,11 +118,11 @@ internal sealed class RepositorioBitacoraFalso : IRepositorioBitacora
         return Task.CompletedTask;
     }
 
-    private static EntradaDeBitacora CrearEntrada(RegistroDeBitacora registro) =>
+    private EntradaDeBitacora CrearEntrada(RegistroDeBitacora registro) =>
         new()
         {
-            Id = registro.Id,
-            FechaHora = registro.FechaHora,
+            Id = Registros.IndexOf(registro) + 1,
+            FechaHora = DateTime.UtcNow,
             UsuarioNombre = registro.Usuario.NombreUsuario,
             Operacion = registro.Operacion,
             PasajeId = registro.PasajeId,
@@ -153,20 +155,8 @@ internal sealed class Escenario
         Catalogos = new RepositorioCatalogosFalso();
         Bitacora = new RepositorioBitacoraFalso();
 
-        Administradora = new Usuario(
-            1,
-            "Administradora",
-            "admin",
-            string.Empty,
-            string.Empty,
-            EstadoCuenta.Activa,
-            0,
-            null,
-            Catalogos.Roles[0],
-            Catalogos.Sedes[0]);
-        Administradora.FijarContrasena("Admin1234");
-        Usuarios.Sembrar(Administradora);
-        Contexto.IdUsuario = Administradora.Id;
+        Administradora = Sembrar(1, "admin", "Admin1234", EstadoCuenta.Activa, esCuentaPrincipal: true, rol: 0);
+        Contexto.Usuario = Administradora;
 
         var servicioBitacora = new ServicioBitacora(Bitacora, Contexto);
         var unidad = new UnidadDeTrabajoFalsa();
@@ -176,9 +166,8 @@ internal sealed class Escenario
             Catalogos,
             servicioBitacora,
             unidad,
-            Reloj,
             Contexto);
-        Sesion = new ServicioSesion(Usuarios, servicioBitacora, unidad, Reloj);
+        Sesion = new ServicioSesion(Usuarios, servicioBitacora, unidad, Reloj, new ContextoDeOperacion());
     }
 
     public RelojFalso Reloj { get; }
@@ -206,17 +195,29 @@ internal sealed class Escenario
             ? 1
             : Usuarios.Todos.Max(usuario => usuario.Id) + 1;
 
-        var usuario = new Usuario(
-            siguienteId,
+        return Sembrar(siguienteId, nombreUsuario, contrasena, estado, esCuentaPrincipal: false, rol: 1);
+    }
+
+    private Usuario Sembrar(
+        int id,
+        string nombreUsuario,
+        string contrasena,
+        EstadoCuenta estado,
+        bool esCuentaPrincipal,
+        int rol)
+    {
+        var usuario = Usuario.Reconstruir(new UsuarioGuardado(
+            id,
             $"Persona {nombreUsuario}",
             nombreUsuario,
             string.Empty,
             string.Empty,
+            esCuentaPrincipal,
+            new RolGuardado(Catalogos.Roles[rol].Id, Catalogos.Roles[rol].Nombre),
+            new SedeGuardada(Catalogos.Sedes[0].Id, Catalogos.Sedes[0].Nombre),
             estado,
             0,
-            null,
-            Catalogos.Roles[1],
-            Catalogos.Sedes[0]);
+            null));
         usuario.FijarContrasena(contrasena);
         Usuarios.Sembrar(usuario);
         return usuario;

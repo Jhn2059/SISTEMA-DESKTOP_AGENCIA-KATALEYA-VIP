@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Kataleya.Aplicacion;
 using Kataleya.Aplicacion.Excepciones;
-using Kataleya.Contratos.Cuentas;
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Enums;
 using Kataleya.Dominio.Interfaces;
@@ -10,8 +10,6 @@ namespace Kataleya.Aplicacion.Services;
 
 public sealed class ServicioCuentas
 {
-    public const string NombreDeLaAdministradora = "admin";
-
     private const string OperacionCrear = "Crear cuenta";
     private const string OperacionDesactivar = "Desactivar cuenta";
     private const string OperacionReactivar = "Reactivar cuenta";
@@ -22,7 +20,6 @@ public sealed class ServicioCuentas
     private readonly IRepositorioCatalogos _catalogos;
     private readonly ServicioBitacora _bitacora;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
-    private readonly IReloj _reloj;
     private readonly ContextoDeOperacion _contexto;
 
     public ServicioCuentas(
@@ -30,14 +27,12 @@ public sealed class ServicioCuentas
         IRepositorioCatalogos catalogos,
         ServicioBitacora bitacora,
         IUnidadDeTrabajo unidadDeTrabajo,
-        IReloj reloj,
         ContextoDeOperacion contexto)
     {
         _usuarios = usuarios ?? throw new ArgumentNullException(nameof(usuarios));
         _catalogos = catalogos ?? throw new ArgumentNullException(nameof(catalogos));
         _bitacora = bitacora ?? throw new ArgumentNullException(nameof(bitacora));
         _unidadDeTrabajo = unidadDeTrabajo ?? throw new ArgumentNullException(nameof(unidadDeTrabajo));
-        _reloj = reloj ?? throw new ArgumentNullException(nameof(reloj));
         _contexto = contexto ?? throw new ArgumentNullException(nameof(contexto));
     }
 
@@ -51,12 +46,12 @@ public sealed class ServicioCuentas
     {
         ArgumentNullException.ThrowIfNull(solicitud);
 
-        var nombre = solicitud.Nombre.Trim();
+        var nombrePersona = solicitud.NombrePersona.Trim();
         var nombreUsuario = solicitud.NombreUsuario.Trim();
 
-        if (string.IsNullOrWhiteSpace(nombre))
+        if (string.IsNullOrWhiteSpace(nombrePersona))
         {
-            throw new ReglaDeNegocioException("Escriba el nombre.", "nombre");
+            throw new ReglaDeNegocioException("Escriba el nombre.", "nombrePersona");
         }
 
         if (string.IsNullOrWhiteSpace(nombreUsuario))
@@ -64,11 +59,11 @@ public sealed class ServicioCuentas
             throw new ReglaDeNegocioException("Escriba el nombre de usuario.", "nombreUsuario");
         }
 
-        if (nombre.Length > Usuario.LongitudMaximaDelNombre)
+        if (nombrePersona.Length > Usuario.LongitudMaximaDelNombre)
         {
             throw new ReglaDeNegocioException(
                 $"El nombre no puede superar los {Usuario.LongitudMaximaDelNombre} caracteres.",
-                "nombre");
+                "nombrePersona");
         }
 
         if (nombreUsuario.Length > Usuario.LongitudMaximaDelNombreUsuario)
@@ -105,18 +100,7 @@ public sealed class ServicioCuentas
         var sede = await _catalogos.BuscarSedeAsync(solicitud.IdSede)
             ?? throw new ReglaDeNegocioException("Elija una sede válida.", "idSede");
 
-        var usuario = new Usuario(
-            0,
-            nombre,
-            nombreUsuario,
-            string.Empty,
-            string.Empty,
-            EstadoCuenta.Activa,
-            0,
-            null,
-            rol,
-            sede);
-        usuario.FijarContrasena(solicitud.ContrasenaInicial);
+        var usuario = new Usuario(solicitud, rol, sede);
 
         Usuario? creada = null;
 
@@ -140,7 +124,7 @@ public sealed class ServicioCuentas
     {
         ArgumentNullException.ThrowIfNull(usuario);
 
-        if (usuario.NombreUsuario.Equals(NombreDeLaAdministradora, StringComparison.OrdinalIgnoreCase))
+        if (!usuario.PuedeDesactivarse())
         {
             throw new ReglaDeNegocioException(
                 "La cuenta de la administradora no puede desactivarse.",
@@ -250,28 +234,17 @@ public sealed class ServicioCuentas
         _contexto.ClaveDeOperacion is Guid clave &&
         await _bitacora.ExisteAsync(clave);
 
-    private async Task RegistrarBitacoraAsync(
+    private Task RegistrarBitacoraAsync(
         string operacion,
         string? anterior,
-        string? nuevo)
-    {
-        var actor = await _usuarios.BuscarPorIdAsync(_contexto.IdUsuario)
-            ?? throw new InvalidOperationException("No se encontró el usuario de la sesión.");
-
-        await _bitacora.RegistrarAsync(new RegistroDeBitacora(
-            0,
-            _reloj.Ahora,
-            operacion,
-            actor,
-            anterior,
-            nuevo));
-    }
+        string? nuevo) =>
+        _bitacora.RegistrarAsync(new MovimientoDeBitacora(operacion, null, anterior, nuevo));
 
     private static string Serializar(Usuario usuario) =>
         JsonSerializer.Serialize(new
         {
             usuario.Id,
-            usuario.Nombre,
+            usuario.NombrePersona,
             usuario.NombreUsuario,
             Rol = usuario.Rol.Nombre,
             Sede = usuario.Sede.Nombre,

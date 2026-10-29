@@ -394,7 +394,7 @@
                                                 </Border.Triggers>
                                                 <Grid ColumnDefinitions="150*,250*,200*,150*,312*">
                                                     <Label Text="{Binding NombreUsuario}" FontSize="14" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
-                                                    <Label Grid.Column="1" Text="{Binding Nombre}" FontSize="14" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="1" Text="{Binding NombrePersona}" FontSize="14" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
                                                     <Label Grid.Column="2" Text="{Binding Rol}" FontSize="14" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
                                                     <Label Grid.Column="3" Text="{Binding Sede}" FontSize="14" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
                                                     <HorizontalStackLayout Grid.Column="4" Spacing="8" VerticalOptions="Center">

@@ -1,6 +1,7 @@
 using Kataleya.Contratos.Configuracion;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Pasajes;
+using Kataleya.Dominio.DataObjects;
 
 namespace Kataleya.Escritorio.Servicios;
 

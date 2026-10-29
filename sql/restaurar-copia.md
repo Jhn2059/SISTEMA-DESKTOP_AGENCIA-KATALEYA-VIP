@@ -17,7 +17,9 @@ un CSV por tabla (con encabezado).
    `python descifrar-copia.py kataleya-copia-AAAA-MM-DD-HHMM.cifrada "clave de cifrado"`
 2. Descomprimir el .zip.
 3. En una base vacía, ejecutar `01-esquema.sql`, `04-modulos-funcionales.sql`,
-   `06-sentido-de-las-unidades.sql` y `07-copia-de-respaldo.sql` (no los de datos iniciales).
+   `06-sentido-de-las-unidades.sql`, `07-copia-de-respaldo.sql` y `09-nombres-de-la-cuenta.sql`
+   (no los de datos iniciales). Una copia anterior al script 09 no trae la columna
+   `es_cuenta_principal`: se restaura sin ejecutar el 09 y se ejecuta después.
 4. Cargar las tablas en este orden, desde la carpeta de los CSV:
 
 ```

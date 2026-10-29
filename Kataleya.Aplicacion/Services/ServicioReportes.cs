@@ -11,7 +11,6 @@ namespace Kataleya.Aplicacion.Services;
 public sealed class ServicioReportes
 {
     private readonly IRepositorioCuadre _cuadre;
-    private readonly IRepositorioUsuarios _usuarios;
     private readonly IRepositorioConfiguracion _configuracion;
     private readonly IRepositorioCatalogos _catalogos;
     private readonly ServicioBitacora _bitacora;
@@ -20,7 +19,6 @@ public sealed class ServicioReportes
 
     public ServicioReportes(
         IRepositorioCuadre cuadre,
-        IRepositorioUsuarios usuarios,
         IRepositorioConfiguracion configuracion,
         IRepositorioCatalogos catalogos,
         ServicioBitacora bitacora,
@@ -28,7 +26,6 @@ public sealed class ServicioReportes
         ContextoDeOperacion contexto)
     {
         _cuadre = cuadre ?? throw new ArgumentNullException(nameof(cuadre));
-        _usuarios = usuarios ?? throw new ArgumentNullException(nameof(usuarios));
         _configuracion = configuracion ?? throw new ArgumentNullException(nameof(configuracion));
         _catalogos = catalogos ?? throw new ArgumentNullException(nameof(catalogos));
         _bitacora = bitacora ?? throw new ArgumentNullException(nameof(bitacora));
@@ -51,7 +48,7 @@ public sealed class ServicioReportes
                 "fecha");
         }
 
-        var usuario = await ObtenerUsuarioAsync();
+        var usuario = _contexto.Usuario;
         var esAdministrador = usuario.Rol.Nombre == "Administrador";
         var emisorId = esAdministrador ? filtro.EmisorId : usuario.Id;
         var sede = esAdministrador
@@ -68,7 +65,7 @@ public sealed class ServicioReportes
     public async Task<DatosDelPanel> ObtenerPanelAsync(DateOnly? fecha)
     {
         var dia = fecha ?? FechasLocales.Hoy(_reloj.Ahora);
-        var usuario = await ObtenerUsuarioAsync();
+        var usuario = _contexto.Usuario;
         int? emisorId = usuario.Rol.Nombre == "Administrador" ? null : usuario.Id;
         var resumen = await _cuadre.ObtenerPanelAsync(dia, emisorId);
 
@@ -119,8 +116,4 @@ public sealed class ServicioReportes
                 ?? new FilaDeHorario { Hora = hora })
             .ToList();
     }
-
-    private async Task<Usuario> ObtenerUsuarioAsync() =>
-        await _usuarios.BuscarPorIdAsync(_contexto.IdUsuario)
-        ?? throw new InvalidOperationException("No se encontró el usuario de la sesión.");
 }
