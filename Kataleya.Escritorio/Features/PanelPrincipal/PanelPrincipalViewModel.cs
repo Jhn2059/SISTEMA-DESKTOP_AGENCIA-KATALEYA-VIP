@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Kataleya.Cliente;
 using Kataleya.Contratos.Panel;
 using Kataleya.Escritorio.Servicios;
+using Kataleya.Escritorio.Servicios.Impresion;
 
 namespace Kataleya.Escritorio.Features.PanelPrincipal;
 
@@ -14,11 +15,16 @@ public partial class PanelPrincipalViewModel : ObservableObject
 
     private readonly ClienteApi _cliente;
     private readonly INavegacion _navegacion;
+    private readonly ServicioImpresion _impresion;
 
-    public PanelPrincipalViewModel(ClienteApi cliente, INavegacion navegacion)
+    public PanelPrincipalViewModel(
+        ClienteApi cliente,
+        INavegacion navegacion,
+        ServicioImpresion impresion)
     {
         _cliente = cliente ?? throw new ArgumentNullException(nameof(cliente));
         _navegacion = navegacion ?? throw new ArgumentNullException(nameof(navegacion));
+        _impresion = impresion ?? throw new ArgumentNullException(nameof(impresion));
     }
 
     public string Nombre => _cliente.CuentaActual?.Nombre ?? string.Empty;
@@ -52,8 +58,14 @@ public partial class PanelPrincipalViewModel : ObservableObject
     [ObservableProperty]
     private string mensajeDeError = string.Empty;
 
+    [ObservableProperty]
+    private bool impresoraNoEncontrada;
+
     public async Task CargarAsync()
     {
+        ImpresoraNoEncontrada =
+            await _impresion.ConsultarEstadoAsync() == EstadoImpresora.SinRespuesta;
+
         var resultado = await _cliente.ObtenerPanelAsync(DateOnly.FromDateTime(DateTime.Now));
 
         if (!resultado.Exito || resultado.Datos is null)

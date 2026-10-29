@@ -117,6 +117,32 @@
                     </Border>
                 </Grid>
 
+                <Border
+                    IsVisible="{Binding ImpresoraNoEncontrada}"
+                    Margin="0,16,0,0"
+                    Padding="12,10"
+                    BackgroundColor="{DynamicResource AdvertenciaFondo}"
+                    Stroke="{DynamicResource AdvertenciaBorde}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8">
+                    <Grid ColumnDefinitions="18,*" ColumnSpacing="10">
+                        <Path
+                            Data="{StaticResource IconoAlerta}"
+                            WidthRequest="18"
+                            HeightRequest="18"
+                            Aspect="Uniform"
+                            Stroke="{DynamicResource AdvertenciaTexto}"
+                            StrokeThickness="1.75"
+                            VerticalOptions="Start" />
+                        <Label
+                            Grid.Column="1"
+                            Text="No se encontró la impresora de etiquetas. Revise que esté encendida y conectada; mientras tanto, los pasajes se registran igual y el boleto se imprime después desde su detalle."
+                            FontSize="13"
+                            TextColor="{DynamicResource AdvertenciaTexto}"
+                            LineBreakMode="WordWrap" />
+                    </Grid>
+                </Border>
+
                 <FlexLayout
                     Direction="Row"
                     Wrap="Wrap"
