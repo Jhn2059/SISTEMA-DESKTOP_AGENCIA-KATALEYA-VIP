@@ -17,6 +17,8 @@
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <ApplicationManifest>Platforms\Windows\app.manifest</ApplicationManifest>
+    <!-- Sin la marca CET: en un Windows 10 sin todas las actualizaciones, .NET cierra la aplicación al abrir. -->
+    <CETCompat>false</CETCompat>
   </PropertyGroup>
 
   <ItemGroup>
