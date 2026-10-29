@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Kataleya.Escritorio.Features.PanelPrincipal.ReporteAnual.DialogoDeReporteAnualPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:common="clr-namespace:Kataleya.Escritorio.Components.Common"
+    xmlns:ui="clr-namespace:Kataleya.Escritorio.UIHelpers.Behaviors"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.PanelPrincipal.ReporteAnual"
+    x:DataType="vm:DialogoDeReporteAnualViewModel"
+    ui:CicloDeVidaDePagina.AlDesaparecer="{Binding AlDesaparecerCommand}"
+    Title="Generar el reporte anual"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{DynamicResource Fondo}">
+    <Border
+        Style="{StaticResource Tarjeta}"
+        WidthRequest="460"
+        Padding="24"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
+        <VerticalStackLayout Spacing="16">
+            <HorizontalStackLayout Spacing="12">
+                <Border
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 22"
+                    BackgroundColor="{DynamicResource AdvertenciaFondo}">
+                    <Path
+                        Data="{StaticResource IconoAlerta}"
+                        WidthRequest="22"
+                        HeightRequest="22"
+                        Aspect="Uniform"
+                        Stroke="{DynamicResource Advertencia}"
+                        StrokeThickness="1.75"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" />
+                </Border>
+                <Label
+                    Text="{Binding Titulo}"
+                    FontFamily="InterSemiBold"
+                    FontSize="16"
+                    TextColor="{DynamicResource Texto}"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Label
+                Text="{Binding Explicacion}"
+                FontSize="13"
+                TextColor="{DynamicResource TextoSuave}"
+                LineBreakMode="WordWrap" />
+
+            <common:CampoDeTexto
+                Etiqueta="Contraseña del PDF *"
+                Texto="{Binding Contrasena}"
+                EsContrasena="True"
+                Icono="{StaticResource IconoCandado}"
+                MensajeDeError="{Binding ErrorContrasena}"
+                ComandoAlCompletar="{Binding AceptarCommand}" />
+
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="10">
+                <Button Text="Cancelar" Style="{StaticResource BotonSecundario}" Command="{Binding CancelarCommand}" />
+                <Button Text="Generar reporte" Style="{StaticResource BotonPrimario}" Command="{Binding AceptarCommand}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Border>
+</ContentPage>

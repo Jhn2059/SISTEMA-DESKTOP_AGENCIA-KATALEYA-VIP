@@ -118,6 +118,32 @@
                 </Grid>
 
                 <Border
+                    IsVisible="{Binding CopiaConFallos}"
+                    Margin="0,16,0,0"
+                    Padding="12,10"
+                    BackgroundColor="{DynamicResource AdvertenciaFondo}"
+                    Stroke="{DynamicResource AdvertenciaBorde}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8">
+                    <Grid ColumnDefinitions="18,*" ColumnSpacing="10">
+                        <Path
+                            Data="{StaticResource IconoAlerta}"
+                            WidthRequest="18"
+                            HeightRequest="18"
+                            Aspect="Uniform"
+                            Stroke="{DynamicResource AdvertenciaTexto}"
+                            StrokeThickness="1.75"
+                            VerticalOptions="Start" />
+                        <Label
+                            Grid.Column="1"
+                            Text="[RES-01] La copia semanal de los datos no se pudo guardar. Avise al equipo de soporte."
+                            FontSize="13"
+                            TextColor="{DynamicResource AdvertenciaTexto}"
+                            LineBreakMode="WordWrap" />
+                    </Grid>
+                </Border>
+
+                <Border
                     IsVisible="{Binding ImpresoraNoEncontrada}"
                     Margin="0,16,0,0"
                     Padding="12,10"
@@ -136,11 +162,56 @@
                             VerticalOptions="Start" />
                         <Label
                             Grid.Column="1"
-                            Text="No se encontró la impresora de etiquetas. Revise que esté encendida y conectada; mientras tanto, los pasajes se registran igual y el boleto se imprime después desde su detalle."
+                            Text="[IMP-03] No se encontró la impresora de etiquetas. Revise que esté encendida y conectada; mientras tanto, los pasajes se registran igual y el boleto se imprime después desde su detalle."
                             FontSize="13"
                             TextColor="{DynamicResource AdvertenciaTexto}"
                             LineBreakMode="WordWrap" />
                     </Grid>
+                </Border>
+
+                <Border
+                    IsVisible="{Binding HayReportePendiente}"
+                    Margin="0,12,0,0"
+                    Padding="12,8"
+                    BackgroundColor="{DynamicResource InfoFondo}"
+                    Stroke="{DynamicResource InfoBorde}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8">
+                    <Grid ColumnDefinitions="18,*,Auto" ColumnSpacing="10">
+                        <Path
+                            Data="{StaticResource IconoInfo}"
+                            WidthRequest="18"
+                            HeightRequest="18"
+                            Aspect="Uniform"
+                            Stroke="{DynamicResource InfoTexto}"
+                            StrokeThickness="1.75"
+                            VerticalOptions="Center" />
+                        <Label
+                            Grid.Column="1"
+                            Text="{Binding TextoDelReportePendiente}"
+                            FontSize="13"
+                            TextColor="{DynamicResource InfoTexto}"
+                            VerticalOptions="Center" />
+                        <Button
+                            Grid.Column="2"
+                            Text="Generar reporte"
+                            Style="{StaticResource BotonSecundario}"
+                            Command="{Binding GenerarReporteAnualCommand}" />
+                    </Grid>
+                </Border>
+
+                <Border
+                    IsVisible="{Binding MensajeDelReporte, Converter={StaticResource TextoNoVacio}}"
+                    Margin="0,12,0,0"
+                    Padding="12,10"
+                    BackgroundColor="{DynamicResource ExitoFondo}"
+                    Stroke="{DynamicResource ExitoBorde}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8">
+                    <Label
+                        Text="{Binding MensajeDelReporte}"
+                        FontSize="13"
+                        TextColor="{DynamicResource Exito}" />
                 </Border>
 
                 <FlexLayout

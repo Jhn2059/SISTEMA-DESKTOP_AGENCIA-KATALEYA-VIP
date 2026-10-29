@@ -300,13 +300,7 @@ public static class BarraDeTitulo
         bloque.GestureRecognizers.Add(puntero);
 
         var toque = new TapGestureRecognizer();
-        toque.Tapped += async (_, _) =>
-        {
-            if (_cerrarSesion is not null)
-            {
-                await _cerrarSesion();
-            }
-        };
+        toque.Tapped += async (_, _) => await MenuDeLaCuenta.AbrirAsync(_cerrarSesion);
         bloque.GestureRecognizers.Add(toque);
 
         return bloque;

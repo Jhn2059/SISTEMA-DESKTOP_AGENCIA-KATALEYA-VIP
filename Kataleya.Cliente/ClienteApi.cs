@@ -457,6 +457,13 @@ public sealed class ClienteApi
             null,
             "Consultar bitácora");
 
+    public Task<ResultadoDeLaApi<Kataleya.Dominio.Entities.EstadoDelRespaldo>> ObtenerEstadoDeLaCopiaAsync() =>
+        EnviarAsync<Kataleya.Dominio.Entities.EstadoDelRespaldo>(
+            HttpMethod.Get,
+            "copia-de-datos/estado",
+            null,
+            "Consultar estado de la copia");
+
     public Task<ResultadoDeLaApi<bool>> HayReportePendienteAsync() =>
         EnviarAsync<bool>(
             HttpMethod.Get,

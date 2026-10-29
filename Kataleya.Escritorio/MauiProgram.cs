@@ -58,6 +58,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<INavegacion, Navegacion>();
         builder.Services.AddSingleton<IDialogos, DialogosDeMaui>();
         builder.Services.AddSingleton<IImpresora, AdaptadorImpresora>();
+        builder.Services.AddSingleton<IRespaldo>(_ => new ServicioRespaldo(Configuracion.CarpetaDelRespaldo));
         builder.Services.AddSingleton<ServicioImpresion>();
 
         builder.Services.AgregarVistasDeKataleya();

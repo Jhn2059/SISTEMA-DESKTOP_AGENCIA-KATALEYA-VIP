@@ -18,6 +18,7 @@
     <ProjectReference Include="..\Kataleya.Aplicacion\Kataleya.Aplicacion.csproj" />
     <ProjectReference Include="..\Kataleya.Cliente\Kataleya.Cliente.csproj" />
     <ProjectReference Include="..\Kataleya.Contratos\Kataleya.Contratos.csproj" />
+    <ProjectReference Include="..\Kataleya.Datos\Kataleya.Datos.csproj" />
     <ProjectReference Include="..\Kataleya.Dominio\Kataleya.Dominio.csproj" />
   </ItemGroup>
 

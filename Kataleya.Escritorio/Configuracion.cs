@@ -29,6 +29,22 @@ public static class Configuracion
             ? valor
             : 3;
 
+    // Por definir: la carpeta de Google Drive del respaldo. Mientras tanto, Documentos\Kataleya\Reportes anuales.
+    public static string CarpetaDelRespaldo
+    {
+        get
+        {
+            var valor = Environment.GetEnvironmentVariable("KATALEYA_CARPETA_RESPALDO");
+
+            return string.IsNullOrWhiteSpace(valor)
+                ? Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    "Kataleya",
+                    "Reportes anuales")
+                : valor;
+        }
+    }
+
     public static bool PermitirHttpSinTls =>
         string.Equals(
             Environment.GetEnvironmentVariable("KATALEYA_PERMITIR_HTTP"),

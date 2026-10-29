@@ -1,3 +1,4 @@
+using System.Globalization;
 using Kataleya.Escritorio.Servicios.Impresion;
 
 namespace Kataleya.Escritorio.Features.GestionDeUsuarios;
@@ -43,6 +44,52 @@ public partial class GestionDeUsuariosPage
         }
 
         await MostrarEstadoDeLaImpresoraAsync();
+        await MostrarUltimaCopiaAsync();
+    }
+
+    // Solo para leer: la copia la hace la Web API (CDU-21, RNF-17).
+    private async Task MostrarUltimaCopiaAsync()
+    {
+        var resultado = await _cliente.ObtenerEstadoDeLaCopiaAsync();
+
+        if (!resultado.Exito || resultado.Datos is null)
+        {
+            PintarUltimaCopia("No se pudo consultar la última copia.", correcta: false);
+            return;
+        }
+
+        var estado = resultado.Datos;
+
+        if (estado.FechaHoraUltimaCopia is not DateTime fecha)
+        {
+            PintarUltimaCopia(
+                estado.FallosSeguidos > 0
+                    ? "Todavía no se guardó ninguna copia: la última no se pudo guardar."
+                    : "Todavía no hay copias.",
+                correcta: false);
+            return;
+        }
+
+        var cultura = CultureInfo.GetCultureInfo("es-PE");
+        var texto = $"Última copia: {fecha.ToLocalTime().ToString("dddd dd/MM/yyyy, HH:mm", cultura)}.";
+
+        PintarUltimaCopia(
+            estado.UltimaCopiaCorrecta
+                ? $"{texto} Se guardó bien."
+                : $"{texto} Después, {estado.FallosSeguidos} no se pudieron guardar.",
+            estado.UltimaCopiaCorrecta);
+    }
+
+    private void PintarUltimaCopia(string texto, bool correcta)
+    {
+        var color = correcta ? "Exito" : "AdvertenciaTexto";
+        var recuadro = correcta ? "Exito" : "Advertencia";
+
+        LblUltimaCopia.Text = texto;
+        LblUltimaCopia.SetDynamicResource(Label.TextColorProperty, color);
+        IconoUltimaCopia.SetDynamicResource(Microsoft.Maui.Controls.Shapes.Shape.StrokeProperty, color);
+        RecuadroUltimaCopia.SetDynamicResource(VisualElement.BackgroundColorProperty, recuadro + "Fondo");
+        RecuadroUltimaCopia.SetDynamicResource(Border.StrokeProperty, recuadro + "Borde");
     }
 
     private async void AlCambiarImpresora(object? remitente, EventArgs argumentos)

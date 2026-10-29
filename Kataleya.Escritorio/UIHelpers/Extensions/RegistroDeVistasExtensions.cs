@@ -1,3 +1,4 @@
+using Kataleya.Escritorio.Features.AcercaDelSistema;
 using Kataleya.Escritorio.Features.Autenticacion.InicioDeSesion;
 using Kataleya.Escritorio.Features.Bitacora;
 using Kataleya.Escritorio.Features.CuadreDeVentas;
@@ -5,6 +6,7 @@ using Kataleya.Escritorio.Features.GestionDeUsuarios;
 using Kataleya.Escritorio.Features.GestionDeUsuarios.CrearCuenta;
 using Kataleya.Escritorio.Features.GestionDeUsuarios.RestablecerContrasena;
 using Kataleya.Escritorio.Features.PanelPrincipal;
+using Kataleya.Escritorio.Features.PanelPrincipal.ReporteAnual;
 using Kataleya.Escritorio.Features.Pasajes;
 using Kataleya.Escritorio.Features.RegistroDePasajes;
 using Kataleya.Escritorio.Features.RegistroDiferido;
@@ -33,6 +35,10 @@ public static class RegistroDeVistasExtensions
         servicios.AddTransient<DialogoDeCuentaPage>();
         servicios.AddTransient<DialogoDeContrasenaViewModel>();
         servicios.AddTransient<DialogoDeContrasenaPage>();
+        servicios.AddTransient<AcercaDelSistemaViewModel>();
+        servicios.AddTransient<AcercaDelSistemaPage>();
+        servicios.AddTransient<DialogoDeReporteAnualViewModel>();
+        servicios.AddTransient<DialogoDeReporteAnualPage>();
         servicios.AddSingleton<AppShell>();
 
         return servicios;

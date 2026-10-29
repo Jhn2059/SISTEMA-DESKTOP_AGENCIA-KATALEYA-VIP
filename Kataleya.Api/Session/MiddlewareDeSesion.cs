@@ -20,7 +20,8 @@ public sealed class MiddlewareDeSesion
         ContextoDeOperacion operacion)
     {
         if (HttpMethods.IsPost(contexto.Request.Method) &&
-            contexto.Request.Path.Equals("/sesiones", StringComparison.OrdinalIgnoreCase))
+            (contexto.Request.Path.Equals("/sesiones", StringComparison.OrdinalIgnoreCase) ||
+             contexto.Request.Path.Equals("/copia-de-datos/semanal", StringComparison.OrdinalIgnoreCase)))
         {
             await _next(contexto);
             return;

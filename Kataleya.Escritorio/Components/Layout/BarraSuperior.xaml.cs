@@ -116,8 +116,12 @@ public partial class BarraSuperior : ContentView
     private void AlTocarMenu(object? remitente, TappedEventArgs argumentos) =>
         MenuSolicitado?.Invoke(this, EventArgs.Empty);
 
-    private void AlTocarUsuario(object? remitente, TappedEventArgs argumentos) =>
-        CierreDeSesionSolicitado?.Invoke(this, EventArgs.Empty);
+    private async void AlTocarUsuario(object? remitente, TappedEventArgs argumentos) =>
+        await MenuDeLaCuenta.AbrirAsync(() =>
+        {
+            CierreDeSesionSolicitado?.Invoke(this, EventArgs.Empty);
+            return Task.CompletedTask;
+        });
 
     private void AlEntrarMenu(object? remitente, PointerEventArgs argumentos) =>
         BotonMenu.BackgroundColor = ServicioDeTema.Color("SuperficieHover");

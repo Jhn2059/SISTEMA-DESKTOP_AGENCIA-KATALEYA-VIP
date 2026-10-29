@@ -14,6 +14,8 @@ public interface IDialogos
         string nombreUsuario,
         IReadOnlyDictionary<string, string>? errores = null);
 
+    Task<string?> PedirContrasenaDelReporteAsync(int anio);
+
     Task<bool> ConfirmarAsync(
         string titulo,
         string mensaje,

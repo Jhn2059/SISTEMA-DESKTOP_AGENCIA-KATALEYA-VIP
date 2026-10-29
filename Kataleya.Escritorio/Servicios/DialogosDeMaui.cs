@@ -1,6 +1,7 @@
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Escritorio.Features.GestionDeUsuarios.CrearCuenta;
 using Kataleya.Escritorio.Features.GestionDeUsuarios.RestablecerContrasena;
+using Kataleya.Escritorio.Features.PanelPrincipal.ReporteAnual;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kataleya.Escritorio.Servicios;
@@ -30,6 +31,14 @@ public sealed class DialogosDeMaui : IDialogos
     {
         var pagina = _servicios.GetRequiredService<DialogoDeContrasenaPage>();
         pagina.Modelo.Inicializar(nombreUsuario, errores);
+        await Shell.Current.Navigation.PushModalAsync(pagina);
+        return await pagina.Modelo.Resultado;
+    }
+
+    public async Task<string?> PedirContrasenaDelReporteAsync(int anio)
+    {
+        var pagina = _servicios.GetRequiredService<DialogoDeReporteAnualPage>();
+        pagina.Modelo.Inicializar(anio);
         await Shell.Current.Navigation.PushModalAsync(pagina);
         return await pagina.Modelo.Resultado;
     }

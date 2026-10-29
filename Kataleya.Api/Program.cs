@@ -1,4 +1,7 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json.Serialization;
+using Kataleya.Api.Copia;
 using Kataleya.Api.Session;
 using Kataleya.Aplicacion;
 using Kataleya.Aplicacion.Excepciones;
@@ -30,6 +33,14 @@ if (string.IsNullOrWhiteSpace(opcionesDeSesion.ClaveSecreta) || opcionesDeSesion
         "Configure 'Sesion:ClaveSecreta' con al menos 32 caracteres.");
 }
 
+var opcionesDeCopia = builder.Configuration
+    .GetSection(OpcionesDeCopia.Seccion)
+    .Get<OpcionesDeCopia>() ?? new OpcionesDeCopia();
+
+var opcionesDeGoogleDrive = builder.Configuration
+    .GetSection(OpcionesDeGoogleDrive.Seccion)
+    .Get<OpcionesDeGoogleDrive>() ?? new OpcionesDeGoogleDrive();
+
 builder.Services.ConfigureHttpJsonOptions(opciones =>
     opciones.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
@@ -46,6 +57,12 @@ builder.Services.AddScoped<IRepositorioUnidades, RepositorioUnidades>();
 builder.Services.AddScoped<IRepositorioConfiguracion, RepositorioConfiguracion>();
 builder.Services.AddScoped<IRepositorioCuadre, RepositorioCuadre>();
 builder.Services.AddScoped<IRepositorioReportesAnuales, RepositorioReportesAnuales>();
+builder.Services.AddScoped<IRepositorioCopias, RepositorioCopias>();
+builder.Services.AddScoped<ICopiaDeLaBase>(servicios => new CopiaDeLaBase(
+    servicios.GetRequiredService<FuenteDeDatos>(),
+    opcionesDeCopia.ClaveDeCifrado));
+builder.Services.AddHttpClient<IAlmacenDeCopias, AlmacenEnGoogleDrive>((http, _) =>
+    new AlmacenEnGoogleDrive(http, opcionesDeGoogleDrive));
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 builder.Services.AddScoped<ServicioBitacora>();
 builder.Services.AddScoped<RegistradorDeBitacora>();
@@ -56,6 +73,9 @@ builder.Services.AddScoped<ServicioInventario>();
 builder.Services.AddScoped<ServicioPasajes>();
 builder.Services.AddScoped<ServicioReportes>();
 builder.Services.AddScoped<ServicioReporteAnual>();
+builder.Services.AddScoped<ServicioCopiaDeDatos>();
+builder.Services.AddSingleton<EjecutorDeCopias>();
+builder.Services.AddHostedService(servicios => servicios.GetRequiredService<EjecutorDeCopias>());
 builder.Services.AddOptions<OpcionesDeSesion>()
     .Bind(builder.Configuration.GetSection(OpcionesDeSesion.Seccion));
 builder.Services.AddSingleton<ServicioDeLlaves>();
@@ -431,6 +451,29 @@ app.MapGet("/bitacora", async (
     [AsParameters] Kataleya.Contratos.Bitacora.FiltroDeBitacora filtro,
     ServicioReportes servicio) =>
     Results.Ok(await servicio.ConsultarBitacoraAsync(filtro)))
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
+// La llama el programador de tareas de Supabase con su clave, sin sesión (CDU-22).
+app.MapPost("/copia-de-datos/semanal", (HttpContext contexto, EjecutorDeCopias ejecutor) =>
+{
+    var clave = contexto.Request.Headers["X-Clave-Programador"].ToString();
+
+    if (string.IsNullOrEmpty(opcionesDeCopia.ClaveDelProgramador) ||
+        !CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(clave),
+            Encoding.UTF8.GetBytes(opcionesDeCopia.ClaveDelProgramador)))
+    {
+        return Results.Problem(
+            statusCode: StatusCodes.Status401Unauthorized,
+            title: "La clave del programador de tareas no es válida.");
+    }
+
+    ejecutor.Pedir();
+    return Results.Accepted();
+});
+
+app.MapGet("/copia-de-datos/estado", async (ServicioCopiaDeDatos servicio) =>
+    Results.Ok(await servicio.ObtenerEstadoAsync()))
     .AddEndpointFilter<FiltroDeAdministrador>();
 
 var reportesAnuales = app.MapGroup("/reportes-anuales")

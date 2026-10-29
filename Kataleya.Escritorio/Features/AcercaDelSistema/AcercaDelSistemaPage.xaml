@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Kataleya.Escritorio.Features.AcercaDelSistema.AcercaDelSistemaPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.AcercaDelSistema"
+    x:DataType="vm:AcercaDelSistemaViewModel"
+    Title="Acerca del sistema"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{DynamicResource Fondo}">
+    <Border
+        Style="{StaticResource Tarjeta}"
+        Margin="40"
+        Padding="24"
+        MaximumWidthRequest="1080"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
+        <VerticalStackLayout Spacing="18">
+            <VerticalStackLayout Spacing="6">
+                <HorizontalStackLayout Spacing="10">
+                    <Path
+                        Data="{StaticResource IconoInfo}"
+                        WidthRequest="20"
+                        HeightRequest="20"
+                        Aspect="Uniform"
+                        Stroke="{DynamicResource Texto}"
+                        StrokeThickness="1.75"
+                        VerticalOptions="Center" />
+                    <Label
+                        Text="Sistema Desktop de la Agencia Kataleya VIP"
+                        FontFamily="InterSemiBold"
+                        FontSize="16"
+                        TextColor="{DynamicResource Texto}"
+                        VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <Label Text="{Binding Modulo}" FontSize="13" TextColor="{DynamicResource TextoSuave}" />
+                <Label Text="Empresa Turismo VIP Kataleya SV E.I.R.L." FontSize="13" TextColor="{DynamicResource TextoSuave}" />
+            </VerticalStackLayout>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="40">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Software en uso" FontFamily="InterSemiBold" FontSize="14" TextColor="{DynamicResource Texto}" />
+                    <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding SoftwareEnUso}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DatoDelSistema">
+                                <Grid ColumnDefinitions="180,*" ColumnSpacing="12">
+                                    <Label Text="{Binding Nombre}" FontSize="13" TextColor="{DynamicResource TextoSuave}" />
+                                    <Label Grid.Column="1" Text="{Binding Valor}" FontSize="13" TextColor="{DynamicResource Texto}" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="8">
+                    <Label Text="Licencias de terceros" FontFamily="InterSemiBold" FontSize="14" TextColor="{DynamicResource Texto}" />
+                    <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Licencias}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DatoDelSistema">
+                                <Grid ColumnDefinitions="200,*" ColumnSpacing="12">
+                                    <Label Text="{Binding Nombre}" FontSize="13" TextColor="{DynamicResource Texto}" />
+                                    <Label Grid.Column="1" Text="{Binding Valor}" FontSize="13" TextColor="{DynamicResource TextoSuave}" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Grid>
+
+            <Border
+                Padding="12,10"
+                BackgroundColor="{DynamicResource InfoFondo}"
+                Stroke="{DynamicResource InfoBorde}"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 8">
+                <Grid ColumnDefinitions="16,*" ColumnSpacing="8">
+                    <Path
+                        Data="{StaticResource IconoInfo}"
+                        WidthRequest="16"
+                        HeightRequest="16"
+                        Aspect="Uniform"
+                        Stroke="{DynamicResource InfoTexto}"
+                        StrokeThickness="1.75"
+                        VerticalOptions="Center" />
+                    <Label
+                        Grid.Column="1"
+                        Text="Si algo no funciona, anote la versión y avise al equipo de soporte."
+                        FontSize="13"
+                        TextColor="{DynamicResource InfoTexto}"
+                        VerticalOptions="Center" />
+                </Grid>
+            </Border>
+
+            <Button
+                Text="Cerrar"
+                Style="{StaticResource BotonSecundario}"
+                HorizontalOptions="End"
+                Command="{Binding CerrarCommand}" />
+        </VerticalStackLayout>
+    </Border>
+</ContentPage>
