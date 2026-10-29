@@ -1,5 +1,6 @@
 using Kataleya.Cliente;
 using Kataleya.Escritorio.Components.Layout;
+using Kataleya.Escritorio.Servicios.Impresion;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Graphics;
 
@@ -29,6 +30,10 @@ public class PaginaDeModulo : ContentPage
     protected ClienteApi Cliente =>
         (Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(ClienteApi))
             as ClienteApi)!;
+
+    protected ServicioImpresion Impresion =>
+        (Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(ServicioImpresion))
+            as ServicioImpresion)!;
 
     protected override void OnAppearing()
     {

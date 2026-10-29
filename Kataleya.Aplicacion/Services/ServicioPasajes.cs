@@ -82,6 +82,11 @@ public sealed class ServicioPasajes
                     emisor);
             }
 
+            if (preparado.Pasaje.Estado == EstadoPasaje.Pagado)
+            {
+                await EmitirBoletoAsync(preparado.Pasaje, emisor);
+            }
+
             await _registrador.RegistrarAsync(
                 "Registrar reserva",
                 null,

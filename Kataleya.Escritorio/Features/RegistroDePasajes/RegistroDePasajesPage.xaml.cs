@@ -4,6 +4,7 @@ using Kataleya.Contratos.Pasajes;
 using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Enums;
 using Kataleya.Escritorio.Components.Common;
+using Kataleya.Escritorio.Servicios.Impresion;
 using Kataleya.Escritorio.UIHelpers;
 using Kataleya.Escritorio.UIHelpers.Paginas;
 using Microsoft.Maui.Controls.Shapes;
@@ -319,7 +320,7 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
         SelectorUnidad.IsVisible = !_esGrupo;
         LblUnidad.IsVisible = !_esGrupo;
         BotonAbrirUnidad.IsVisible = !_esGrupo;
-        BotonVenta.Text = _esGrupo ? "Registrar venta de grupo" : "Registrar venta";
+        BotonVenta.Text = _esGrupo ? "Registrar grupo e imprimir boletos" : "Registrar venta e imprimir boleto";
         BotonReserva.Text = _esGrupo ? "Guardar reserva de grupo" : "Guardar reserva";
         LblMensaje.Text = _esGrupo
             ? "En el grupo, el precio y los pagos se registran en el responsable."
@@ -473,11 +474,19 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
         }
 
         var pasaje = resultado.Datos;
-        var boleto = pasaje.Boleto?.NumeroCompleto ?? "sin boleto (reserva)";
-        await DisplayAlertAsync(
-            esVenta ? "Venta registrada" : "Reserva registrada",
-            $"Pasaje {pasaje.Id} · {pasaje.Estado} · Boleto {boleto}.",
-            "Aceptar");
+
+        if (pasaje.Boleto is null)
+        {
+            await DisplayAlertAsync("Reserva registrada", "Reserva registrada.", "Aceptar");
+        }
+        else
+        {
+            var estado = await Impresion.ImprimirBoletoAsync(pasaje);
+            await AvisarImpresionAsync(
+                estado,
+                esVenta ? "Venta registrada" : "Reserva registrada",
+                $"{(esVenta ? "Venta" : "Reserva")} registrada. Boleto N.º {pasaje.Boleto.Numero:D6} enviado a la impresora.");
+        }
 
         LimpiarPasajero();
         await CargarUnidadesAsync();
@@ -622,14 +631,39 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
         }
 
         var grupo = resultado.Datos;
-        await DisplayAlertAsync(
-            esVenta ? "Venta de grupo registrada" : "Reserva de grupo registrada",
-            $"Grupo {grupo.Codigo} · {grupo.Pasajes.Count} integrantes · " +
-            $"Pagado S/ {grupo.Pagado:N2} · Saldo S/ {grupo.Saldo:N2}.",
-            "Aceptar");
+        var registrado = $"Grupo {grupo.Codigo} registrado: {grupo.Pasajes.Count} pasajes";
+
+        if (grupo.Pasajes.All(integrante => integrante.Boleto is null))
+        {
+            await DisplayAlertAsync("Grupo registrado", $"{registrado}.", "Aceptar");
+        }
+        else
+        {
+            var estado = await Impresion.ImprimirBoletosAsync(grupo.Pasajes);
+            await AvisarImpresionAsync(
+                estado,
+                "Grupo registrado",
+                $"{registrado}; boletos enviados a la impresora.");
+        }
 
         LimpiarPasajero();
     }
+
+    private Task AvisarImpresionAsync(EstadoImpresora estado, string titulo, string exito) =>
+        estado switch
+        {
+            EstadoImpresora.Lista => DisplayAlertAsync(titulo, exito, "Aceptar"),
+            EstadoImpresora.SinPapel => DisplayAlertAsync(
+                "No se pudo imprimir",
+                "La venta quedó registrada, pero la impresora no tiene papel. " +
+                "Cambie el rollo e imprima el boleto desde el detalle del pasaje.",
+                "Aceptar"),
+            _ => DisplayAlertAsync(
+                "No se pudo imprimir",
+                "La venta quedó registrada, pero la impresora no responde. " +
+                "Revise que esté encendida y conectada, e imprima el boleto desde el detalle del pasaje.",
+                "Aceptar")
+        };
 
     private MedioDePago MedioSeleccionado() =>
         SelectorMedio.SelectedIndex == 1 ? MedioDePago.Yape : MedioDePago.Efectivo;

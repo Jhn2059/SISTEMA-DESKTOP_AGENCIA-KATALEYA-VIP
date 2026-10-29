@@ -474,11 +474,11 @@
                             <Label Text="Se guarda solo en esta laptop." FontSize="13" TextColor="{DynamicResource TextoSuave}" />
                             <Label Text="Impresora *" Style="{StaticResource EtiquetaDeCampo}" />
                             <Border Style="{StaticResource CampoDeFormulario}">
-                                <Picker Title="Sin impresoras detectadas" />
+                                <Picker x:Name="SelectorImpresora" Title="Sin impresoras detectadas" SelectedIndexChanged="AlCambiarImpresora" />
                             </Border>
                             <Label Text="Ancho del papel *" Style="{StaticResource EtiquetaDeCampo}" />
                             <Border Style="{StaticResource CampoDeFormulario}">
-                                <Picker Title="Seleccione ancho">
+                                <Picker x:Name="SelectorAnchoPapel" Title="Seleccione ancho" SelectedIndexChanged="AlCambiarImpresora">
                                     <Picker.ItemsSource>
                                         <x:Array Type="{x:Type x:String}">
                                             <x:String>58 mm</x:String>
@@ -487,13 +487,13 @@
                                     </Picker.ItemsSource>
                                 </Picker>
                             </Border>
-                            <Border Padding="10,8" BackgroundColor="{DynamicResource ExitoFondo}" Stroke="{DynamicResource ExitoBorde}" StrokeThickness="1" StrokeShape="RoundRectangle 6">
+                            <Border x:Name="RecuadroEstadoImpresora" Padding="10,8" BackgroundColor="{DynamicResource AdvertenciaFondo}" Stroke="{DynamicResource AdvertenciaBorde}" StrokeThickness="1" StrokeShape="RoundRectangle 6">
                                 <HorizontalStackLayout Spacing="7">
-                                    <Path Data="{StaticResource IconoCheckCirculo}" WidthRequest="15" HeightRequest="15" Stroke="{DynamicResource Exito}" VerticalOptions="Center" />
-                                    <Label Text="Impresora sin configurar." FontSize="13" TextColor="{DynamicResource Exito}" VerticalOptions="Center" />
+                                    <Path x:Name="IconoEstadoImpresora" Data="{StaticResource IconoCheckCirculo}" WidthRequest="15" HeightRequest="15" Stroke="{DynamicResource AdvertenciaTexto}" VerticalOptions="Center" />
+                                    <Label x:Name="LblEstadoImpresora" Text="Impresora sin configurar." FontSize="13" TextColor="{DynamicResource AdvertenciaTexto}" VerticalOptions="Center" />
                                 </HorizontalStackLayout>
                             </Border>
-                            <Button Text="Imprimir prueba" Style="{StaticResource BotonSecundario}" IsEnabled="False" Opacity="0.45" HorizontalOptions="Start" />
+                            <Button x:Name="BotonImprimirPrueba" Text="Imprimir prueba" Style="{StaticResource BotonSecundario}" IsEnabled="False" Opacity="0.45" HorizontalOptions="Start" Clicked="AlImprimirPrueba" />
                         </VerticalStackLayout>
                     </Border>
 

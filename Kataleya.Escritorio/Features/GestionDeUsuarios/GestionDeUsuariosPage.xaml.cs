@@ -1,5 +1,6 @@
 ﻿using Kataleya.Cliente;
 using Kataleya.Escritorio.Components.Layout;
+using Kataleya.Escritorio.Servicios.Impresion;
 using Kataleya.Escritorio.UIHelpers;
 using Kataleya.Escritorio.UIHelpers.Paginas;
 using Microsoft.Maui.Controls.Shapes;
@@ -11,13 +12,18 @@ namespace Kataleya.Escritorio.Features.GestionDeUsuarios;
 public partial class GestionDeUsuariosPage : ContentPage
 {
     private readonly ClienteApi _cliente;
+    private readonly ServicioImpresion _impresion;
     private bool _lateralVisible = true;
     private string _pestanaActiva = "cuentas";
 
-    public GestionDeUsuariosPage(GestionDeUsuariosViewModel modelo, ClienteApi cliente)
+    public GestionDeUsuariosPage(
+        GestionDeUsuariosViewModel modelo,
+        ClienteApi cliente,
+        ServicioImpresion impresion)
     {
         InitializeComponent();
         _cliente = cliente;
+        _impresion = impresion;
         BindingContext = modelo;
     }
 
@@ -60,8 +66,11 @@ public partial class GestionDeUsuariosPage : ContentPage
     private void AlElegirCuentas(object? remitente, TappedEventArgs argumentos) =>
         MostrarPestana("cuentas");
 
-    private void AlElegirEquipo(object? remitente, TappedEventArgs argumentos) =>
+    private async void AlElegirEquipo(object? remitente, TappedEventArgs argumentos)
+    {
         MostrarPestana("equipo");
+        await CargarEquipoAsync();
+    }
 
     private void MostrarPestana(string pestana)
     {

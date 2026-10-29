@@ -1,6 +1,7 @@
 using Kataleya.Cliente;
 using Kataleya.Dominio.Interfaces;
 using Kataleya.Escritorio.Servicios;
+using Kataleya.Escritorio.Servicios.Impresion;
 using Kataleya.Escritorio.UIHelpers.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 #if WINDOWS
@@ -56,6 +57,8 @@ public static class MauiProgram
             Configuracion.PermitirHttpSinTls));
         builder.Services.AddSingleton<INavegacion, Navegacion>();
         builder.Services.AddSingleton<IDialogos, DialogosDeMaui>();
+        builder.Services.AddSingleton<IImpresora, AdaptadorImpresora>();
+        builder.Services.AddSingleton<ServicioImpresion>();
 
         builder.Services.AgregarVistasDeKataleya();
 

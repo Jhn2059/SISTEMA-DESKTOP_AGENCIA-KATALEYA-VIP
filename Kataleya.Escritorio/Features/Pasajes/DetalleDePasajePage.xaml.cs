@@ -1,6 +1,7 @@
 using System.Globalization;
 using Kataleya.Contratos.Pasajes;
 using Kataleya.Dominio.Enums;
+using Kataleya.Escritorio.Servicios.Impresion;
 using Kataleya.Escritorio.UIHelpers.Paginas;
 
 namespace Kataleya.Escritorio.Features.Pasajes;
@@ -155,7 +156,45 @@ public partial class DetalleDePasajePage : PaginaDeModulo
         {
             await CargarAsync();
         }
+
+        if (_pasaje?.Estado == EstadoPasaje.Pagado && _pasaje.Boleto is not null)
+        {
+            var estado = await ImprimirLosBoletosDelPagoAsync(_pasaje);
+            await AvisarImpresionAsync(
+                estado,
+                "Pago registrado",
+                "Pago registrado. El pasaje quedó Pagado; boleto enviado a la impresora.");
+        }
     }
+
+    // Si el pago completa un grupo, se emite un boleto por integrante (CDU-11 A4).
+    private async Task<EstadoImpresora> ImprimirLosBoletosDelPagoAsync(DatosDePasaje pasaje)
+    {
+        if (pasaje.GrupoId is long idGrupo)
+        {
+            var grupo = await Cliente.ObtenerGrupoAsync(idGrupo);
+            if (grupo.Exito && grupo.Datos is not null)
+            {
+                return await Impresion.ImprimirBoletosAsync(grupo.Datos.Pasajes);
+            }
+        }
+
+        return await Impresion.ImprimirBoletoAsync(pasaje);
+    }
+
+    private Task AvisarImpresionAsync(EstadoImpresora estado, string titulo, string exito) =>
+        estado switch
+        {
+            EstadoImpresora.Lista => DisplayAlertAsync(titulo, exito, "Aceptar"),
+            EstadoImpresora.SinPapel => DisplayAlertAsync(
+                "No se pudo imprimir",
+                "La impresora no tiene papel. Revísela y vuelva a pulsar «Imprimir».",
+                "Aceptar"),
+            _ => DisplayAlertAsync(
+                "No se pudo imprimir",
+                "La impresora no responde. Revísela y vuelva a pulsar «Imprimir».",
+                "Aceptar")
+        };
 
     private async void AlAnular(object? remitente, EventArgs argumentos)
     {
@@ -303,15 +342,20 @@ public partial class DetalleDePasajePage : PaginaDeModulo
             return;
         }
 
-        await DisplayAlertAsync(
-            "Boleto",
-            $"Boleto {_pasaje.Boleto.NumeroCompleto}\n" +
-            $"{_pasaje.PasajeroNombre} · {_pasaje.TipoDocumento} {_pasaje.NumeroDocumento}\n" +
-            $"{_pasaje.Origen} → {_pasaje.Destino}\n" +
-            $"{_pasaje.FechaSalida:dd/MM/yyyy} {_pasaje.HoraSalida:HH:mm}\n" +
-            $"{_pasaje.Unidad ?? "—"} · Asiento {_pasaje.NumeroAsiento?.ToString() ?? "—"}\n" +
-            $"Importe S/ {_pasaje.Importe:N2}",
-            "Cerrar");
+        BotonImprimir.IsEnabled = false;
+
+        try
+        {
+            var estado = await Impresion.ImprimirBoletoAsync(_pasaje);
+            await AvisarImpresionAsync(
+                estado,
+                "Boleto enviado",
+                $"Boleto N.º {_pasaje.Boleto.Numero:D6} enviado a la impresora.");
+        }
+        finally
+        {
+            BotonImprimir.IsEnabled = true;
+        }
     }
 
     private async void AlReimprimir(object? remitente, EventArgs argumentos)
@@ -321,21 +365,21 @@ public partial class DetalleDePasajePage : PaginaDeModulo
             return;
         }
 
-        var resultado = await Cliente.ReimprimirBoletoAsync(
-            _pasaje.Boleto.Serie,
-            _pasaje.Boleto.Numero);
+        BotonReimprimir.IsEnabled = false;
 
-        if (!resultado.Exito)
+        try
         {
-            await MostrarErrorAsync(resultado, "No se pudo registrar la reimpresión.");
-            return;
+            var estado = await Impresion.ReimprimirAsync(_pasaje);
+            await AvisarImpresionAsync(
+                estado,
+                "Boleto enviado",
+                $"Boleto N.º {_pasaje.Boleto.Numero:D6} enviado a la impresora.");
+        }
+        finally
+        {
+            BotonReimprimir.IsEnabled = true;
         }
 
-        var reimpresiones = resultado.Datos?.Reimpresiones ?? _pasaje.Boleto.Reimpresiones + 1;
-        await DisplayAlertAsync(
-            "Reimpresión registrada",
-            $"Boleto {_pasaje.Boleto.NumeroCompleto} reimpreso. Reimpresiones: {reimpresiones}.",
-            "Aceptar");
         await CargarAsync();
     }
 

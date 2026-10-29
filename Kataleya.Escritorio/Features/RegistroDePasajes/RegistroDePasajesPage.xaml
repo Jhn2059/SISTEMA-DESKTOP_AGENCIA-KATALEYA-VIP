@@ -144,7 +144,7 @@
 
                         <HorizontalStackLayout Spacing="12" Margin="0,4,0,0">
                             <Button x:Name="BotonReserva" Text="Guardar reserva" Style="{StaticResource BotonSecundario}" Clicked="AlGuardarReserva" />
-                            <Button x:Name="BotonVenta" Text="Registrar venta" Style="{StaticResource BotonPrimario}" Clicked="AlGuardarVenta" />
+                            <Button x:Name="BotonVenta" Text="Registrar venta e imprimir boleto" Style="{StaticResource BotonPrimario}" Clicked="AlGuardarVenta" />
                             <Button Text="Cancelar" Style="{StaticResource BotonSecundario}" Clicked="AlCancelar" />
                         </HorizontalStackLayout>
 
