@@ -24,7 +24,7 @@
                     PointerEntered="AlEntrarPuntero"
                     PointerExited="AlSalirPuntero" />
             </Border.GestureRecognizers>
-            <Grid ColumnDefinitions="38,*,30" ColumnSpacing="0">
+            <Grid x:Name="Contenido" ColumnDefinitions="12,*,12" ColumnSpacing="0">
                 <Path
                     Grid.Column="0"
                     WidthRequest="18"

@@ -42,6 +42,32 @@ public static class MauiProgram
                 Microsoft.UI.Colors.Transparent);
             handler.PlatformView.Padding = new Microsoft.UI.Xaml.Thickness(0);
         });
+
+        // En Windows, el valor inicial llega antes que las opciones y el selector queda en blanco.
+        PickerHandler.Mapper.AppendToMapping("Kataleya.SeleccionInicial", (handler, picker) =>
+        {
+            handler.PlatformView.Loaded += (_, _) =>
+            {
+                if (picker.SelectedIndex >= 0 &&
+                    picker.SelectedIndex < handler.PlatformView.Items.Count &&
+                    handler.PlatformView.SelectedIndex != picker.SelectedIndex)
+                {
+                    handler.PlatformView.SelectedIndex = picker.SelectedIndex;
+                }
+            };
+        });
+
+        // La casilla y el selector de hora de WinUI traen un ancho mínimo que no entra en los formularios.
+        CheckBoxHandler.Mapper.AppendToMapping("Kataleya.SinAnchoMinimo", (handler, _) =>
+            handler.PlatformView.MinWidth = 0);
+
+        TimePickerHandler.Mapper.AppendToMapping("Kataleya.SinAnchoMinimo", (handler, _) =>
+        {
+            handler.PlatformView.MinWidth = 0;
+            handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+            handler.PlatformView.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(
+                Microsoft.UI.Colors.Transparent);
+        });
 #endif
 
         builder.Services.AddSingleton(_ => new HttpClient

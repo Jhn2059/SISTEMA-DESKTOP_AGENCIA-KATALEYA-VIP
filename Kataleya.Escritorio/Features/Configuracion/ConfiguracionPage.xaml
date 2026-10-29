@@ -268,24 +268,26 @@
                                         <FlexLayout Direction="Row" Wrap="Wrap" AlignItems="Start" BindableLayout.ItemsSource="{Binding HorariosDeSalida}">
                                             <BindableLayout.ItemTemplate>
                                                 <DataTemplate x:DataType="tarifas:HorarioVisible">
-                                                    <Border Margin="0,0,8,8" Padding="12,0,6,0" HeightRequest="30" BackgroundColor="{DynamicResource Superficie}" Stroke="{DynamicResource BordeControl}" StrokeThickness="1" StrokeShape="RoundRectangle 15">
-                                                        <HorizontalStackLayout Spacing="4">
-                                                            <Label Text="{Binding Hora}" FontSize="14" VerticalTextAlignment="Center" />
-                                                            <Button
-                                                                Text="×"
-                                                                FontSize="16"
-                                                                WidthRequest="24"
-                                                                HeightRequest="24"
-                                                                Padding="0"
-                                                                BackgroundColor="Transparent"
-                                                                BorderWidth="0"
-                                                                TextColor="{DynamicResource TextoSuave}"
-                                                                IsEnabled="{Binding SePuedeQuitar}"
-                                                                SemanticProperties.Description="Quitar horario"
-                                                                Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.Tarifas.QuitarHorarioCommand}"
-                                                                CommandParameter="{Binding .}" />
-                                                        </HorizontalStackLayout>
-                                                    </Border>
+                                                    <ContentView Padding="0,0,8,8">
+                                                        <Border Padding="12,0,6,0" HeightRequest="30" BackgroundColor="{DynamicResource Superficie}" Stroke="{DynamicResource BordeControl}" StrokeThickness="1" StrokeShape="RoundRectangle 15">
+                                                            <HorizontalStackLayout Spacing="4">
+                                                                <Label Text="{Binding Hora}" FontSize="14" VerticalTextAlignment="Center" />
+                                                                <Button
+                                                                    Text="×"
+                                                                    FontSize="16"
+                                                                    WidthRequest="24"
+                                                                    HeightRequest="24"
+                                                                    Padding="0"
+                                                                    BackgroundColor="Transparent"
+                                                                    BorderWidth="0"
+                                                                    TextColor="{DynamicResource TextoSuave}"
+                                                                    IsEnabled="{Binding SePuedeQuitar}"
+                                                                    SemanticProperties.Description="Quitar horario"
+                                                                    Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.Tarifas.QuitarHorarioCommand}"
+                                                                    CommandParameter="{Binding .}" />
+                                                            </HorizontalStackLayout>
+                                                        </Border>
+                                                    </ContentView>
                                                 </DataTemplate>
                                             </BindableLayout.ItemTemplate>
                                         </FlexLayout>
@@ -310,9 +312,11 @@
                                         <FlexLayout Direction="Row" Wrap="Wrap" AlignItems="Start" BindableLayout.ItemsSource="{Binding TiposDeVehiculo}">
                                             <BindableLayout.ItemTemplate>
                                                 <DataTemplate x:DataType="x:String">
-                                                    <Border Margin="0,0,8,8" Padding="12,0" HeightRequest="30" BackgroundColor="{DynamicResource Superficie}" Stroke="{DynamicResource BordeControl}" StrokeThickness="1" StrokeShape="RoundRectangle 15">
-                                                        <Label Text="{Binding .}" FontSize="14" VerticalTextAlignment="Center" />
-                                                    </Border>
+                                                    <ContentView Padding="0,0,8,8">
+                                                        <Border Padding="12,0" HeightRequest="30" BackgroundColor="{DynamicResource Superficie}" Stroke="{DynamicResource BordeControl}" StrokeThickness="1" StrokeShape="RoundRectangle 15">
+                                                            <Label Text="{Binding .}" FontSize="14" VerticalTextAlignment="Center" />
+                                                        </Border>
+                                                    </ContentView>
                                                 </DataTemplate>
                                             </BindableLayout.ItemTemplate>
                                         </FlexLayout>
@@ -565,8 +569,9 @@
                                 <Label Text="Se guarda solo en esta laptop." FontSize="13" TextColor="{DynamicResource TextoSuave}" />
                                 <Label Text="Impresora *" Style="{StaticResource EtiquetaDeCampo}" />
                                 <Border Style="{StaticResource CampoDeFormulario}">
-                                    <Picker ItemsSource="{Binding Impresoras}" SelectedIndex="{Binding ImpresoraElegida}" Title="Sin impresoras detectadas" />
+                                    <Picker ItemsSource="{Binding Impresoras}" SelectedIndex="{Binding ImpresoraElegida}" />
                                 </Border>
+                                <Label Text="Sin impresoras detectadas." Style="{StaticResource TextoDeError}" IsVisible="{Binding NoHayImpresoras}" />
                                 <Label Text="Ancho del papel *" Style="{StaticResource EtiquetaDeCampo}" />
                                 <Border Style="{StaticResource CampoDeFormulario}" WidthRequest="230" HorizontalOptions="Start">
                                     <Picker ItemsSource="{Binding AnchosDePapel}" SelectedIndex="{Binding AnchoElegido}" />

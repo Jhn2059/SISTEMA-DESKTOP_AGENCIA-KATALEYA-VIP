@@ -49,7 +49,11 @@ public partial class CampoDeTexto : ContentView
             propertyChanged: AlCambiarMensajeDeError);
 
     public static readonly BindableProperty IconoProperty =
-        BindableProperty.Create(nameof(Icono), typeof(Geometry), typeof(CampoDeTexto));
+        BindableProperty.Create(
+            nameof(Icono),
+            typeof(Geometry),
+            typeof(CampoDeTexto),
+            propertyChanged: (campo, _, _) => ((CampoDeTexto)campo).AjustarColumnas());
 
     public static readonly BindableProperty LongitudMaximaProperty =
         BindableProperty.Create(nameof(LongitudMaxima), typeof(int), typeof(CampoDeTexto), int.MaxValue);
@@ -182,6 +186,14 @@ public partial class CampoDeTexto : ContentView
 
         campo.Entrada.IsPassword = (bool)(valorNuevo ?? false);
         campo.ActualizarIconoDeOjo();
+        campo.AjustarColumnas();
+    }
+
+    // El icono y el ojo solo ocupan lugar cuando el campo los usa.
+    private void AjustarColumnas()
+    {
+        Contenido.ColumnDefinitions[0].Width = new GridLength(Icono is null ? 12 : 38);
+        Contenido.ColumnDefinitions[2].Width = new GridLength(EsContrasena ? 30 : 12);
     }
 
     private static void AlCambiarMensajeDeError(BindableObject objetivo, object? valorAnterior, object? valorNuevo)

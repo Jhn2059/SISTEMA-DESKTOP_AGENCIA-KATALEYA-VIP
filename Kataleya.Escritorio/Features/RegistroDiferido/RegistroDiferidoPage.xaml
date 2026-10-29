@@ -41,7 +41,7 @@
                             MensajeDeError="{Binding ErrorTalonario}" />
                         <VerticalStackLayout Grid.Column="1" Spacing="6">
                             <Label Text="Fecha y hora reales de emisión *" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Grid ColumnDefinitions="*,110" ColumnSpacing="8">
+                            <Grid ColumnDefinitions="*,120" ColumnSpacing="8">
                                 <Border Style="{StaticResource CampoDeFormulario}">
                                     <DatePicker Date="{Binding FechaDeEmision}" Format="dd/MM/yyyy" />
                                 </Border>

@@ -312,21 +312,22 @@
                                 <FlexLayout Direction="Row" Wrap="Wrap" JustifyContent="Start" BindableLayout.ItemsSource="{Binding Asientos}">
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate x:DataType="vm:AsientoVisible">
-                                            <Border
-                                                WidthRequest="52"
-                                                HeightRequest="40"
-                                                Margin="3"
-                                                StrokeThickness="1"
-                                                StrokeShape="RoundRectangle 6"
-                                                BackgroundColor="{Binding Fondo}"
-                                                Stroke="{Binding Borde}">
-                                                <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer
-                                                        Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.ElegirAsientoCommand}"
-                                                        CommandParameter="{Binding .}" />
-                                                </Border.GestureRecognizers>
-                                                <Label Text="{Binding Texto}" TextColor="{Binding ColorDelTexto}" FontSize="13" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                            </Border>
+                                            <ContentView Padding="3">
+                                                <Border
+                                                    WidthRequest="52"
+                                                    HeightRequest="40"
+                                                    StrokeThickness="1"
+                                                    StrokeShape="RoundRectangle 6"
+                                                    BackgroundColor="{Binding Fondo}"
+                                                    Stroke="{Binding Borde}">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer
+                                                            Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.ElegirAsientoCommand}"
+                                                            CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
+                                                    <Label Text="{Binding Texto}" TextColor="{Binding ColorDelTexto}" FontSize="13" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                </Border>
+                                            </ContentView>
                                         </DataTemplate>
                                     </BindableLayout.ItemTemplate>
                                 </FlexLayout>

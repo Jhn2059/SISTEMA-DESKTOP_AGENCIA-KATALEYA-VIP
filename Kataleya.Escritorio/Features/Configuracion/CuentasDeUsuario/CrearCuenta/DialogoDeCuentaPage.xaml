@@ -75,8 +75,7 @@
                         <Picker
                             ItemsSource="{Binding Roles}"
                             SelectedItem="{Binding RolSeleccionado, Mode=TwoWay}"
-                            ItemDisplayBinding="{Binding Nombre, x:DataType=contratos:DatosDeRol}"
-                            Title="Seleccione" />
+                            ItemDisplayBinding="{Binding Nombre, x:DataType=contratos:DatosDeRol}" />
                     </Border>
                     <Label Text="{Binding ErrorRol}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorRol, Converter={StaticResource TextoNoVacio}}" />
                 </VerticalStackLayout>
@@ -86,8 +85,7 @@
                         <Picker
                             ItemsSource="{Binding Sedes}"
                             SelectedItem="{Binding SedeSeleccionada, Mode=TwoWay}"
-                            ItemDisplayBinding="{Binding Nombre, x:DataType=contratos:DatosDeSede}"
-                            Title="Seleccione" />
+                            ItemDisplayBinding="{Binding Nombre, x:DataType=contratos:DatosDeSede}" />
                     </Border>
                     <Label Text="{Binding ErrorSede}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorSede, Converter={StaticResource TextoNoVacio}}" />
                 </VerticalStackLayout>

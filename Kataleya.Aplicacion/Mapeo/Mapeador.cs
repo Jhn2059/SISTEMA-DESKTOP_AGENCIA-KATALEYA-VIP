@@ -75,9 +75,7 @@ public static class Mapeador
             FechaSalida = pasaje.FechaSalida,
             HoraSalida = pasaje.HoraSalida,
             UnidadSalidaId = pasaje.UnidadSalidaId,
-            Unidad = pasaje.UnidadNombre is null
-                ? null
-                : $"Unidad {pasaje.UnidadNombre} · asiento {pasaje.NumeroAsiento}",
+            Unidad = pasaje.UnidadNombre,
             NumeroAsiento = pasaje.NumeroAsiento,
             GrupoId = pasaje.GrupoId,
             GrupoCodigo = pasaje.GrupoCodigo,

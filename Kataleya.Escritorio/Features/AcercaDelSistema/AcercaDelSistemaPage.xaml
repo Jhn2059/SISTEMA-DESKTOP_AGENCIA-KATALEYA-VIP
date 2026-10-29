@@ -43,9 +43,9 @@
                     <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding SoftwareEnUso}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="vm:DatoDelSistema">
-                                <Grid ColumnDefinitions="180,*" ColumnSpacing="12">
+                                <Grid ColumnDefinitions="150,*" ColumnSpacing="12">
                                     <Label Text="{Binding Nombre}" FontSize="13" TextColor="{DynamicResource TextoSuave}" />
-                                    <Label Grid.Column="1" Text="{Binding Valor}" FontSize="13" TextColor="{DynamicResource Texto}" />
+                                    <Label Grid.Column="1" Text="{Binding Valor}" FontSize="13" TextColor="{DynamicResource Texto}" LineBreakMode="WordWrap" />
                                 </Grid>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>

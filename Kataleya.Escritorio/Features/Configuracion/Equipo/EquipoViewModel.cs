@@ -31,6 +31,8 @@ public partial class EquipoViewModel : ObservableObject
 
     public IReadOnlyList<string> AnchosDePapel { get; } = ["58 mm", "80 mm"];
 
+    public bool NoHayImpresoras => Impresoras.Count == 0;
+
     [ObservableProperty]
     private int impresoraElegida = -1;
 
@@ -74,6 +76,7 @@ public partial class EquipoViewModel : ObservableObject
                 Impresoras.Add(impresora);
             }
 
+            OnPropertyChanged(nameof(NoHayImpresoras));
             ImpresoraElegida = configuracion is null ? -1 : impresoras.IndexOf(configuracion.NombreImpresora);
             AnchoElegido = Math.Max(0, Array.IndexOf(Anchos, configuracion?.AnchoDePapel ?? AnchoDePapel.Mm58));
         }
