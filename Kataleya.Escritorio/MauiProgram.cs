@@ -54,7 +54,8 @@ public static class MauiProgram
             sp.GetRequiredService<HttpClient>(),
             sp.GetRequiredService<IRegistroTecnico>(),
             Configuracion.Reintentos,
-            Configuracion.PermitirHttpSinTls));
+            Configuracion.PermitirHttpSinTls,
+            new CopiaLocal()));
         builder.Services.AddSingleton<INavegacion, Navegacion>();
         builder.Services.AddSingleton<IDialogos, DialogosDeMaui>();
         builder.Services.AddSingleton<IImpresora, AdaptadorImpresora>();

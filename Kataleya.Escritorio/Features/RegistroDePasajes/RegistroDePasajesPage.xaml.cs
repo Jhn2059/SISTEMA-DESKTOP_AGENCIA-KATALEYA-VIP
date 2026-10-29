@@ -24,6 +24,7 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
     private short _asientoSeleccionado;
     private decimal _tarifaActual;
     private SentidoDelViaje? _sentidoDeLasUnidades;
+    private string? _horaCopiada;
 
     public RegistroDePasajesPage()
     {
@@ -53,6 +54,34 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
     }
 
     private SentidoDelViaje? SentidoElegido => Ruta.SentidoSegunElOrigen(CampoOrigen.Texto);
+
+    // Copia el viaje de otro pasaje; los datos del pasajero quedan vacíos (IU-P04).
+    public void CopiarDatosDe(DatosDePasaje pasaje)
+    {
+        ArgumentNullException.ThrowIfNull(pasaje);
+
+        CampoOrigen.Texto = pasaje.Origen;
+        CampoDestino.Texto = pasaje.Destino;
+        CampoEmbarque.Texto = pasaje.LugarDeEmbarque;
+        FechaSalida.Date = pasaje.FechaSalida.ToDateTime(TimeOnly.MinValue);
+        _horaCopiada = pasaje.HoraSalida.ToString("HH:mm", Cultura);
+        ElegirHoraCopiada();
+    }
+
+    private void ElegirHoraCopiada()
+    {
+        if (_horaCopiada is null || SelectorHora.ItemsSource is not IList<string> horas)
+        {
+            return;
+        }
+
+        var posicion = horas.IndexOf(_horaCopiada);
+        if (posicion >= 0)
+        {
+            SelectorHora.SelectedIndex = posicion;
+            _horaCopiada = null;
+        }
+    }
 
     protected override async void AlAparecer()
     {
@@ -106,6 +135,7 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
 
         SelectorHora.ItemsSource = horas.ToList();
         SelectorHora.SelectedIndex = 0;
+        ElegirHoraCopiada();
 
         await CargarUnidadesAsync();
         await ActualizarTarifaAsync();

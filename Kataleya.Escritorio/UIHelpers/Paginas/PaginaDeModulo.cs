@@ -14,6 +14,9 @@ public class PaginaDeModulo : ContentPage
     private BarraLateral? _lateral;
     private BarraSuperior? _superior;
     private Image? _fondo;
+    private Grid? _pie;
+    private Border? _avisoSinConexion;
+    private Label? _textoSinConexion;
 
     public PaginaDeModulo()
     {
@@ -45,8 +48,28 @@ public class PaginaDeModulo : ContentPage
         }
 
         ActualizarEncabezado();
+        MostrarConexion();
+
+        if (Cliente is not null)
+        {
+            Cliente.ConexionCambiada += AlCambiarConexion;
+        }
+
         AlAparecer();
     }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        if (Cliente is not null)
+        {
+            Cliente.ConexionCambiada -= AlCambiarConexion;
+        }
+    }
+
+    private void AlCambiarConexion(object? remitente, EventArgs argumentos) =>
+        MainThread.BeginInvokeOnMainThread(MostrarConexion);
 
     protected virtual void AlAparecer()
     {
@@ -148,14 +171,20 @@ public class PaginaDeModulo : ContentPage
         }
         _raiz.Children.Add(host);
 
-        var pie = CrearPieDePagina();
-        Grid.SetColumn(pie, 1);
-        Grid.SetRow(pie, 2);
-        _raiz.Children.Add(pie);
+        _pie = CrearPieDePagina();
+        Grid.SetColumn(_pie, 1);
+        Grid.SetRow(_pie, 2);
+        _raiz.Children.Add(_pie);
+
+        _avisoSinConexion = CrearAvisoSinConexion();
+        Grid.SetColumn(_avisoSinConexion, 1);
+        Grid.SetRow(_avisoSinConexion, 2);
+        _raiz.Children.Add(_avisoSinConexion);
 
         Content = _raiz;
         _marcoConstruido = true;
         ServicioDeTema.Cambio += AlCambiarTema;
+
     }
 
     private static Grid CrearPieDePagina()
@@ -176,6 +205,46 @@ public class PaginaDeModulo : ContentPage
 
         pie.Children.Add(fila);
         return pie;
+    }
+
+    // RNF-16: si la Web API no responde, se avisa que se emita con talonario.
+    private Border CrearAvisoSinConexion()
+    {
+        _textoSinConexion = new Label
+        {
+            FontSize = 12,
+            VerticalOptions = LayoutOptions.Center
+        };
+        _textoSinConexion.SetDynamicResource(Label.TextColorProperty, "AdvertenciaTexto");
+
+        var aviso = new Border
+        {
+            StrokeThickness = 0,
+            Padding = new Thickness(16, 0),
+            IsVisible = false,
+            Content = _textoSinConexion
+        };
+        aviso.SetDynamicResource(BackgroundColorProperty, "AdvertenciaFondo");
+        return aviso;
+    }
+
+    private void MostrarConexion()
+    {
+        if (_avisoSinConexion is null || _textoSinConexion is null || _pie is null)
+        {
+            return;
+        }
+
+        var desde = Cliente?.SinConexionDesde;
+        _avisoSinConexion.IsVisible = desde is not null;
+        _pie.IsVisible = desde is null;
+
+        if (desde is DateTime hora)
+        {
+            _textoSinConexion.Text =
+                $"Sin conexión desde las {hora:HH:mm}. Emita con talonario; " +
+                "los pasajes de hoy se consultan en la copia local.";
+        }
     }
 
     private static Label CrearTextoDelPie(string texto, string claveDeColor)

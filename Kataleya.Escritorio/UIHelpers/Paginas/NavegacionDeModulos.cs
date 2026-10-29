@@ -1,3 +1,4 @@
+using Kataleya.Contratos.Pasajes;
 using Kataleya.Escritorio.Features.Bitacora;
 using Kataleya.Escritorio.Features.CuadreDeVentas;
 using Kataleya.Escritorio.Features.GestionDeUsuarios;
@@ -97,6 +98,24 @@ public static class NavegacionDeModulos
         var pagina = Servicios.GetRequiredService<DetalleDePasajePage>();
         pagina.IdPasaje = idPasaje;
         await navegacion.PushAsync(pagina);
+    }
+
+    // IU-P04 «Copiar datos para otro pasajero»: el registro se abre con el viaje del pasaje elegido.
+    public static async Task IrAlRegistroConLosDatosDeAsync(DatosDePasaje pasaje)
+    {
+        var navegacion = Shell.Current.Navigation;
+        var pagina = navegacion.NavigationStack.OfType<RegistroDePasajesPage>().LastOrDefault();
+
+        if (pagina is null)
+        {
+            pagina = Servicios.GetRequiredService<RegistroDePasajesPage>();
+            pagina.CopiarDatosDe(pasaje);
+            await navegacion.PushAsync(pagina);
+            return;
+        }
+
+        pagina.CopiarDatosDe(pasaje);
+        await RetrocederHastaAsync(pagina);
     }
 
     private static async Task RetrocederHastaAsync(Page destino)

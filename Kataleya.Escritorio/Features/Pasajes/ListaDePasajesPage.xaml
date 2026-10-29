@@ -4,7 +4,8 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:paginas="clr-namespace:Kataleya.Escritorio.UIHelpers.Paginas"
-    xmlns:pasajes="clr-namespace:Kataleya.Contratos.Pasajes;assembly=Kataleya.Contratos">
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.Pasajes"
+    x:DataType="vm:ListaDePasajesViewModel">
     <ScrollView VerticalScrollBarVisibility="Never">
         <VerticalStackLayout Padding="24,16,24,24" Spacing="0">
 
@@ -18,48 +19,49 @@
                     <VerticalStackLayout Spacing="4">
                         <Label Text="Desde" Style="{StaticResource EtiquetaDeCampo}" />
                         <Border Style="{StaticResource CampoDeFormulario}">
-                            <DatePicker x:Name="FechaDesde" Format="dd/MM/yyyy" />
+                            <DatePicker Date="{Binding Desde}" Format="dd/MM/yyyy" />
                         </Border>
+                        <Label Text="{Binding ErrorDeFechas}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorDeFechas, Converter={StaticResource TextoNoVacio}}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="1" Spacing="4">
                         <Label Text="Hasta" Style="{StaticResource EtiquetaDeCampo}" />
                         <Border Style="{StaticResource CampoDeFormulario}">
-                            <DatePicker x:Name="FechaHasta" Format="dd/MM/yyyy" />
+                            <DatePicker Date="{Binding Hasta}" Format="dd/MM/yyyy" />
                         </Border>
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="2" Spacing="4">
                         <Label Text="Horario" Style="{StaticResource EtiquetaDeCampo}" />
                         <Border Style="{StaticResource CampoDeFormulario}">
-                            <Picker x:Name="SelectorHora" Title="Todos" />
+                            <Picker ItemsSource="{Binding Horarios}" SelectedIndex="{Binding HorarioElegido}" />
                         </Border>
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="3" Spacing="4">
                         <Label Text="Estado" Style="{StaticResource EtiquetaDeCampo}" />
                         <Border Style="{StaticResource CampoDeFormulario}">
-                            <Picker x:Name="SelectorEstado" Title="Todos" />
+                            <Picker ItemsSource="{Binding Estados}" SelectedIndex="{Binding EstadoElegido}" />
                         </Border>
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="4" Spacing="4">
                         <Label Text="Tipo de pasaje" Style="{StaticResource EtiquetaDeCampo}" />
                         <Border Style="{StaticResource CampoDeFormulario}">
-                            <Picker x:Name="SelectorTipo" Title="Todos" />
+                            <Picker ItemsSource="{Binding Tipos}" SelectedIndex="{Binding TipoElegido}" />
                         </Border>
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="5" Spacing="4">
                         <Label Text="Pasajero (nombre o documento)" Style="{StaticResource EtiquetaDeCampo}" />
                         <Border Style="{StaticResource CampoDeFormulario}">
-                            <Entry x:Name="CampoPasajero" Placeholder="Nombre o documento" />
+                            <Entry Text="{Binding Pasajero}" Placeholder="Nombre o documento" ReturnCommand="{Binding BuscarCommand}" />
                         </Border>
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="6" Spacing="4">
                         <Label Text="Emisor" Style="{StaticResource EtiquetaDeCampo}" />
                         <Border Style="{StaticResource CampoDeFormulario}">
-                            <Picker x:Name="SelectorEmisor" Title="Todos" />
+                            <Picker ItemsSource="{Binding Emisores}" SelectedIndex="{Binding EmisorElegido}" />
                         </Border>
                     </VerticalStackLayout>
-                    <Border Grid.Column="7" HeightRequest="36" Padding="16,0" BackgroundColor="{DynamicResource BotonClaro}" StrokeThickness="0" StrokeShape="RoundRectangle 6" VerticalOptions="End">
+                    <Border Grid.Column="7" HeightRequest="36" Padding="16,0" BackgroundColor="{DynamicResource BotonClaro}" StrokeThickness="0" StrokeShape="RoundRectangle 6" VerticalOptions="Start" Margin="0,22,0,0">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="AlBuscar" />
+                            <TapGestureRecognizer Command="{Binding BuscarCommand}" />
                         </Border.GestureRecognizers>
                         <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                             <Path Data="{StaticResource IconoLupa}" WidthRequest="17" HeightRequest="17" Stroke="{DynamicResource BotonClaroTexto}" VerticalOptions="Center" />
@@ -69,9 +71,16 @@
                 </Grid>
             </Border>
 
+            <Border IsVisible="{Binding AvisoDeCopiaLocal, Converter={StaticResource TextoNoVacio}}" Margin="0,12,0,0" Padding="12,10" BackgroundColor="{DynamicResource AdvertenciaFondo}" Stroke="{DynamicResource AdvertenciaBorde}" StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                <HorizontalStackLayout Spacing="8">
+                    <Path Data="{StaticResource IconoAlerta}" WidthRequest="16" HeightRequest="16" Stroke="{DynamicResource AdvertenciaTexto}" VerticalOptions="Center" />
+                    <Label Text="{Binding AvisoDeCopiaLocal}" FontSize="13" TextColor="{DynamicResource AdvertenciaTexto}" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
             <Border Style="{StaticResource Tarjeta}" Padding="0" Margin="0,12,0,0">
                 <VerticalStackLayout Spacing="0">
-                    <Grid HeightRequest="40" Padding="12,0" BackgroundColor="{DynamicResource EncabezadoTabla}" ColumnDefinitions="100,140,110,100,110,80,70,90,90,80,120,*" ColumnSpacing="0">
+                    <Grid HeightRequest="40" Padding="12,0" BackgroundColor="{DynamicResource EncabezadoTabla}" ColumnDefinitions="100,140,110,100,110,80,70,90,90,80,170,*" ColumnSpacing="0">
                         <Label Text="Salida" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
                         <Label Grid.Column="1" Text="Pasajero" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
                         <Label Grid.Column="2" Text="Documento" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
@@ -88,7 +97,7 @@
 
                     <BoxView HeightRequest="1" Color="{DynamicResource Borde}" />
 
-                    <CollectionView x:Name="TablaPasajes" SelectionMode="Single" SelectionChanged="AlSeleccionarPasaje">
+                    <CollectionView ItemsSource="{Binding Filas}" SelectionMode="Single" SelectedItem="{Binding FilaElegida}">
                         <CollectionView.EmptyView>
                             <VerticalStackLayout HeightRequest="150" Spacing="8" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,26,0,0">
                                 <Path Data="{StaticResource IconoLupa}" WidthRequest="28" HeightRequest="28" Stroke="{DynamicResource TextoTenue}" HorizontalOptions="Center" />
@@ -96,20 +105,22 @@
                             </VerticalStackLayout>
                         </CollectionView.EmptyView>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="pasajes:DatosDePasaje">
-                                <Grid HeightRequest="38" Padding="12,0" ColumnDefinitions="100,140,110,100,110,80,70,90,90,80,120,*" ColumnSpacing="0">
-                                    <Label Text="{Binding FechaSalida, StringFormat='{0:dd/MM}'}" FontSize="13" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="1" Text="{Binding PasajeroNombre}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="2" Text="{Binding NumeroDocumento}" FontSize="13" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="3" Text="{Binding Destino}" FontSize="13" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="4" Text="{Binding LugarDeEmbarque}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="5" Text="{Binding NumeroAsiento}" FontSize="13" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="6" Text="{Binding GrupoCodigo}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="7" Text="{Binding Importe, StringFormat='S/ {0:N2}'}" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="8" Text="{Binding Pagado, StringFormat='S/ {0:N2}'}" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="9" Text="{Binding Saldo, StringFormat='S/ {0:N2}'}" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="10" Text="{Binding Estado}" FontSize="13" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="11" Text="{Binding Emisor}" FontSize="13" HorizontalTextAlignment="End" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                            <DataTemplate x:DataType="vm:FilaDePasaje">
+                                <Grid HeightRequest="38" Padding="12,0" ColumnDefinitions="100,140,110,100,110,80,70,90,90,80,170,*" ColumnSpacing="0">
+                                    <Label Text="{Binding Salida}" FontSize="13" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="1" Text="{Binding Pasaje.PasajeroNombre}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="2" Text="{Binding Pasaje.NumeroDocumento}" FontSize="13" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="3" Text="{Binding Pasaje.Destino}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="4" Text="{Binding Pasaje.LugarDeEmbarque}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="5" Text="{Binding Asiento}" FontSize="13" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="6" Text="{Binding Grupo}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="7" Text="{Binding Importe}" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="8" Text="{Binding Pagado}" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="9" Text="{Binding Saldo}" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                    <Border Grid.Column="10" Margin="10,0,0,0" Padding="10,2" HorizontalOptions="Start" VerticalOptions="Center" StrokeThickness="0" StrokeShape="RoundRectangle 11" BackgroundColor="{Binding FondoDelEstado}">
+                                        <Label Text="{Binding Estado}" FontSize="12" FontFamily="InterMedium" TextColor="{Binding TextoDelEstado}" />
+                                    </Border>
+                                    <Label Grid.Column="11" Text="{Binding Pasaje.Emisor}" FontSize="13" HorizontalTextAlignment="End" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
                                 </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
@@ -118,7 +129,8 @@
             </Border>
 
             <HorizontalStackLayout Spacing="12" Margin="0,12,0,0">
-                <Button x:Name="BotonAbrirDetalle" Text="Abrir detalle" Style="{StaticResource BotonSecundario}" IsEnabled="False" Opacity="0.45" Clicked="AlAbrirDetalle" />
+                <Button Text="Abrir detalle" Style="{StaticResource BotonSecundario}" Command="{Binding AbrirDetalleCommand}" />
+                <Button Text="Copiar datos para otro pasajero" Style="{StaticResource BotonSecundario}" Command="{Binding CopiarDatosCommand}" />
             </HorizontalStackLayout>
 
             <HorizontalStackLayout Spacing="7" Margin="0,12,0,0">

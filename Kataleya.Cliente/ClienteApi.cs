@@ -32,6 +32,7 @@ public sealed class ClienteApi
     private readonly HttpClient _http;
     private readonly IRegistroTecnico _registro;
     private readonly int _reintentosMaximos;
+    private readonly CopiaLocal? _copiaLocal;
     private readonly Dictionary<string, Guid> _clavesDeOperacion = [];
     private string? _llave;
     private DateTime? _venceLlave;
@@ -40,10 +41,12 @@ public sealed class ClienteApi
         HttpClient http,
         IRegistroTecnico registro,
         int reintentosMaximos = ReintentosPredeterminados,
-        bool permitirHttpSinTls = false)
+        bool permitirHttpSinTls = false,
+        CopiaLocal? copiaLocal = null)
     {
         _http = http ?? throw new ArgumentNullException(nameof(http));
         _registro = registro ?? throw new ArgumentNullException(nameof(registro));
+        _copiaLocal = copiaLocal;
 
         if (reintentosMaximos < 0)
         {
@@ -66,6 +69,11 @@ public sealed class ClienteApi
     }
 
     public DatosDeCuenta? CuentaActual { get; private set; }
+
+    // RNF-16: desde cuándo la Web API no responde; null si hay conexión.
+    public DateTime? SinConexionDesde { get; private set; }
+
+    public event EventHandler? ConexionCambiada;
 
     public bool SesionActiva =>
         _llave is not null &&
@@ -490,8 +498,31 @@ public sealed class ClienteApi
             "Depurar pasajes del reporte anual",
             idempotente: true);
 
+    // Guarda en la laptop los pasajes del día, para consultarlos si se corta internet (RNF-16).
+    public async Task ActualizarCopiaLocalAsync()
+    {
+        if (_copiaLocal is null || _llave is null)
+        {
+            return;
+        }
+
+        var hoy = DateOnly.FromDateTime(DateTime.Now);
+        var pasajes = await ObtenerPasajesAsync(new FiltroDePasajes { Desde = hoy, Hasta = hoy });
+
+        if (pasajes.Exito && pasajes.Datos is not null && _llave is not null)
+        {
+            await _copiaLocal.GuardarAsync(pasajes.Datos, DateTime.Now, _llave);
+        }
+    }
+
+    public async Task<CopiaDelDia?> LeerCopiaLocalAsync() =>
+        _copiaLocal is null || _llave is null
+            ? null
+            : await _copiaLocal.LeerAsync(_llave);
+
     public void CerrarSesion()
     {
+        _copiaLocal?.Borrar();
         _llave = null;
         _venceLlave = null;
         CuentaActual = null;
@@ -512,6 +543,7 @@ public sealed class ClienteApi
         {
             using var respuesta = await EnviarConReintentosAsync(
                 () => CrearSolicitud(metodo, ruta, contenido, clave));
+            MarcarConexion(hayConexion: true);
 
             if (respuesta.IsSuccessStatusCode)
             {
@@ -546,6 +578,7 @@ public sealed class ClienteApi
         }
         catch (TaskCanceledException)
         {
+            MarcarConexion(hayConexion: false);
             await RegistrarAsync(
                 "CON-02",
                 operacion,
@@ -555,6 +588,7 @@ public sealed class ClienteApi
         catch (HttpRequestException ex)
             when (ex.HttpRequestError is HttpRequestError.ConnectionError or HttpRequestError.NameResolutionError)
         {
+            MarcarConexion(hayConexion: false);
             var sinInternet = !NetworkInterface.GetIsNetworkAvailable();
             await RegistrarAsync(
                 sinInternet ? "CON-01" : "CON-02",
@@ -564,6 +598,7 @@ public sealed class ClienteApi
         }
         catch (HttpRequestException ex)
         {
+            MarcarConexion(hayConexion: false);
             await RegistrarAsync("CON-02", operacion, ex.GetType().Name);
             return Error<T>("CON-02");
         }
@@ -572,6 +607,17 @@ public sealed class ClienteApi
         {
             await RegistrarAsync("SERVIDOR", operacion, ex.GetType().Name);
             return Error<T>("SERVIDOR");
+        }
+    }
+
+    private void MarcarConexion(bool hayConexion)
+    {
+        var anterior = SinConexionDesde;
+        SinConexionDesde = hayConexion ? null : anterior ?? DateTime.Now;
+
+        if (anterior != SinConexionDesde)
+        {
+            ConexionCambiada?.Invoke(this, EventArgs.Empty);
         }
     }
 
