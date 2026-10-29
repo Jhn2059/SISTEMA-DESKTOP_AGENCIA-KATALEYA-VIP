@@ -1,4 +1,5 @@
 using Kataleya.Dominio.Entities;
+using Kataleya.Dominio.Enums;
 using Kataleya.Dominio.Interfaces;
 using Npgsql;
 using NpgsqlTypes;
@@ -14,7 +15,8 @@ public sealed class RepositorioUnidades : IRepositorioUnidades
                u.tipo_vehiculo_id,
                t.nombre,
                t.numero_asientos,
-               u.grupo_id
+               u.grupo_id,
+               u.sentido
         FROM unidad_salida u
         INNER JOIN tipo_vehiculo t ON t.id = u.tipo_vehiculo_id
         """;
@@ -24,13 +26,16 @@ public sealed class RepositorioUnidades : IRepositorioUnidades
     public RepositorioUnidades(ContextoDeBaseDeDatos contexto) =>
         _contexto = contexto ?? throw new ArgumentNullException(nameof(contexto));
 
-    public async Task<IReadOnlyList<UnidadDeSalida>> ListarDeLaSalidaAsync(DateTime fechaHora)
+    public async Task<IReadOnlyList<UnidadDeSalida>> ListarDeLaSalidaAsync(
+        DateTime fechaHora,
+        SentidoDelViaje sentido)
     {
         var conexion = await _contexto.ObtenerConexionAsync();
         await using var comando = new NpgsqlCommand(
             $"""
             {SeleccionarUnidad}
             WHERE date_trunc('minute', u.fecha_hora_salida) = date_trunc('minute', @fecha)
+              AND u.sentido = @sentido
               AND u.grupo_id IS NULL
             ORDER BY u.numero
             """,
@@ -39,6 +44,7 @@ public sealed class RepositorioUnidades : IRepositorioUnidades
             Transaction = _contexto.TransaccionActual
         };
         comando.Parameters.Add("fecha", NpgsqlDbType.TimestampTz).Value = fechaHora;
+        comando.Parameters.Add("sentido", NpgsqlDbType.Varchar).Value = sentido.ToString();
 
         return await LeerUnidadesAsync(comando);
     }
@@ -63,8 +69,8 @@ public sealed class RepositorioUnidades : IRepositorioUnidades
         var conexion = await _contexto.ObtenerConexionAsync();
         await using var comando = new NpgsqlCommand(
             """
-            INSERT INTO unidad_salida (fecha_hora_salida, numero, tipo_vehiculo_id, grupo_id)
-            VALUES (@fecha_hora_salida, @numero, @tipo_vehiculo_id, @grupo_id)
+            INSERT INTO unidad_salida (fecha_hora_salida, sentido, numero, tipo_vehiculo_id, grupo_id)
+            VALUES (@fecha_hora_salida, @sentido, @numero, @tipo_vehiculo_id, @grupo_id)
             RETURNING id
             """,
             conexion)
@@ -72,6 +78,8 @@ public sealed class RepositorioUnidades : IRepositorioUnidades
             Transaction = _contexto.TransaccionActual
         };
         comando.Parameters.Add("fecha_hora_salida", NpgsqlDbType.TimestampTz).Value = unidad.FechaHoraSalida;
+        comando.Parameters.Add("sentido", NpgsqlDbType.Varchar).Value =
+            unidad.Sentido is null ? DBNull.Value : unidad.Sentido.Value.ToString();
         comando.Parameters.Add("numero", NpgsqlDbType.Varchar).Value = unidad.Numero;
         comando.Parameters.Add("tipo_vehiculo_id", NpgsqlDbType.Smallint).Value = unidad.TipoVehiculoId;
         comando.Parameters.Add("grupo_id", NpgsqlDbType.Bigint).Value =
@@ -135,7 +143,8 @@ public sealed class RepositorioUnidades : IRepositorioUnidades
                 TipoVehiculoId = lector.GetInt16(3),
                 TipoVehiculoNombre = lector.GetString(4),
                 NumeroAsientos = lector.GetInt16(5),
-                GrupoId = lector.IsDBNull(6) ? null : lector.GetInt64(6)
+                GrupoId = lector.IsDBNull(6) ? null : lector.GetInt64(6),
+                Sentido = lector.IsDBNull(7) ? null : Enum.Parse<SentidoDelViaje>(lector.GetString(7))
             });
         }
 

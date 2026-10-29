@@ -170,55 +170,6 @@ public sealed class RepositorioConfiguracion : IRepositorioConfiguracion
             : null;
     }
 
-    public async Task<short> AgregarTipoDeVehiculoAsync(TipoDeVehiculo tipo)
-    {
-        var conexion = await _contexto.ObtenerConexionAsync();
-        await using var comando = new NpgsqlCommand(
-            """
-            INSERT INTO tipo_vehiculo (nombre, numero_asientos)
-            VALUES (@nombre, @numero_asientos)
-            RETURNING id
-            """,
-            conexion)
-        {
-            Transaction = _contexto.TransaccionActual
-        };
-        comando.Parameters.Add("nombre", NpgsqlDbType.Varchar).Value = tipo.Nombre;
-        comando.Parameters.Add("numero_asientos", NpgsqlDbType.Smallint).Value = tipo.NumeroAsientos;
-
-        return (short)(await comando.ExecuteScalarAsync())!;
-    }
-
-    public async Task ActualizarTipoDeVehiculoAsync(TipoDeVehiculo tipo)
-    {
-        var conexion = await _contexto.ObtenerConexionAsync();
-        await using var comando = new NpgsqlCommand(
-            "UPDATE tipo_vehiculo SET nombre = @nombre, numero_asientos = @numero_asientos WHERE id = @id",
-            conexion)
-        {
-            Transaction = _contexto.TransaccionActual
-        };
-        comando.Parameters.Add("id", NpgsqlDbType.Smallint).Value = tipo.Id;
-        comando.Parameters.Add("nombre", NpgsqlDbType.Varchar).Value = tipo.Nombre;
-        comando.Parameters.Add("numero_asientos", NpgsqlDbType.Smallint).Value = tipo.NumeroAsientos;
-
-        await comando.ExecuteNonQueryAsync();
-    }
-
-    public async Task EliminarTipoDeVehiculoAsync(short id)
-    {
-        var conexion = await _contexto.ObtenerConexionAsync();
-        await using var comando = new NpgsqlCommand(
-            "DELETE FROM tipo_vehiculo WHERE id = @id",
-            conexion)
-        {
-            Transaction = _contexto.TransaccionActual
-        };
-        comando.Parameters.Add("id", NpgsqlDbType.Smallint).Value = id;
-
-        await comando.ExecuteNonQueryAsync();
-    }
-
     public async Task<IReadOnlyList<ParametroDelNegocio>> ListarParametrosAsync()
     {
         var conexion = await _contexto.ObtenerConexionAsync();

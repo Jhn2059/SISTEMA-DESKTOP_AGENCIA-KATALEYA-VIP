@@ -351,10 +351,11 @@ public sealed class ClienteApi
 
     public Task<ResultadoDeLaApi<List<DatosDeUnidad>>> ObtenerUnidadesAsync(
         DateOnly fecha,
-        TimeOnly hora) =>
+        TimeOnly hora,
+        SentidoDelViaje sentido) =>
         EnviarAsync<List<DatosDeUnidad>>(
             HttpMethod.Get,
-            $"inventario/unidades{CrearConsulta(new { fecha, hora })}",
+            $"inventario/unidades{CrearConsulta(new { fecha, hora, sentido })}",
             null,
             "Consultar unidades");
 
@@ -414,26 +415,6 @@ public sealed class ClienteApi
             "configuracion/tipos-de-vehiculo",
             null,
             "Consultar tipos de vehículo");
-
-    public Task<ResultadoDeLaApi<DatosDeTipoDeVehiculo>> GuardarTipoDeVehiculoAsync(
-        int? id,
-        SolicitudDeTipoDeVehiculo solicitud) =>
-        EnviarAsync<DatosDeTipoDeVehiculo>(
-            id is null ? HttpMethod.Post : HttpMethod.Put,
-            id is null
-                ? "configuracion/tipos-de-vehiculo"
-                : $"configuracion/tipos-de-vehiculo/{id}",
-            solicitud,
-            "Guardar tipo de vehículo",
-            idempotente: true);
-
-    public Task<ResultadoDeLaApi> EliminarTipoDeVehiculoAsync(int id) =>
-        EnviarSinDatosAsync(
-            HttpMethod.Delete,
-            $"configuracion/tipos-de-vehiculo/{id}",
-            null,
-            "Eliminar tipo de vehículo",
-            idempotente: true);
 
     public Task<ResultadoDeLaApi<List<DatosDeParametro>>> ObtenerParametrosAsync() =>
         EnviarAsync<List<DatosDeParametro>>(

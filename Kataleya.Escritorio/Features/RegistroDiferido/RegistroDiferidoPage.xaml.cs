@@ -2,7 +2,9 @@ using System.Globalization;
 using Kataleya.Contratos.Configuracion;
 using Kataleya.Contratos.Pasajes;
 using Kataleya.Dominio.DataObjects;
+using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Enums;
+using Kataleya.Escritorio.Components.Common;
 using Kataleya.Escritorio.UIHelpers.Paginas;
 
 namespace Kataleya.Escritorio.Features.RegistroDiferido;
@@ -25,6 +27,7 @@ public partial class RegistroDiferidoPage : PaginaDeModulo
     private HashSet<short> _asientosOcupados = [];
     private bool _cargado;
     private decimal _tarifaActual;
+    private SentidoDelViaje? _sentidoDeLasUnidades;
 
     public RegistroDiferidoPage()
     {
@@ -44,7 +47,18 @@ public partial class RegistroDiferidoPage : PaginaDeModulo
         };
         SelectorHora.SelectedIndexChanged += async (_, _) => await CargarUnidadesAsync();
         SelectorUnidad.SelectedIndexChanged += async (_, _) => await CargarAsientosAsync();
+        CampoOrigen.PropertyChanged += async (_, argumentos) =>
+        {
+            if (argumentos.PropertyName == nameof(CampoDeTexto.Texto) &&
+                SentidoElegido != _sentidoDeLasUnidades)
+            {
+                await CargarUnidadesAsync();
+                await ActualizarTarifaAsync();
+            }
+        };
     }
+
+    private SentidoDelViaje? SentidoElegido => Ruta.SentidoSegunElOrigen(CampoOrigen.Texto);
 
     protected override async void AlAparecer()
     {
@@ -109,12 +123,17 @@ public partial class RegistroDiferidoPage : PaginaDeModulo
             return;
         }
 
-        var resultado = await Cliente.ObtenerUnidadesAsync(fecha, hora);
+        _sentidoDeLasUnidades = SentidoElegido;
         _unidades.Clear();
 
-        if (resultado.Exito && resultado.Datos is not null)
+        if (_sentidoDeLasUnidades is SentidoDelViaje sentido)
         {
-            _unidades.AddRange(resultado.Datos);
+            var resultado = await Cliente.ObtenerUnidadesAsync(fecha, hora, sentido);
+
+            if (resultado.Exito && resultado.Datos is not null)
+            {
+                _unidades.AddRange(resultado.Datos);
+            }
         }
 
         SelectorUnidad.ItemsSource = _unidades
@@ -163,6 +182,12 @@ public partial class RegistroDiferidoPage : PaginaDeModulo
             return;
         }
 
+        if (SentidoElegido is not SentidoDelViaje sentido)
+        {
+            await DisplayAlertAsync("Falta el origen", "Escriba como origen Huancayo o Ica.", "Aceptar");
+            return;
+        }
+
         var opciones = _tipos.Select(tipo => $"{tipo.Nombre} ({tipo.NumeroAsientos})").ToArray();
         var elegido = await DisplayActionSheetAsync("Tipo de vehículo", "Cancelar", null, opciones);
 
@@ -185,7 +210,8 @@ public partial class RegistroDiferidoPage : PaginaDeModulo
             {
                 TipoVehiculoId = _tipos[indice].Id,
                 Fecha = DateOnly.FromDateTime(FechaSalida.Date ?? DateTime.Today),
-                Hora = hora
+                Hora = hora,
+                Sentido = sentido
             });
 
             if (!resultado.Exito)
@@ -214,9 +240,13 @@ public partial class RegistroDiferidoPage : PaginaDeModulo
     private async Task ActualizarTarifaAsync()
     {
         var fecha = DateOnly.FromDateTime(FechaSalida.Date ?? DateTime.Today);
-        var sentido = CampoDestino.Texto.Contains("Ica", StringComparison.OrdinalIgnoreCase)
-            ? SentidoDelViaje.Ida
-            : SentidoDelViaje.Vuelta;
+
+        if (SentidoElegido is not SentidoDelViaje sentido)
+        {
+            _tarifaActual = 0;
+            LblImporte.Text = "Sin tarifa vigente";
+            return;
+        }
 
         var resultado = await Cliente.ObtenerTarifaVigenteAsync(fecha, sentido);
 
@@ -265,7 +295,7 @@ public partial class RegistroDiferidoPage : PaginaDeModulo
                 CampoHoraEmision.Texto.Trim(),
                 FormatosDeEmision,
                 Cultura,
-                DateTimeStyles.None,
+                DateTimeStyles.AssumeLocal,
                 out var emision))
         {
             await DisplayAlertAsync(

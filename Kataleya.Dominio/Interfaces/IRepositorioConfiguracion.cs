@@ -18,12 +18,6 @@ public interface IRepositorioConfiguracion
 
     Task<TipoDeVehiculo?> BuscarTipoDeVehiculoAsync(short id);
 
-    Task<short> AgregarTipoDeVehiculoAsync(TipoDeVehiculo tipo);
-
-    Task ActualizarTipoDeVehiculoAsync(TipoDeVehiculo tipo);
-
-    Task EliminarTipoDeVehiculoAsync(short id);
-
     Task<IReadOnlyList<ParametroDelNegocio>> ListarParametrosAsync();
 
     Task GuardarParametroAsync(ParametroDelNegocio parametro);

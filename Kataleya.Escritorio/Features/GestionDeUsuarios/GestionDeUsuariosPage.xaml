@@ -456,17 +456,8 @@
                                         <Path Data="{StaticResource IconoBus}" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
                                         <Label Text="Tipos de vehículo" FontFamily="InterSemiBold" FontSize="15" VerticalOptions="Center" />
                                     </HorizontalStackLayout>
-                                    <Label Text="Nombre y número de asientos. Se usan para abrir unidades." FontSize="12" TextColor="{DynamicResource TextoSuave}" />
+                                    <Label Text="Número de asientos de cada tipo. Son fijos: se cargan al instalar el sistema." FontSize="12" TextColor="{DynamicResource TextoSuave}" />
                                     <FlexLayout x:Name="ListaTiposVehiculo" Direction="Row" Wrap="Wrap" AlignItems="Start" />
-                                    <Grid ColumnDefinitions="*,86,Auto" ColumnSpacing="10">
-                                        <Border Style="{StaticResource CampoDeFormulario}">
-                                            <Entry x:Name="EntradaNuevoTipo" Placeholder="Nombre" />
-                                        </Border>
-                                        <Border Grid.Column="1" Style="{StaticResource CampoDeFormulario}">
-                                            <Entry x:Name="EntradaNuevosAsientos" Placeholder="Asientos" Keyboard="Numeric" />
-                                        </Border>
-                                        <Button x:Name="BotonAgregarTipo" Grid.Column="2" Text="+  Agregar" Style="{StaticResource BotonSecundario}" Clicked="AlAgregarTipo" />
-                                    </Grid>
                                 </VerticalStackLayout>
                             </Border>
                         </VerticalStackLayout>

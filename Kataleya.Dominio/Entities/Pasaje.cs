@@ -152,6 +152,8 @@ public sealed class UnidadDeSalida
 
     public DateTime FechaHoraSalida { get; set; }
 
+    public SentidoDelViaje? Sentido { get; set; }
+
     public string Numero { get; set; } = string.Empty;
 
     public short TipoVehiculoId { get; set; }

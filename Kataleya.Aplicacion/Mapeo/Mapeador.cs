@@ -109,6 +109,7 @@ public static class Mapeador
             NumeroAsientos = unidad.NumeroAsientos,
             Descripcion = unidad.Descripcion,
             FechaHoraSalida = unidad.FechaHoraSalida,
+            Sentido = unidad.Sentido,
             GrupoId = unidad.GrupoId,
             AsientosOcupados = unidad.AsientosOcupados
         };

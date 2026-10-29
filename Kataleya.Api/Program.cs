@@ -341,13 +341,14 @@ var inventario = app.MapGroup("/inventario");
 inventario.MapGet("/unidades", async (
     DateOnly fecha,
     TimeOnly hora,
+    Kataleya.Dominio.Enums.SentidoDelViaje sentido,
     ServicioInventario servicio) =>
-    Results.Ok(await servicio.ListarAsync(fecha, hora)));
+    Results.Ok(await servicio.ListarAsync(fecha, hora, sentido)));
 
 inventario.MapPost("/unidades", async (
     Kataleya.Contratos.Pasajes.SolicitudDeUnidad solicitud,
     ServicioInventario servicio) =>
-    Results.Ok(await servicio.AbrirAsync(solicitud.Fecha, solicitud.Hora, solicitud.TipoVehiculoId)));
+    Results.Ok(await servicio.AbrirAsync(solicitud)));
 
 inventario.MapGet("/unidades/{id:long}/asientos", async (
     long id,
@@ -369,7 +370,7 @@ configuracion.MapGet("/tarifas/vigente", async (
     IReloj reloj,
     ServicioConfiguracion servicio) =>
 {
-    var dia = fecha ?? DateOnly.FromDateTime(reloj.Ahora);
+    var dia = fecha ?? FechasLocales.Hoy(reloj.Ahora);
     var tarifa = await servicio.ObtenerTarifaVigenteAsync(
         dia,
         sentido ?? Kataleya.Dominio.Enums.SentidoDelViaje.Ida);
@@ -401,27 +402,6 @@ configuracion.MapGet("/tipos-de-vehiculo", async (ServicioConfiguracion servicio
     Results.Ok((await servicio.ListarTiposDeVehiculoAsync())
         .Select(t => Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(t))
         .ToList()));
-
-configuracionAdministrativa.MapPost("/tipos-de-vehiculo", async (
-    Kataleya.Contratos.Configuracion.SolicitudDeTipoDeVehiculo solicitud,
-    ServicioConfiguracion servicio) =>
-    Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
-        await servicio.GuardarTipoDeVehiculoAsync(null, solicitud))));
-
-configuracionAdministrativa.MapPut("/tipos-de-vehiculo/{id:int}", async (
-    int id,
-    Kataleya.Contratos.Configuracion.SolicitudDeTipoDeVehiculo solicitud,
-    ServicioConfiguracion servicio) =>
-    Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
-        await servicio.GuardarTipoDeVehiculoAsync((short)id, solicitud))));
-
-configuracionAdministrativa.MapDelete("/tipos-de-vehiculo/{id:int}", async (
-    int id,
-    ServicioConfiguracion servicio) =>
-{
-    await servicio.EliminarTipoDeVehiculoAsync((short)id);
-    return Results.NoContent();
-});
 
 configuracion.MapGet("/parametros", async (ServicioConfiguracion servicio) =>
     Results.Ok((await servicio.ListarParametrosAsync())

@@ -175,7 +175,7 @@ public sealed class RepositorioUsuarios : IRepositorioUsuarios
 
     private static Usuario LeerUsuario(NpgsqlDataReader lector)
     {
-        var finBloqueo = lector.IsDBNull(7) ? (DateTime?)null : lector.GetDateTime(7);
+        var finBloqueo = lector.IsDBNull(7) ? (DateTime?)null : lector.GetDateTime(7).ToUniversalTime();
         var rol = new Rol(lector.GetInt16(8), lector.GetString(9));
         var sede = new Sede(lector.GetInt16(10), lector.GetString(11));
 

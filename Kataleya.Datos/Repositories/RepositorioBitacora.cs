@@ -122,13 +122,13 @@ public sealed class RepositorioBitacora : IRepositorioBitacora
 
         if (filtro.Desde is not null)
         {
-            condiciones.Add("b.fecha_hora::date >= @desde");
+            condiciones.Add("(b.fecha_hora AT TIME ZONE 'America/Lima')::date >= @desde");
             comando.Parameters.Add("desde", NpgsqlDbType.Date).Value = filtro.Desde.Value;
         }
 
         if (filtro.Hasta is not null)
         {
-            condiciones.Add("b.fecha_hora::date <= @hasta");
+            condiciones.Add("(b.fecha_hora AT TIME ZONE 'America/Lima')::date <= @hasta");
             comando.Parameters.Add("hasta", NpgsqlDbType.Date).Value = filtro.Hasta.Value;
         }
 

@@ -234,6 +234,8 @@ public sealed class DatosDeUnidad
 
     public DateTime FechaHoraSalida { get; set; }
 
+    public SentidoDelViaje? Sentido { get; set; }
+
     public long? GrupoId { get; set; }
 
     public List<short> AsientosOcupados { get; set; } = [];
@@ -246,6 +248,8 @@ public sealed class SolicitudDeUnidad
     public DateOnly Fecha { get; set; }
 
     public TimeOnly Hora { get; set; }
+
+    public SentidoDelViaje Sentido { get; set; }
 }
 
 public sealed class FiltroDePasajes

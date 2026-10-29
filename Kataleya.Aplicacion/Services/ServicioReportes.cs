@@ -37,7 +37,7 @@ public sealed class ServicioReportes
     {
         ArgumentNullException.ThrowIfNull(filtro);
 
-        var hoy = DateOnly.FromDateTime(_reloj.Ahora);
+        var hoy = FechasLocales.Hoy(_reloj.Ahora);
         var desde = filtro.Desde ?? hoy;
         var hasta = filtro.Hasta ?? hoy;
 
@@ -61,7 +61,7 @@ public sealed class ServicioReportes
 
     public async Task<DatosDelPanel> ObtenerPanelAsync(DateOnly? fecha)
     {
-        var dia = fecha ?? DateOnly.FromDateTime(_reloj.Ahora);
+        var dia = fecha ?? FechasLocales.Hoy(_reloj.Ahora);
         var usuario = await ObtenerUsuarioAsync();
         int? emisorId = usuario.Rol.Nombre == "Administrador" ? null : usuario.Id;
         var resumen = await _cuadre.ObtenerPanelAsync(dia, emisorId);

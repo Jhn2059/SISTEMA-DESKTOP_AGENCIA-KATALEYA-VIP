@@ -2,6 +2,7 @@ using Kataleya.Aplicacion.Excepciones;
 using Kataleya.Aplicacion.Mapeo;
 using Kataleya.Contratos.Pasajes;
 using Kataleya.Dominio.Entities;
+using Kataleya.Dominio.Enums;
 using Kataleya.Dominio.Interfaces;
 
 namespace Kataleya.Aplicacion.Services;
@@ -19,22 +20,27 @@ public sealed class ServicioInventario
         _configuracion = configuracion ?? throw new ArgumentNullException(nameof(configuracion));
     }
 
-    public async Task<IReadOnlyList<DatosDeUnidad>> ListarAsync(DateOnly fecha, TimeOnly hora)
+    public async Task<IReadOnlyList<DatosDeUnidad>> ListarAsync(
+        DateOnly fecha,
+        TimeOnly hora,
+        SentidoDelViaje sentido)
     {
-        var unidades = await _unidades.ListarDeLaSalidaAsync(FechasLocales.Combinar(fecha, hora));
+        ValidarSentido(sentido);
+
+        var unidades = await _unidades.ListarDeLaSalidaAsync(FechasLocales.Combinar(fecha, hora), sentido);
         return unidades.Select(u => u.ADatos()).ToList();
     }
 
-    public async Task<DatosDeUnidad> AbrirAsync(
-        DateOnly fecha,
-        TimeOnly hora,
-        short tipoVehiculoId)
+    public async Task<DatosDeUnidad> AbrirAsync(SolicitudDeUnidad solicitud)
     {
-        var tipo = await _configuracion.BuscarTipoDeVehiculoAsync(tipoVehiculoId)
+        ArgumentNullException.ThrowIfNull(solicitud);
+        ValidarSentido(solicitud.Sentido);
+
+        var tipo = await _configuracion.BuscarTipoDeVehiculoAsync(solicitud.TipoVehiculoId)
             ?? throw new ReglaDeNegocioException("Elija un tipo de vehículo válido.", "tipoVehiculoId");
 
-        var fechaHora = FechasLocales.Combinar(fecha, hora);
-        var existentes = await _unidades.ListarDeLaSalidaAsync(fechaHora);
+        var fechaHora = FechasLocales.Combinar(solicitud.Fecha, solicitud.Hora);
+        var existentes = await _unidades.ListarDeLaSalidaAsync(fechaHora, solicitud.Sentido);
 
         var numero = (existentes
             .Select(u => int.TryParse(u.Numero, out var n) ? n : 0)
@@ -44,6 +50,7 @@ public sealed class ServicioInventario
         var unidad = new UnidadDeSalida
         {
             FechaHoraSalida = fechaHora,
+            Sentido = solicitud.Sentido,
             Numero = numero,
             TipoVehiculoId = tipo.Id,
             TipoVehiculoNombre = tipo.Nombre,
@@ -56,4 +63,14 @@ public sealed class ServicioInventario
 
     public async Task<IReadOnlyList<short>> AsientosOcupadosAsync(long unidadId) =>
         await _unidades.AsientosOcupadosAsync(unidadId);
+
+    private static void ValidarSentido(SentidoDelViaje sentido)
+    {
+        if (sentido == SentidoDelViaje.Ambos)
+        {
+            throw new ReglaDeNegocioException(
+                "Una unidad sale de Huancayo o de Ica: elija uno de los dos sentidos.",
+                "sentido");
+        }
+    }
 }

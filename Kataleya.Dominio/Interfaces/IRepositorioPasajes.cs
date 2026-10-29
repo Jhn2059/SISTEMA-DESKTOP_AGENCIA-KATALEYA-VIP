@@ -1,4 +1,5 @@
 using Kataleya.Dominio.Entities;
+using Kataleya.Dominio.Enums;
 
 namespace Kataleya.Dominio.Interfaces;
 
@@ -45,7 +46,7 @@ public interface IRepositorioPasajes
 
 public interface IRepositorioUnidades
 {
-    Task<IReadOnlyList<UnidadDeSalida>> ListarDeLaSalidaAsync(DateTime fechaHora);
+    Task<IReadOnlyList<UnidadDeSalida>> ListarDeLaSalidaAsync(DateTime fechaHora, SentidoDelViaje sentido);
 
     Task<UnidadDeSalida?> BuscarAsync(long id);
 

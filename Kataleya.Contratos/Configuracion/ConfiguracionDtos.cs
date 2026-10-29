@@ -47,13 +47,6 @@ public sealed class DatosDeTipoDeVehiculo
     public short NumeroAsientos { get; set; }
 }
 
-public sealed class SolicitudDeTipoDeVehiculo
-{
-    public string Nombre { get; set; } = string.Empty;
-
-    public short NumeroAsientos { get; set; }
-}
-
 public sealed class DatosDeParametro
 {
     public string Nombre { get; set; } = string.Empty;

@@ -73,6 +73,9 @@ public partial class DetalleDePasajePage : PaginaDeModulo
             pasaje.Estado != EstadoPasaje.NoSePresento &&
             pasaje.FechaSalida.ToDateTime(pasaje.HoraSalida) <= DateTime.Now;
 
+        BotonModificar.IsVisible = Cliente.EsAdministrador;
+        FilaAnulacion.IsVisible = Cliente.EsAdministrador;
+
         AjustarOpacidad(BotonCobrar);
         AjustarOpacidad(BotonModificar);
         AjustarOpacidad(BotonAnular);

@@ -183,7 +183,7 @@ public sealed class ServicioPasajes
                 "horaEmisionReal");
         }
 
-        if (solicitud.HoraEmisionReal.Value > _reloj.Ahora)
+        if (solicitud.HoraEmisionReal.Value.ToUniversalTime() > _reloj.Ahora)
         {
             throw new ReglaDeNegocioException(
                 "La hora real de emisión no puede estar en el futuro.",
@@ -306,12 +306,14 @@ public sealed class ServicioPasajes
             ValidarIntegrante(integrante);
         }
 
-        if (esVenta && FechasLocales.Combinar(solicitud.FechaSalida, solicitud.HoraSalida) < _reloj.Ahora)
+        if (FechasLocales.Combinar(solicitud.FechaSalida, solicitud.HoraSalida) < _reloj.Ahora)
         {
             throw new ReglaDeNegocioException(
                 "La salida del grupo no puede estar en el pasado.",
                 "fechaSalida");
         }
+
+        await ValidarPlazoDeReservaAsync(solicitud.FechaSalida);
 
         var monto = solicitud.Monto ?? (esVenta ? solicitud.PrecioAcordado : 0m);
 
@@ -761,7 +763,8 @@ public sealed class ServicioPasajes
                 "La unidad seleccionada ya no existe.",
                 "unidadSalidaId");
 
-        if (unidad.FechaHoraSalida != FechasLocales.Combinar(nuevaFecha, nuevaHora))
+        if (unidad.FechaHoraSalida.ToUniversalTime() != FechasLocales.Combinar(nuevaFecha, nuevaHora) ||
+            unidad.Sentido != Ruta.SentidoSegunElOrigen(pasaje.Origen))
         {
             throw new ReglaDeNegocioException(
                 "La unidad no corresponde a la fecha y hora de salida.",
@@ -966,12 +969,22 @@ public sealed class ServicioPasajes
                 "fechaSalida");
         }
 
+        if (!permitirPasado)
+        {
+            await ValidarPlazoDeReservaAsync(solicitud.FechaSalida);
+        }
+
+        var sentido = Ruta.SentidoSegunElOrigen(solicitud.Origen)
+            ?? throw new ReglaDeNegocioException(
+                "El origen debe ser Huancayo o Ica.",
+                "origen");
+
         var unidad = await _unidades.BuscarAsync(solicitud.UnidadSalidaId)
             ?? throw new ReglaDeNegocioException(
                 "La unidad seleccionada ya no existe.",
                 "unidadSalidaId");
 
-        if (unidad.FechaHoraSalida != salida)
+        if (unidad.FechaHoraSalida.ToUniversalTime() != salida || unidad.Sentido != sentido)
         {
             throw new ReglaDeNegocioException(
                 "La unidad no corresponde a la fecha y hora de salida.",
@@ -993,7 +1006,6 @@ public sealed class ServicioPasajes
                 "numeroAsiento");
         }
 
-        var sentido = ServicioConfiguracion.DeducirSentido(solicitud.Origen, solicitud.Destino);
         var tarifa = await _servicioConfiguracion.ObtenerTarifaVigenteAsync(solicitud.FechaSalida, sentido);
 
         var pasaje = new Pasaje
@@ -1118,14 +1130,32 @@ public sealed class ServicioPasajes
         return _emisor;
     }
 
-    private async Task<int> ObtenerHorasDeAvisoAsync()
+    private Task<int> ObtenerHorasDeAvisoAsync() =>
+        ObtenerParametroAsync("aviso_previo_horas", 3);
+
+    private Task<int> ObtenerPlazoDeReservaAsync() =>
+        ObtenerParametroAsync("plazo_maximo_reserva_dias", 7);
+
+    private async Task<int> ObtenerParametroAsync(string nombre, int predeterminado)
     {
         var parametros = await _configuracion.ListarParametrosAsync();
         var valor = parametros
-            .FirstOrDefault(p => p.Nombre == "aviso_previo_horas")
+            .FirstOrDefault(p => p.Nombre == nombre)
             ?.Valor;
 
-        return int.TryParse(valor, out var horas) ? horas : 3;
+        return int.TryParse(valor, out var numero) ? numero : predeterminado;
+    }
+
+    private async Task ValidarPlazoDeReservaAsync(DateOnly fechaSalida)
+    {
+        var plazo = await ObtenerPlazoDeReservaAsync();
+
+        if (fechaSalida > FechasLocales.Hoy(_reloj.Ahora).AddDays(plazo))
+        {
+            throw new ReglaDeNegocioException(
+                $"La salida debe ser desde ahora hasta dentro de {plazo} días.",
+                "fechaSalida");
+        }
     }
 
     private async Task<DatosDePasaje?> BuscarRepeticionAsync()

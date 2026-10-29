@@ -1,7 +1,9 @@
 ﻿using System.Globalization;
 using Kataleya.Contratos.Configuracion;
 using Kataleya.Contratos.Pasajes;
+using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Enums;
+using Kataleya.Escritorio.Components.Common;
 using Kataleya.Escritorio.UIHelpers;
 using Kataleya.Escritorio.UIHelpers.Paginas;
 using Microsoft.Maui.Controls.Shapes;
@@ -20,6 +22,7 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
     private bool _cargado;
     private short _asientoSeleccionado;
     private decimal _tarifaActual;
+    private SentidoDelViaje? _sentidoDeLasUnidades;
 
     public RegistroDePasajesPage()
     {
@@ -37,7 +40,18 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
         };
         SelectorHora.SelectedIndexChanged += async (_, _) => await CargarUnidadesAsync();
         SelectorUnidad.SelectedIndexChanged += async (_, _) => await CargarAsientosAsync();
+        CampoOrigen.PropertyChanged += async (_, argumentos) =>
+        {
+            if (argumentos.PropertyName == nameof(CampoDeTexto.Texto) &&
+                SentidoElegido != _sentidoDeLasUnidades)
+            {
+                await CargarUnidadesAsync();
+                await ActualizarTarifaAsync();
+            }
+        };
     }
+
+    private SentidoDelViaje? SentidoElegido => Ruta.SentidoSegunElOrigen(CampoOrigen.Texto);
 
     protected override async void AlAparecer()
     {
@@ -46,6 +60,11 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
         if (_cargado)
         {
             return;
+        }
+
+        if (string.IsNullOrWhiteSpace(CampoOrigen.Texto))
+        {
+            CampoOrigen.Texto = Cliente?.CuentaActual?.Sede ?? string.Empty;
         }
 
         _cargado = true;
@@ -104,12 +123,17 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
             return;
         }
 
-        var resultado = await Cliente.ObtenerUnidadesAsync(fecha, hora);
+        _sentidoDeLasUnidades = SentidoElegido;
         _unidades.Clear();
 
-        if (resultado.Exito && resultado.Datos is not null)
+        if (_sentidoDeLasUnidades is SentidoDelViaje sentido)
         {
-            _unidades.AddRange(resultado.Datos);
+            var resultado = await Cliente.ObtenerUnidadesAsync(fecha, hora, sentido);
+
+            if (resultado.Exito && resultado.Datos is not null)
+            {
+                _unidades.AddRange(resultado.Datos);
+            }
         }
 
         SelectorUnidad.ItemsSource = _unidades
@@ -127,7 +151,9 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
             _asientoSeleccionado = 0;
             LblAsiento.Text = "Asiento elegido: —";
             MapaAsientos.Children.Clear();
-            LblMensaje.Text = "No hay unidades abiertas para esa salida. Use «Abrir otra unidad».";
+            LblMensaje.Text = _sentidoDeLasUnidades is null
+                ? "Escriba como origen Huancayo o Ica para ver sus unidades."
+                : "No hay unidades abiertas para esa salida. Use «Abrir otra unidad».";
         }
     }
 
@@ -245,11 +271,18 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
             return;
         }
 
+        if (SentidoElegido is not SentidoDelViaje sentido)
+        {
+            await DisplayAlertAsync("Falta el origen", "Escriba como origen Huancayo o Ica.", "Aceptar");
+            return;
+        }
+
         var resultado = await Cliente.AbrirUnidadAsync(new SolicitudDeUnidad
         {
             TipoVehiculoId = _tipos[indice].Id,
             Fecha = DateOnly.FromDateTime(FechaSalida.Date ?? DateTime.Today),
-            Hora = hora
+            Hora = hora,
+            Sentido = sentido
         });
 
         if (!resultado.Exito)
@@ -619,9 +652,13 @@ public partial class RegistroDePasajesPage : PaginaDeModulo
     private async Task ActualizarTarifaAsync()
     {
         var fecha = DateOnly.FromDateTime(FechaSalida.Date ?? DateTime.Today);
-        var sentido = CampoDestino.Texto.Contains("Ica", StringComparison.OrdinalIgnoreCase)
-            ? SentidoDelViaje.Ida
-            : SentidoDelViaje.Vuelta;
+
+        if (SentidoElegido is not SentidoDelViaje sentido)
+        {
+            _tarifaActual = 0;
+            LblTarifa.Text = "Sin tarifa vigente";
+            return;
+        }
 
         var resultado = await Cliente.ObtenerTarifaVigenteAsync(fecha, sentido);
 

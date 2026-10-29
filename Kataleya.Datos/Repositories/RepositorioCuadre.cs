@@ -18,7 +18,7 @@ public sealed class RepositorioCuadre : IRepositorioCuadre
                    pg.medio,
                    pg.tipo_movimiento
             FROM pago pg
-            WHERE pg.fecha_hora::date BETWEEN @desde AND @hasta
+            WHERE (pg.fecha_hora AT TIME ZONE 'America/Lima')::date BETWEEN @desde AND @hasta
         )
         """;
 
@@ -172,23 +172,23 @@ public sealed class RepositorioCuadre : IRepositorioCuadre
             """
             SELECT
                 (SELECT COUNT(*) FROM pasaje p
-                 WHERE p.fecha_hora_registro::date = @fecha
+                 WHERE (p.fecha_hora_registro AT TIME ZONE 'America/Lima')::date = @fecha
                    AND p.estado IN ('Reservado', 'ReservadoConAdelanto')
                    AND (@emisor IS NULL OR p.emisor_id = @emisor)),
                 (SELECT COUNT(*) FROM pasaje p
-                 WHERE p.fecha_hora_registro::date = @fecha
+                 WHERE (p.fecha_hora_registro AT TIME ZONE 'America/Lima')::date = @fecha
                    AND p.estado = 'Pagado'
                    AND (@emisor IS NULL OR p.emisor_id = @emisor)),
                 COALESCE((SELECT SUM(CASE WHEN pg.tipo_movimiento = 'Pago' THEN pg.importe ELSE -pg.importe END)
                           FROM pago pg
                           INNER JOIN usuario u ON u.id = pg.usuario_id
-                          WHERE pg.fecha_hora::date = @fecha
+                          WHERE (pg.fecha_hora AT TIME ZONE 'America/Lima')::date = @fecha
                             AND pg.medio = 'Efectivo'
                             AND (@emisor IS NULL OR u.id = @emisor)), 0),
                 COALESCE((SELECT SUM(CASE WHEN pg.tipo_movimiento = 'Pago' THEN pg.importe ELSE -pg.importe END)
                           FROM pago pg
                           INNER JOIN usuario u ON u.id = pg.usuario_id
-                          WHERE pg.fecha_hora::date = @fecha
+                          WHERE (pg.fecha_hora AT TIME ZONE 'America/Lima')::date = @fecha
                             AND pg.medio = 'Yape'
                             AND (@emisor IS NULL OR u.id = @emisor)), 0),
                 COALESCE((SELECT SUM(GREATEST(

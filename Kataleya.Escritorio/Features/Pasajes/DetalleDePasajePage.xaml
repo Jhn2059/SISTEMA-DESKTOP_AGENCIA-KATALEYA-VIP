@@ -149,7 +149,7 @@
                             <Button x:Name="BotonImprimir" Text="Imprimir boleto" Style="{StaticResource BotonSecundario}" IsEnabled="False" Opacity="0.45" Clicked="AlImprimir" />
                             <Button x:Name="BotonReimprimir" Grid.Column="1" Text="Reimprimir" Style="{StaticResource BotonSecundario}" IsEnabled="False" Opacity="0.45" Clicked="AlReimprimir" />
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                        <Grid x:Name="FilaAnulacion" ColumnDefinitions="Auto,*" ColumnSpacing="8">
                             <Button x:Name="BotonAnular" Text="Anular" Style="{StaticResource BotonPeligro}" IsEnabled="False" Opacity="0.45" Clicked="AlAnular" />
                             <Button x:Name="BotonNoPresentado" Grid.Column="1" Text="Marcar «No se presentó»" Style="{StaticResource BotonSecundario}" IsEnabled="False" Opacity="0.45" Clicked="AlNoPresentado" />
                         </Grid>

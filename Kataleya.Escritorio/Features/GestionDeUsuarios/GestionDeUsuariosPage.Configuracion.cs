@@ -284,28 +284,12 @@ public partial class GestionDeUsuariosPage
         chip.SetDynamicResource(Border.BackgroundColorProperty, "Superficie");
         chip.SetDynamicResource(Border.StrokeProperty, "Borde");
 
-        var contenido = new HorizontalStackLayout { Spacing = 6 };
-        contenido.Children.Add(new Label
+        chip.Content = new Label
         {
             Text = $"{tipo.Nombre} · {tipo.NumeroAsientos}",
             FontSize = 13,
             VerticalTextAlignment = TextAlignment.Center
-        });
-
-        var quitar = new Button
-        {
-            Text = "×",
-            FontSize = 12,
-            WidthRequest = 22,
-            HeightRequest = 22,
-            Padding = 0,
-            BackgroundColor = Colors.Transparent
         };
-        quitar.TextColor = ServicioDeTema.Color("TextoSuave");
-        quitar.Clicked += async (_, _) => await EliminarTipoAsync(tipo);
-        contenido.Children.Add(quitar);
-
-        chip.Content = contenido;
         return chip;
     }
 
@@ -650,84 +634,6 @@ public partial class GestionDeUsuariosPage
         _horariosConfig = horarios;
         RenderizarHorarios();
         MostrarMensajeConfig("Horarios de salida guardados.");
-    }
-
-    private async void AlAgregarTipo(object? remitente, EventArgs argumentos)
-    {
-        if (string.IsNullOrWhiteSpace(EntradaNuevoTipo.Text))
-        {
-            MostrarMensajeConfig("Escriba el nombre del tipo de vehículo.", esError: true);
-            return;
-        }
-
-        if (!short.TryParse(EntradaNuevosAsientos.Text, out var asientos) || asientos <= 0)
-        {
-            MostrarMensajeConfig("Indique un número de asientos mayor que cero.", esError: true);
-            return;
-        }
-
-        BotonAgregarTipo.IsEnabled = false;
-
-        try
-        {
-            var resultado = await _cliente.GuardarTipoDeVehiculoAsync(null, new SolicitudDeTipoDeVehiculo
-            {
-                Nombre = EntradaNuevoTipo.Text.Trim(),
-                NumeroAsientos = asientos
-            });
-
-            if (!resultado.Exito)
-            {
-                MostrarErrorConfig(resultado, "No se pudo guardar el tipo de vehículo.");
-                return;
-            }
-
-            EntradaNuevoTipo.Text = string.Empty;
-            EntradaNuevosAsientos.Text = string.Empty;
-            MostrarMensajeConfig("Tipo de vehículo guardado.");
-            await RecargarTiposAsync();
-        }
-        finally
-        {
-            BotonAgregarTipo.IsEnabled = true;
-        }
-    }
-
-    private async Task EliminarTipoAsync(DatosDeTipoDeVehiculo tipo)
-    {
-        var confirmar = await DisplayAlertAsync(
-            "Quitar tipo de vehículo",
-            $"¿Eliminar «{tipo.Nombre} · {tipo.NumeroAsientos}»?",
-            "Quitar",
-            "Cancelar");
-
-        if (!confirmar)
-        {
-            return;
-        }
-
-        var resultado = await _cliente.EliminarTipoDeVehiculoAsync(tipo.Id);
-        if (!resultado.Exito)
-        {
-            MostrarErrorConfig(resultado, "No se pudo eliminar el tipo de vehículo.");
-            return;
-        }
-
-        MostrarMensajeConfig("Tipo de vehículo eliminado.");
-        await RecargarTiposAsync();
-    }
-
-    private async Task RecargarTiposAsync()
-    {
-        var resultado = await _cliente.ObtenerTiposDeVehiculoAsync();
-        if (!resultado.Exito || resultado.Datos is null)
-        {
-            MostrarErrorConfig(resultado, "No se pudieron actualizar los tipos de vehículo.");
-            return;
-        }
-
-        _tiposConfig = resultado.Datos;
-        RenderizarTiposDeVehiculo();
     }
 
     private void MostrarMensajeConfig(string mensaje, bool esError = false)
