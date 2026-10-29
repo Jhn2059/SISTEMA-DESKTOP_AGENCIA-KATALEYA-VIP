@@ -4,7 +4,9 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:paginas="clr-namespace:Kataleya.Escritorio.UIHelpers.Paginas"
-    xmlns:common="clr-namespace:Kataleya.Escritorio.Components.Common">
+    xmlns:common="clr-namespace:Kataleya.Escritorio.Components.Common"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.RegistroDiferido"
+    x:DataType="vm:RegistroDiferidoViewModel">
     <ScrollView VerticalScrollBarVisibility="Never">
         <VerticalStackLayout Padding="24,16,24,24" Spacing="0">
 
@@ -13,92 +15,121 @@
                 <Label Text="Pasajes emitidos con talonario durante una contingencia" Style="{StaticResource SubtituloDePagina}" VerticalOptions="Center" />
             </HorizontalStackLayout>
 
+            <Border
+                IsVisible="{Binding MensajeDeExito, Converter={StaticResource TextoNoVacio}}"
+                Margin="0,12,0,0"
+                Padding="12,10"
+                BackgroundColor="{DynamicResource ExitoFondo}"
+                Stroke="{DynamicResource ExitoBorde}"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 8">
+                <HorizontalStackLayout Spacing="8">
+                    <Path Data="{StaticResource IconoCheckCirculo}" WidthRequest="16" HeightRequest="16" Stroke="{DynamicResource Exito}" VerticalOptions="Center" />
+                    <Label Text="{Binding MensajeDeExito}" FontSize="13" TextColor="{DynamicResource Exito}" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
             <Border Style="{StaticResource Tarjeta}" Margin="0,12,0,0">
                 <VerticalStackLayout Spacing="14">
 
                     <Label Text="Boleto del talonario" FontFamily="InterSemiBold" FontSize="15" />
-                    <Grid ColumnDefinitions="240,240,*" ColumnSpacing="12">
-                        <common:CampoDeTexto x:Name="CampoTalonario" Etiqueta="N.º de boleto del talonario *" Placeholder="T-0001" />
-                        <common:CampoDeTexto x:Name="CampoHoraEmision" Grid.Column="1" Etiqueta="Fecha y hora reales de emisión *" Placeholder="dd/MM/yyyy HH:mm" />
+                    <Grid ColumnDefinitions="220,300,*" ColumnSpacing="12">
+                        <common:CampoDeTexto
+                            Etiqueta="N.º de boleto del talonario *"
+                            Placeholder="000123"
+                            Texto="{Binding NumeroTalonario}"
+                            MensajeDeError="{Binding ErrorTalonario}" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="Fecha y hora reales de emisión *" Style="{StaticResource EtiquetaDeCampo}" />
+                            <Grid ColumnDefinitions="*,110" ColumnSpacing="8">
+                                <Border Style="{StaticResource CampoDeFormulario}">
+                                    <DatePicker Date="{Binding FechaDeEmision}" Format="dd/MM/yyyy" />
+                                </Border>
+                                <Border Grid.Column="1" Style="{StaticResource CampoDeFormulario}">
+                                    <TimePicker Time="{Binding HoraDeEmision}" Format="HH:mm" />
+                                </Border>
+                            </Grid>
+                            <Label Text="{Binding ErrorEmision}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorEmision, Converter={StaticResource TextoNoVacio}}" />
+                        </VerticalStackLayout>
                     </Grid>
 
-                    <BoxView HeightRequest="1" Color="{DynamicResource Borde}" Margin="0,4" />
-
                     <Label Text="Pasajero" FontFamily="InterSemiBold" FontSize="15" />
-                    <Grid ColumnDefinitions="*,190,180,180" ColumnSpacing="12">
-                        <common:CampoDeTexto x:Name="CampoNombre" Etiqueta="Nombre *" Placeholder="Nombre Apellido" />
+                    <Grid ColumnDefinitions="*,140,170,170" ColumnSpacing="12">
+                        <common:CampoDeTexto
+                            Etiqueta="Nombre *"
+                            Placeholder="Nombre Apellido"
+                            Texto="{Binding Nombre}"
+                            MensajeDeError="{Binding ErrorNombre}" />
                         <VerticalStackLayout Grid.Column="1" Spacing="6">
                             <Label Text="Documento *" Style="{StaticResource EtiquetaDeCampo}" />
                             <Border Style="{StaticResource CampoDeFormulario}">
-                                <Picker x:Name="SelectorTipoDocumento" Title="DNI">
-                                    <Picker.ItemsSource>
-                                        <x:Array Type="{x:Type x:String}">
-                                            <x:String>DNI</x:String>
-                                            <x:String>Pasaporte</x:String>
-                                        </x:Array>
-                                    </Picker.ItemsSource>
-                                </Picker>
+                                <Picker ItemsSource="{Binding TiposDeDocumento}" SelectedIndex="{Binding TipoDeDocumento}" />
                             </Border>
                         </VerticalStackLayout>
-                        <common:CampoDeTexto x:Name="CampoDocumento" Grid.Column="2" Etiqueta="N.º de documento *" Placeholder="12345678" />
-                        <common:CampoDeTexto x:Name="CampoTelefono" Grid.Column="3" Etiqueta="Teléfono" Placeholder="9XX XXX XXX" />
+                        <common:CampoDeTexto
+                            Grid.Column="2"
+                            Etiqueta="N.º de documento *"
+                            Placeholder="12345678"
+                            Texto="{Binding NumeroDocumento}"
+                            MensajeDeError="{Binding ErrorDocumento}" />
+                        <common:CampoDeTexto
+                            Grid.Column="3"
+                            Etiqueta="Teléfono *"
+                            Placeholder="9XX XXX XXX"
+                            Teclado="Telephone"
+                            Texto="{Binding Telefono}"
+                            MensajeDeError="{Binding ErrorTelefono}" />
                     </Grid>
-
-                    <BoxView HeightRequest="1" Color="{DynamicResource Borde}" Margin="0,4" />
 
                     <Label Text="Viaje" FontFamily="InterSemiBold" FontSize="15" />
-                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
-                        <common:CampoDeTexto x:Name="CampoDestino" Etiqueta="Destino *" Placeholder="Huancayo" />
+                    <Grid ColumnDefinitions="*,300,*,*" ColumnSpacing="12">
+                        <common:CampoDeTexto
+                            Etiqueta="Destino *"
+                            Placeholder="Ica"
+                            Texto="{Binding Destino}"
+                            MensajeDeError="{Binding ErrorDestino}" />
                         <VerticalStackLayout Grid.Column="1" Spacing="6">
-                            <Label Text="Fecha de salida *" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoDeFormulario}">
-                                <DatePicker x:Name="FechaSalida" Format="dd/MM/yyyy" />
-                            </Border>
-                        </VerticalStackLayout>
-                        <VerticalStackLayout Grid.Column="2" Spacing="6">
-                            <Label Text="Horario *" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoDeFormulario}">
-                                <Picker x:Name="SelectorHora" Title="Seleccione horario" />
-                            </Border>
-                        </VerticalStackLayout>
-                        <common:CampoDeTexto x:Name="CampoEmbarque" Grid.Column="3" Etiqueta="Lugar de embarque *" Placeholder="Agencia" />
-                    </Grid>
-
-                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
-                        <common:CampoDeTexto x:Name="CampoOrigen" Etiqueta="Origen *" Placeholder="Ica" />
-                        <VerticalStackLayout Grid.Column="1" Spacing="6">
-                            <Label Text="Unidad *" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Label Text="Salida *" Style="{StaticResource EtiquetaDeCampo}" />
+                            <Grid ColumnDefinitions="*,110" ColumnSpacing="8">
                                 <Border Style="{StaticResource CampoDeFormulario}">
-                                    <Picker x:Name="SelectorUnidad" Title="Sin unidades disponibles" />
+                                    <DatePicker Date="{Binding FechaSalida}" Format="dd/MM/yyyy" />
                                 </Border>
-                                <Button Grid.Column="1" x:Name="BotonAbrirUnidad" Text="Abrir" Style="{StaticResource BotonSecundario}" FontSize="12" Padding="12,0" Clicked="AlAbrirUnidad" />
+                                <Border Grid.Column="1" Style="{StaticResource CampoDeFormulario}">
+                                    <Picker ItemsSource="{Binding Horarios}" SelectedIndex="{Binding HorarioElegido}" />
+                                </Border>
                             </Grid>
                         </VerticalStackLayout>
-                        <common:CampoDeTexto x:Name="CampoAsiento" Grid.Column="2" Etiqueta="Asiento *" Placeholder="1" Teclado="Numeric" />
+                        <common:CampoDeTexto
+                            Grid.Column="2"
+                            Etiqueta="Lugar de embarque *"
+                            Placeholder="Agencia"
+                            Texto="{Binding LugarDeEmbarque}"
+                            MensajeDeError="{Binding ErrorEmbarque}" />
+                        <VerticalStackLayout Grid.Column="3" Spacing="6">
+                            <Label Text="Unidad y asiento *" Style="{StaticResource EtiquetaDeCampo}" />
+                            <Border Style="{StaticResource CampoDeFormulario}">
+                                <Picker ItemsSource="{Binding Lugares}" SelectedIndex="{Binding LugarElegido}" />
+                            </Border>
+                            <Label Text="{Binding ErrorAsiento}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorAsiento, Converter={StaticResource TextoNoVacio}}" />
+                            <Button Text="+  Abrir otra unidad" Style="{StaticResource BotonSecundario}" FontSize="12" HorizontalOptions="Start" Command="{Binding AbrirUnidadCommand}" />
+                        </VerticalStackLayout>
                     </Grid>
 
-                    <BoxView HeightRequest="1" Color="{DynamicResource Borde}" Margin="0,4" />
-
                     <Label Text="Cobro" FontFamily="InterSemiBold" FontSize="15" />
-                    <Grid ColumnDefinitions="220,220,*" ColumnSpacing="12">
+                    <Grid ColumnDefinitions="200,200,*" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="6">
                             <Label Text="Importe" Style="{StaticResource EtiquetaDeCampo}" />
                             <Border Style="{StaticResource CampoSoloLectura}">
-                                <Label x:Name="LblImporte" Text="S/ 0.00" FontSize="14" VerticalOptions="Center" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="{Binding Importe}" FontSize="14" VerticalOptions="Center" />
+                                    <Path Grid.Column="1" Data="{StaticResource IconoCandado}" WidthRequest="15" HeightRequest="15" Stroke="{DynamicResource TextoSuave}" VerticalOptions="Center" />
+                                </Grid>
                             </Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="1" Spacing="6">
                             <Label Text="Medio de pago" Style="{StaticResource EtiquetaDeCampo}" />
                             <Border Style="{StaticResource CampoDeFormulario}">
-                                <Picker x:Name="SelectorMedio" Title="Seleccione medio">
-                                    <Picker.ItemsSource>
-                                        <x:Array Type="{x:Type x:String}">
-                                            <x:String>Efectivo</x:String>
-                                            <x:String>Yape</x:String>
-                                        </x:Array>
-                                    </Picker.ItemsSource>
-                                </Picker>
+                                <Picker ItemsSource="{Binding Medios}" SelectedIndex="{Binding MedioElegido}" />
                             </Border>
                         </VerticalStackLayout>
                     </Grid>
@@ -111,8 +142,8 @@
                     </Border>
 
                     <HorizontalStackLayout Spacing="12">
-                        <Button x:Name="BotonRegistrar" Text="Registrar pasaje diferido" Style="{StaticResource BotonPrimario}" Clicked="AlRegistrar" />
-                        <Button Text="Cancelar" Style="{StaticResource BotonSecundario}" Clicked="AlCancelar" />
+                        <Button Text="Registrar pasaje diferido" Style="{StaticResource BotonPrimario}" Command="{Binding RegistrarCommand}" />
+                        <Button Text="Cancelar" Style="{StaticResource BotonSecundario}" Command="{Binding CancelarCommand}" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Border>

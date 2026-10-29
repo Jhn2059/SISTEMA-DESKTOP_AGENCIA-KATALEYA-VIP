@@ -168,7 +168,7 @@ public sealed class ServicioPasajes
         if (string.IsNullOrWhiteSpace(solicitud.NumeroTalonario))
         {
             throw new ReglaDeNegocioException(
-                "Escriba el número de talonario del boleto físico.",
+                "Escriba el número de boleto del talonario.",
                 "numeroTalonario");
         }
 
@@ -177,21 +177,21 @@ public sealed class ServicioPasajes
         if (await _pasajes.ExisteTalonarioAsync(talonario))
         {
             throw new ReglaDeNegocioException(
-                "Ese número de talonario ya fue registrado.",
+                "Ese número de boleto ya está registrado.",
                 "numeroTalonario");
         }
 
         if (solicitud.HoraEmisionReal is null)
         {
             throw new ReglaDeNegocioException(
-                "Indique la hora real de emisión del boleto.",
+                "Escriba la fecha y hora reales de emisión.",
                 "horaEmisionReal");
         }
 
         if (solicitud.HoraEmisionReal.Value.ToUniversalTime() > _reloj.Ahora)
         {
             throw new ReglaDeNegocioException(
-                "La hora real de emisión no puede estar en el futuro.",
+                "La fecha de emisión no puede ser posterior a este momento.",
                 "horaEmisionReal");
         }
 

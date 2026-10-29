@@ -39,6 +39,7 @@ public static class RegistroDeVistasExtensions
         servicios.AddTransient<DialogoDeModificacionPage>();
         servicios.AddTransient<CuadreDeVentasViewModel>();
         servicios.AddTransient<CuadreDeVentasPage>();
+        servicios.AddTransient<RegistroDiferidoViewModel>();
         servicios.AddTransient<RegistroDiferidoPage>();
         servicios.AddTransient<BitacoraViewModel>();
         servicios.AddTransient<BitacoraPage>();
