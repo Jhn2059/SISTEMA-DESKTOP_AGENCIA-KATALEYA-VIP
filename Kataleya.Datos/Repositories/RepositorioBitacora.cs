@@ -101,6 +101,76 @@ public sealed class RepositorioBitacora : IRepositorioBitacora
         };
     }
 
+    public async Task<IReadOnlyList<EntradaDeBitacora>> BuscarHistoriaDeAsync(IReadOnlyCollection<long> idsDePasajes)
+    {
+        ArgumentNullException.ThrowIfNull(idsDePasajes);
+
+        if (idsDePasajes.Count == 0)
+        {
+            return [];
+        }
+
+        var conexion = await _contexto.ObtenerConexionAsync();
+        await using var comando = new NpgsqlCommand(
+            """
+            SELECT b.id,
+                   b.fecha_hora,
+                   u.nombre_usuario,
+                   b.operacion,
+                   b.pasaje_id,
+                   b.valor_anterior::text,
+                   b.valor_nuevo::text
+            FROM registro_bitacora b
+            INNER JOIN usuario u ON u.id = b.usuario_id
+            WHERE b.pasaje_id = ANY(@pasajes)
+            ORDER BY b.fecha_hora, b.id
+            """,
+            conexion)
+        {
+            Transaction = _contexto.TransaccionActual
+        };
+        comando.Parameters.Add("pasajes", NpgsqlDbType.Array | NpgsqlDbType.Bigint).Value = idsDePasajes.ToArray();
+
+        var entradas = new List<EntradaDeBitacora>();
+        await using var lector = await comando.ExecuteReaderAsync();
+        while (await lector.ReadAsync())
+        {
+            entradas.Add(new EntradaDeBitacora
+            {
+                Id = lector.GetInt64(0),
+                FechaHora = lector.GetDateTime(1),
+                UsuarioNombre = lector.GetString(2),
+                Operacion = lector.GetString(3),
+                PasajeId = lector.IsDBNull(4) ? null : lector.GetInt64(4),
+                ValorAnterior = lector.IsDBNull(5) ? null : lector.GetString(5),
+                ValorNuevo = lector.IsDBNull(6) ? null : lector.GetString(6)
+            });
+        }
+
+        return entradas;
+    }
+
+    public async Task EliminarHistoriaDeAsync(IReadOnlyCollection<long> idsDePasajes)
+    {
+        ArgumentNullException.ThrowIfNull(idsDePasajes);
+
+        if (idsDePasajes.Count == 0)
+        {
+            return;
+        }
+
+        var conexion = await _contexto.ObtenerConexionAsync();
+        await using var comando = new NpgsqlCommand(
+            "DELETE FROM registro_bitacora WHERE pasaje_id = ANY(@pasajes)",
+            conexion)
+        {
+            Transaction = _contexto.TransaccionActual
+        };
+        comando.Parameters.Add("pasajes", NpgsqlDbType.Array | NpgsqlDbType.Bigint).Value = idsDePasajes.ToArray();
+
+        await comando.ExecuteNonQueryAsync();
+    }
+
     public async Task<IReadOnlyList<EntradaDeBitacora>> ConsultarAsync(FiltroDeBitacora filtro)
     {
         ArgumentNullException.ThrowIfNull(filtro);

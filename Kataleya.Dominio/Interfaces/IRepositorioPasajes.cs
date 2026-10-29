@@ -42,6 +42,10 @@ public interface IRepositorioPasajes
     Task<bool> ExisteTalonarioAsync(string numero);
 
     Task<bool> ExisteBoletoFisicoAsync(string serie, long numero);
+
+    Task<IReadOnlyList<Pasaje>> BuscarDelAnioAsync(int anio);
+
+    Task<int> EliminarDelAnioAsync(int anio);
 }
 
 public interface IRepositorioUnidades

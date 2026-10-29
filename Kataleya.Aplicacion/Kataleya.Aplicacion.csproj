@@ -5,6 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- 6.2.4 es la última versión de PDFsharp con licencia MIT; desde la 6.5 es AGPL. -->
+    <PackageReference Include="PDFsharp" Version="6.2.4" />
+    <!-- PDFsharp trae la 8.0.1, que tiene vulnerabilidades conocidas. -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\Kataleya.Escritorio\Resources\Fonts\Inter-Regular.ttf" LogicalName="Kataleya.Fuentes.Inter-Regular.ttf" />
+    <EmbeddedResource Include="..\Kataleya.Escritorio\Resources\Fonts\Inter-Bold.ttf" LogicalName="Kataleya.Fuentes.Inter-Bold.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Kataleya.Contratos\Kataleya.Contratos.csproj" />
     <ProjectReference Include="..\Kataleya.Dominio\Kataleya.Dominio.csproj" />
   </ItemGroup>

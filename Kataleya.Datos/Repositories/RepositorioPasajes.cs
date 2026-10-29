@@ -592,6 +592,110 @@ public sealed class RepositorioPasajes : IRepositorioPasajes
         return await comando.ExecuteScalarAsync() is true;
     }
 
+    public async Task<IReadOnlyList<Pasaje>> BuscarDelAnioAsync(int anio)
+    {
+        var conexion = await _contexto.ObtenerConexionAsync();
+        await using var comando = new NpgsqlCommand(
+            $"""
+            {SeleccionarPasaje}
+            WHERE p.fecha_salida BETWEEN @desde AND @hasta
+            ORDER BY p.fecha_salida, p.hora_salida, p.id
+            """,
+            conexion)
+        {
+            Transaction = _contexto.TransaccionActual
+        };
+        AgregarParametrosDelAnio(comando, anio);
+
+        var pasajes = await LeerPasajesAsync(comando);
+        if (pasajes.Count == 0)
+        {
+            return pasajes;
+        }
+
+        await using var consultaDePagos = new NpgsqlCommand(
+            """
+            SELECT pg.id, pg.pasaje_id, pg.grupo_id, pg.importe, pg.medio,
+                   pg.tipo_movimiento, pg.fecha_hora, pg.usuario_id, u.nombre_usuario
+            FROM pago pg
+            INNER JOIN usuario u ON u.id = pg.usuario_id
+            WHERE pg.pasaje_id = ANY(@pasajes) OR pg.grupo_id = ANY(@grupos)
+            ORDER BY pg.fecha_hora
+            """,
+            conexion)
+        {
+            Transaction = _contexto.TransaccionActual
+        };
+        consultaDePagos.Parameters.Add("pasajes", NpgsqlDbType.Array | NpgsqlDbType.Bigint).Value =
+            pasajes.Select(pasaje => pasaje.Id).ToArray();
+        consultaDePagos.Parameters.Add("grupos", NpgsqlDbType.Array | NpgsqlDbType.Bigint).Value =
+            pasajes.Where(pasaje => pasaje.GrupoId is not null).Select(pasaje => pasaje.GrupoId!.Value).Distinct().ToArray();
+
+        var pagos = new List<Pago>();
+        await using (var lector = await consultaDePagos.ExecuteReaderAsync())
+        {
+            while (await lector.ReadAsync())
+            {
+                pagos.Add(LeerPago(lector));
+            }
+        }
+
+        // Los pagos de un grupo van en el pasaje del responsable, como en el cuadre.
+        foreach (var pasaje in pasajes)
+        {
+            pasaje.Pagos = pasaje.GrupoId is null
+                ? pagos.Where(pago => pago.PasajeId == pasaje.Id).ToList()
+                : pasaje.EsResponsable
+                    ? pagos.Where(pago => pago.GrupoId == pasaje.GrupoId).ToList()
+                    : [];
+        }
+
+        return pasajes;
+    }
+
+    public async Task<int> EliminarDelAnioAsync(int anio)
+    {
+        var conexion = await _contexto.ObtenerConexionAsync();
+        await using var comando = new NpgsqlCommand(
+            """
+            CREATE TEMP TABLE pasajes_depurados ON COMMIT DROP AS
+                SELECT id, grupo_id FROM pasaje WHERE fecha_salida BETWEEN @desde AND @hasta;
+
+            DELETE FROM pago
+            WHERE pasaje_id IN (SELECT id FROM pasajes_depurados)
+               OR grupo_id IN (SELECT grupo_id FROM pasajes_depurados WHERE grupo_id IS NOT NULL);
+
+            DELETE FROM boleto_viaje WHERE pasaje_id IN (SELECT id FROM pasajes_depurados);
+
+            DELETE FROM pasaje WHERE id IN (SELECT id FROM pasajes_depurados);
+
+            DELETE FROM unidad_salida
+            WHERE grupo_id IN (SELECT grupo_id FROM pasajes_depurados WHERE grupo_id IS NOT NULL);
+
+            DELETE FROM grupo WHERE id IN (SELECT grupo_id FROM pasajes_depurados WHERE grupo_id IS NOT NULL);
+
+            DELETE FROM unidad_salida u
+            WHERE u.grupo_id IS NULL
+              AND (u.fecha_hora_salida AT TIME ZONE 'America/Lima')::date BETWEEN @desde AND @hasta
+              AND NOT EXISTS (SELECT 1 FROM pasaje p WHERE p.unidad_salida_id = u.id);
+
+            SELECT count(*)::int FROM pasajes_depurados;
+            """,
+            conexion)
+        {
+            Transaction = _contexto.TransaccionActual
+        };
+        AgregarParametrosDelAnio(comando, anio);
+
+        return (int)(await comando.ExecuteScalarAsync())!;
+    }
+
+    private static void AgregarParametrosDelAnio(NpgsqlCommand comando, int anio)
+    {
+        comando.Parameters.Add("desde", NpgsqlDbType.Date).Value = new DateOnly(anio, 1, 1);
+        comando.Parameters.Add("hasta", NpgsqlDbType.Date).Value = new DateOnly(anio, 12, 31);
+    }
+
     private static void AgregarParametrosDePasaje(NpgsqlCommand comando, Pasaje pasaje)
     {
         comando.Parameters.Add("pasajero_nombre", NpgsqlDbType.Varchar).Value = pasaje.PasajeroNombre;

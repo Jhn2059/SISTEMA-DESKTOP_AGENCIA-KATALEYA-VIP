@@ -9,5 +9,8 @@ public static class FechasLocales
         DateTime.SpecifyKind(fecha.ToDateTime(hora) - DiferenciaConUtc, DateTimeKind.Utc);
 
     public static DateOnly Hoy(DateTime ahora) =>
-        DateOnly.FromDateTime(ahora.ToUniversalTime() + DiferenciaConUtc);
+        DateOnly.FromDateTime(EnHoraDePeru(ahora));
+
+    public static DateTime EnHoraDePeru(DateTime fechaHora) =>
+        DateTime.SpecifyKind(fechaHora.ToUniversalTime() + DiferenciaConUtc, DateTimeKind.Unspecified);
 }

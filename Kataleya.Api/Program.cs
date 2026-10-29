@@ -45,6 +45,7 @@ builder.Services.AddScoped<IRepositorioPasajes, RepositorioPasajes>();
 builder.Services.AddScoped<IRepositorioUnidades, RepositorioUnidades>();
 builder.Services.AddScoped<IRepositorioConfiguracion, RepositorioConfiguracion>();
 builder.Services.AddScoped<IRepositorioCuadre, RepositorioCuadre>();
+builder.Services.AddScoped<IRepositorioReportesAnuales, RepositorioReportesAnuales>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 builder.Services.AddScoped<ServicioBitacora>();
 builder.Services.AddScoped<RegistradorDeBitacora>();
@@ -54,6 +55,7 @@ builder.Services.AddScoped<ServicioConfiguracion>();
 builder.Services.AddScoped<ServicioInventario>();
 builder.Services.AddScoped<ServicioPasajes>();
 builder.Services.AddScoped<ServicioReportes>();
+builder.Services.AddScoped<ServicioReporteAnual>();
 builder.Services.AddOptions<OpcionesDeSesion>()
     .Bind(builder.Configuration.GetSection(OpcionesDeSesion.Seccion));
 builder.Services.AddSingleton<ServicioDeLlaves>();
@@ -430,6 +432,24 @@ app.MapGet("/bitacora", async (
     ServicioReportes servicio) =>
     Results.Ok(await servicio.ConsultarBitacoraAsync(filtro)))
     .AddEndpointFilter<FiltroDeAdministrador>();
+
+var reportesAnuales = app.MapGroup("/reportes-anuales")
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
+reportesAnuales.MapGet("/pendiente", async (ServicioReporteAnual servicio) =>
+    Results.Ok(await servicio.HayReportePendienteAsync()));
+
+reportesAnuales.MapPost("/{anio:int}", async (
+    int anio,
+    Kataleya.Contratos.Reportes.SolicitudDeReporteAnual solicitud,
+    ServicioReporteAnual servicio) =>
+    Results.Ok(await servicio.GenerarAsync(anio, solicitud.ContrasenaPdf)));
+
+reportesAnuales.MapPost("/{anio:int}/depuracion", async (
+    int anio,
+    Kataleya.Contratos.Reportes.SolicitudDeDepuracion solicitud,
+    ServicioReporteAnual servicio) =>
+    Results.Ok(await servicio.DepurarAsync(anio, solicitud.RutaPdf)));
 
 app.Run();
 

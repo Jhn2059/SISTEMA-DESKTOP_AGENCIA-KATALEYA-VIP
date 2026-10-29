@@ -11,6 +11,7 @@ using Kataleya.Contratos.Cuadre;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Panel;
 using Kataleya.Contratos.Pasajes;
+using Kataleya.Contratos.Reportes;
 using Kataleya.Contratos.Session;
 using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Enums;
@@ -455,6 +456,32 @@ public sealed class ClienteApi
             $"bitacora{CrearConsulta(filtro)}",
             null,
             "Consultar bitácora");
+
+    public Task<ResultadoDeLaApi<bool>> HayReportePendienteAsync() =>
+        EnviarAsync<bool>(
+            HttpMethod.Get,
+            "reportes-anuales/pendiente",
+            null,
+            "Consultar reporte anual pendiente");
+
+    public Task<ResultadoDeLaApi<ArchivoProtegido>> DescargarReporteAnualAsync(
+        int anio,
+        string contrasenaPdf) =>
+        EnviarAsync<ArchivoProtegido>(
+            HttpMethod.Post,
+            $"reportes-anuales/{anio}",
+            new SolicitudDeReporteAnual { ContrasenaPdf = contrasenaPdf },
+            "Generar reporte anual");
+
+    public Task<ResultadoDeLaApi<DatosDelReporteAnual>> PedirDepuracionAsync(
+        int anio,
+        string rutaPdf) =>
+        EnviarAsync<DatosDelReporteAnual>(
+            HttpMethod.Post,
+            $"reportes-anuales/{anio}/depuracion",
+            new SolicitudDeDepuracion { RutaPdf = rutaPdf },
+            "Depurar pasajes del reporte anual",
+            idempotente: true);
 
     public void CerrarSesion()
     {

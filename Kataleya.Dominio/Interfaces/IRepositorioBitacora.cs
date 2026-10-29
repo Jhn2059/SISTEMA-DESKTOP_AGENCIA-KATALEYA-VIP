@@ -11,4 +11,8 @@ public interface IRepositorioBitacora
     Task<EntradaDeBitacora?> BuscarPorClaveAsync(Guid clave);
 
     Task<IReadOnlyList<EntradaDeBitacora>> ConsultarAsync(FiltroDeBitacora filtro);
+
+    Task<IReadOnlyList<EntradaDeBitacora>> BuscarHistoriaDeAsync(IReadOnlyCollection<long> idsDePasajes);
+
+    Task EliminarHistoriaDeAsync(IReadOnlyCollection<long> idsDePasajes);
 }

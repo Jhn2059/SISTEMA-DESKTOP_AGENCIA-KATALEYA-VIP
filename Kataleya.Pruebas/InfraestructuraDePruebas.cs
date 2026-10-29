@@ -104,6 +104,18 @@ internal sealed class RepositorioBitacoraFalso : IRepositorioBitacora
             .Select(CrearEntrada)
             .ToList());
 
+    public Task<IReadOnlyList<EntradaDeBitacora>> BuscarHistoriaDeAsync(IReadOnlyCollection<long> idsDePasajes) =>
+        Task.FromResult<IReadOnlyList<EntradaDeBitacora>>(Registros
+            .Where(registro => registro.PasajeId is long id && idsDePasajes.Contains(id))
+            .Select(CrearEntrada)
+            .ToList());
+
+    public Task EliminarHistoriaDeAsync(IReadOnlyCollection<long> idsDePasajes)
+    {
+        Registros.RemoveAll(registro => registro.PasajeId is long id && idsDePasajes.Contains(id));
+        return Task.CompletedTask;
+    }
+
     private static EntradaDeBitacora CrearEntrada(RegistroDeBitacora registro) =>
         new()
         {
