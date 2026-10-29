@@ -128,7 +128,8 @@ public partial class CuentasDeUsuarioViewModel : ObservableObject
 
         while (true)
         {
-            var solicitud = await _dialogos.PedirDatosDeCuentaAsync(_roles, _sedes, errores, anterior);
+            var solicitud = await _dialogos.PedirDatosDeCuentaAsync(
+                new FormularioDeCuenta(_roles, _sedes, errores, anterior));
             if (solicitud is null)
             {
                 return;
@@ -163,11 +164,11 @@ public partial class CuentasDeUsuarioViewModel : ObservableObject
             return;
         }
 
-        var confirmado = await _dialogos.ConfirmarAsync(
+        var confirmado = await _dialogos.ConfirmarAsync(new Confirmacion(
             $"¿Desactivar la cuenta {cuenta.NombreUsuario}?",
             "No podrá ingresar hasta que la reactiven.",
             "Sí, desactivar",
-            "No, volver");
+            "No, volver"));
 
         if (!confirmado)
         {

@@ -251,11 +251,11 @@ public partial class TarifasYParametrosViewModel : ObservableObject
 
         MensajeDeExito = string.Empty;
 
-        var confirmado = await _dialogos.ConfirmarAsync(
+        var confirmado = await _dialogos.ConfirmarAsync(new Confirmacion(
             $"¿Quitar la tarifa programada «{fila.Nombre}»?",
             "En esas fechas se aplicará la tarifa regular.",
             "Sí, quitar",
-            "No, volver");
+            "No, volver"));
 
         if (!confirmado)
         {
@@ -415,11 +415,11 @@ public partial class TarifasYParametrosViewModel : ObservableObject
                        "conservan su horario; si hace falta, modifíquelos desde su detalle.";
         }
 
-        var confirmado = await _dialogos.ConfirmarAsync(
+        var confirmado = await _dialogos.ConfirmarAsync(new Confirmacion(
             $"¿Quitar el horario de las {horario.Hora}?",
             mensaje,
             "Sí, quitar",
-            "No, volver");
+            "No, volver"));
 
         if (!confirmado)
         {

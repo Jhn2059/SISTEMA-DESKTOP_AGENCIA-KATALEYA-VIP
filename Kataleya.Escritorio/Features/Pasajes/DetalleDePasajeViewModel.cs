@@ -249,7 +249,11 @@ public partial class DetalleDePasajeViewModel : ObservableObject
     {
         var cambios = await _dialogos.PedirCambiosAsync(_pasaje!, soloAsiento);
         if (cambios is null ||
-            !await _dialogos.ConfirmarAsync("Guardar cambios", "¿Guardar los cambios del pasaje?", "Sí, guardar", "No"))
+            !await _dialogos.ConfirmarAsync(new Confirmacion(
+                "Guardar cambios",
+                "¿Guardar los cambios del pasaje?",
+                "Sí, guardar",
+                "No")))
         {
             return;
         }
@@ -314,11 +318,11 @@ public partial class DetalleDePasajeViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(PuedeMarcarNoPresentado), AllowConcurrentExecutions = false)]
     private async Task MarcarNoPresentadoAsync()
     {
-        if (!await _dialogos.ConfirmarAsync(
+        if (!await _dialogos.ConfirmarAsync(new Confirmacion(
                 "No se presentó",
                 "¿Marcar que el pasajero no se presentó? El pasaje no tendrá devolución.",
                 "Sí, marcar",
-                "No"))
+                "No")))
         {
             return;
         }

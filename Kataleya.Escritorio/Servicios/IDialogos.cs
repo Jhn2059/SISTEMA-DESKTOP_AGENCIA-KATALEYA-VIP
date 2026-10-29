@@ -7,11 +7,7 @@ namespace Kataleya.Escritorio.Servicios;
 
 public interface IDialogos
 {
-    Task<SolicitudDeCuenta?> PedirDatosDeCuentaAsync(
-        IReadOnlyList<DatosDeRol> roles,
-        IReadOnlyList<DatosDeSede> sedes,
-        IReadOnlyDictionary<string, string>? errores = null,
-        SolicitudDeCuenta? anterior = null);
+    Task<SolicitudDeCuenta?> PedirDatosDeCuentaAsync(FormularioDeCuenta formulario);
 
     Task<string?> PedirContrasenaAsync(
         string nombreUsuario,
@@ -29,11 +25,7 @@ public interface IDialogos
         DatosDeTarifa? tarifa,
         IReadOnlyDictionary<string, string>? errores = null);
 
-    Task<bool> ConfirmarAsync(
-        string titulo,
-        string mensaje,
-        string textoAceptar,
-        string textoCancelar);
+    Task<bool> ConfirmarAsync(Confirmacion confirmacion);
 
     Task MostrarMensajeAsync(string titulo, string mensaje);
 }

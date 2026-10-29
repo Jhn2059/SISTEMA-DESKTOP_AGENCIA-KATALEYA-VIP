@@ -18,14 +18,12 @@ public sealed class DialogosDeMaui : IDialogos
     public DialogosDeMaui(IServiceProvider servicios) =>
         _servicios = servicios ?? throw new ArgumentNullException(nameof(servicios));
 
-    public async Task<SolicitudDeCuenta?> PedirDatosDeCuentaAsync(
-        IReadOnlyList<DatosDeRol> roles,
-        IReadOnlyList<DatosDeSede> sedes,
-        IReadOnlyDictionary<string, string>? errores = null,
-        SolicitudDeCuenta? anterior = null)
+    public async Task<SolicitudDeCuenta?> PedirDatosDeCuentaAsync(FormularioDeCuenta formulario)
     {
+        ArgumentNullException.ThrowIfNull(formulario);
+
         var pagina = _servicios.GetRequiredService<DialogoDeCuentaPage>();
-        pagina.Modelo.Inicializar(roles, sedes, errores, anterior);
+        pagina.Modelo.Inicializar(formulario);
         await Shell.Current.Navigation.PushModalAsync(pagina);
         return await pagina.Modelo.Resultado;
     }
@@ -82,16 +80,16 @@ public sealed class DialogosDeMaui : IDialogos
         return await pagina.Modelo.Resultado;
     }
 
-    public Task<bool> ConfirmarAsync(
-        string titulo,
-        string mensaje,
-        string textoAceptar,
-        string textoCancelar) =>
-        Shell.Current.CurrentPage.DisplayAlertAsync(
-            titulo,
-            mensaje,
-            textoAceptar,
-            textoCancelar);
+    public Task<bool> ConfirmarAsync(Confirmacion confirmacion)
+    {
+        ArgumentNullException.ThrowIfNull(confirmacion);
+
+        return Shell.Current.CurrentPage.DisplayAlertAsync(
+            confirmacion.Titulo,
+            confirmacion.Mensaje,
+            confirmacion.TextoAceptar,
+            confirmacion.TextoCancelar);
+    }
 
     public Task MostrarMensajeAsync(string titulo, string mensaje) =>
         Shell.Current.CurrentPage.DisplayAlertAsync(titulo, mensaje, "Aceptar");

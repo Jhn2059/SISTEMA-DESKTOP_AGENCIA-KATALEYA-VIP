@@ -56,14 +56,13 @@ public partial class DialogoDeCuentaViewModel : ObservableObject
 
     public Task<SolicitudDeCuenta?> Resultado => _resultado.Task;
 
-    public void Inicializar(
-        IReadOnlyList<DatosDeRol> roles,
-        IReadOnlyList<DatosDeSede> sedes,
-        IReadOnlyDictionary<string, string>? errores = null,
-        SolicitudDeCuenta? anterior = null)
+    public void Inicializar(FormularioDeCuenta formulario)
     {
-        Roles = roles ?? throw new ArgumentNullException(nameof(roles));
-        Sedes = sedes ?? throw new ArgumentNullException(nameof(sedes));
+        ArgumentNullException.ThrowIfNull(formulario);
+
+        Roles = formulario.Roles;
+        Sedes = formulario.Sedes;
+        var anterior = formulario.Anterior;
 
         Nombre = anterior?.NombrePersona ?? string.Empty;
         NombreUsuario = anterior?.NombreUsuario ?? string.Empty;
@@ -76,7 +75,7 @@ public partial class DialogoDeCuentaViewModel : ObservableObject
             : Sedes.FirstOrDefault(sede => sede.Id == anterior.IdSede);
 
         LimpiarErrores();
-        AplicarErrores(errores);
+        AplicarErrores(formulario.Errores);
     }
 
     [RelayCommand]

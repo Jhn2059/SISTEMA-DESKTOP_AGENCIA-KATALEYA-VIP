@@ -1,5 +1,8 @@
-namespace Kataleya.Dominio.DataObjects;
+using Kataleya.Dominio.DataObjects;
 
+namespace Kataleya.Cliente;
+
+// La respuesta del cliente de la Web API; el servidor no la usa.
 public class ResultadoDeLaApi
 {
     public string? CodigoDeError { get; init; }
