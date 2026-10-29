@@ -33,7 +33,7 @@
                 <VerticalStackLayout Spacing="14">
 
                     <Label Text="Boleto del talonario" FontFamily="InterSemiBold" FontSize="15" />
-                    <Grid ColumnDefinitions="220,300,*" ColumnSpacing="12">
+                    <Grid ColumnDefinitions="220,420,*" ColumnSpacing="12">
                         <common:CampoDeTexto
                             Etiqueta="N.º de boleto del talonario *"
                             Placeholder="000123"
@@ -41,7 +41,7 @@
                             MensajeDeError="{Binding ErrorTalonario}" />
                         <VerticalStackLayout Grid.Column="1" Spacing="6">
                             <Label Text="Fecha y hora reales de emisión *" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Grid ColumnDefinitions="*,120" ColumnSpacing="8">
+                            <Grid ColumnDefinitions="*,220" ColumnSpacing="8">
                                 <Border Style="{StaticResource CampoDeFormulario}">
                                     <DatePicker Date="{Binding FechaDeEmision}" Format="dd/MM/yyyy" />
                                 </Border>
