@@ -8,6 +8,7 @@ using Kataleya.Contratos.Pasajes;
 using Kataleya.Dominio.Enums;
 using Kataleya.Escritorio.Servicios;
 using Kataleya.Escritorio.UIHelpers.Paginas;
+using Kataleya.Escritorio.UIHelpers;
 using Microsoft.Maui.Graphics;
 
 namespace Kataleya.Escritorio.Features.Pasajes;
@@ -83,6 +84,9 @@ public partial class ListaDePasajesViewModel : ObservableObject
 
     public async Task CargarAsync()
     {
+        Selecciones.Refrescar(() => EstadoElegido, valor => EstadoElegido = valor);
+        Selecciones.Refrescar(() => TipoElegido, valor => TipoElegido = valor);
+
         if (!_catalogosCargados)
         {
             await CargarCatalogosAsync();

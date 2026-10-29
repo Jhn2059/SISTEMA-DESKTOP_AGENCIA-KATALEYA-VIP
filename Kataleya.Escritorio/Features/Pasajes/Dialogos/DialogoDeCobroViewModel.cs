@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Kataleya.Contratos.Pasajes;
 using Kataleya.Dominio.Enums;
 using Kataleya.Escritorio.Servicios;
+using Kataleya.Escritorio.UIHelpers;
 
 namespace Kataleya.Escritorio.Features.Pasajes.Dialogos;
 
@@ -42,6 +43,7 @@ public partial class DialogoDeCobroViewModel : ObservableObject
     public void Inicializar(DatosDePasaje pasaje)
     {
         ArgumentNullException.ThrowIfNull(pasaje);
+        Selecciones.Refrescar(() => MedioElegido, valor => MedioElegido = valor);
 
         _saldo = pasaje.Saldo;
         Descripcion = $"Pasaje P-{pasaje.Id:0000} · saldo pendiente: S/ {_saldo.ToString("N2", Cultura)}.";

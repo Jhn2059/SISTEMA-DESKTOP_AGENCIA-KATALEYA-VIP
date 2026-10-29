@@ -11,6 +11,7 @@ using Kataleya.Dominio.Enums;
 using Kataleya.Escritorio.Features.Pasajes;
 using Kataleya.Escritorio.Servicios;
 using Kataleya.Escritorio.UIHelpers.Paginas;
+using Kataleya.Escritorio.UIHelpers;
 
 namespace Kataleya.Escritorio.Features.RegistroDiferido;
 
@@ -115,6 +116,8 @@ public partial class RegistroDiferidoViewModel : ObservableObject
     public async Task CargarAsync()
     {
         OnPropertyChanged(nameof(Origen));
+        Selecciones.Refrescar(() => TipoDeDocumento, valor => TipoDeDocumento = valor);
+        Selecciones.Refrescar(() => MedioElegido, valor => MedioElegido = valor);
 
         if (_cargado)
         {

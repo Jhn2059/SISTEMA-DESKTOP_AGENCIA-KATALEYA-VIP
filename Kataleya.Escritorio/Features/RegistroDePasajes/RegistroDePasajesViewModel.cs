@@ -8,9 +8,10 @@ using Kataleya.Contratos.Pasajes;
 using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Enums;
 using Kataleya.Escritorio.Features.Pasajes;
-using Kataleya.Escritorio.Servicios;
 using Kataleya.Escritorio.Servicios.Impresion;
+using Kataleya.Escritorio.Servicios;
 using Kataleya.Escritorio.UIHelpers.Paginas;
+using Kataleya.Escritorio.UIHelpers;
 
 namespace Kataleya.Escritorio.Features.RegistroDePasajes;
 
@@ -208,6 +209,9 @@ public partial class RegistroDePasajesViewModel : ObservableObject
     public async Task CargarAsync()
     {
         OnPropertyChanged(nameof(Emisor));
+        Selecciones.Refrescar(() => TipoDeDocumento, valor => TipoDeDocumento = valor);
+        Selecciones.Refrescar(() => MedioElegido, valor => MedioElegido = valor);
+        Selecciones.Refrescar(() => MedioDelGrupo, valor => MedioDelGrupo = valor);
 
         if (!_cargado)
         {

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Kataleya.Contratos.Configuracion;
 using Kataleya.Dominio.Enums;
 using Kataleya.Escritorio.Servicios;
+using Kataleya.Escritorio.UIHelpers;
 
 namespace Kataleya.Escritorio.Features.Configuracion.TarifasYParametros;
 
@@ -69,6 +70,8 @@ public partial class DialogoDeTarifaViewModel : ObservableObject
             Hasta = tarifa.VigenciaHasta?.ToDateTime(TimeOnly.MinValue) ?? DateTime.Today;
             SentidoElegido = Math.Max(0, Array.IndexOf(Sentidos, tarifa.Sentido));
         }
+
+        Selecciones.Refrescar(() => SentidoElegido, valor => SentidoElegido = valor);
 
         if (errores is null)
         {
