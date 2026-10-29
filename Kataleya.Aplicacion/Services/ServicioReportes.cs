@@ -13,6 +13,7 @@ public sealed class ServicioReportes
     private readonly IRepositorioCuadre _cuadre;
     private readonly IRepositorioUsuarios _usuarios;
     private readonly IRepositorioConfiguracion _configuracion;
+    private readonly IRepositorioCatalogos _catalogos;
     private readonly ServicioBitacora _bitacora;
     private readonly IReloj _reloj;
     private readonly ContextoDeOperacion _contexto;
@@ -21,6 +22,7 @@ public sealed class ServicioReportes
         IRepositorioCuadre cuadre,
         IRepositorioUsuarios usuarios,
         IRepositorioConfiguracion configuracion,
+        IRepositorioCatalogos catalogos,
         ServicioBitacora bitacora,
         IReloj reloj,
         ContextoDeOperacion contexto)
@@ -28,6 +30,7 @@ public sealed class ServicioReportes
         _cuadre = cuadre ?? throw new ArgumentNullException(nameof(cuadre));
         _usuarios = usuarios ?? throw new ArgumentNullException(nameof(usuarios));
         _configuracion = configuracion ?? throw new ArgumentNullException(nameof(configuracion));
+        _catalogos = catalogos ?? throw new ArgumentNullException(nameof(catalogos));
         _bitacora = bitacora ?? throw new ArgumentNullException(nameof(bitacora));
         _reloj = reloj ?? throw new ArgumentNullException(nameof(reloj));
         _contexto = contexto ?? throw new ArgumentNullException(nameof(contexto));
@@ -49,13 +52,16 @@ public sealed class ServicioReportes
         }
 
         var usuario = await ObtenerUsuarioAsync();
-        var emisorId = usuario.Rol.Nombre == "Administrador"
-            ? filtro.EmisorId
-            : usuario.Id;
-        var detalle = await _cuadre.GenerarAsync(desde, hasta, emisorId);
+        var esAdministrador = usuario.Rol.Nombre == "Administrador";
+        var emisorId = esAdministrador ? filtro.EmisorId : usuario.Id;
+        var sede = esAdministrador
+            ? filtro.SedeId is short sedeId ? await _catalogos.BuscarSedeAsync(sedeId) : null
+            : usuario.Sede;
+
+        var detalle = await _cuadre.GenerarAsync(desde, hasta, emisorId, sede?.Id);
         detalle.GeneradoEl = _reloj.Ahora;
-        detalle.GeneradoPor = usuario.Nombre;
-        detalle.Sede = usuario.Sede.Nombre;
+        detalle.GeneradoPor = usuario.NombreUsuario;
+        detalle.Sede = sede?.Nombre ?? "todas";
         return detalle.ADatos();
     }
 

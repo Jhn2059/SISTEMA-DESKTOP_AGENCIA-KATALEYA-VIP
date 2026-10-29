@@ -27,7 +27,7 @@ public sealed class RepositorioCuadre : IRepositorioCuadre
     public RepositorioCuadre(ContextoDeBaseDeDatos contexto) =>
         _contexto = contexto ?? throw new ArgumentNullException(nameof(contexto));
 
-    public async Task<DetalleDelCuadre> GenerarAsync(DateOnly desde, DateOnly hasta, int? emisorId)
+    public async Task<DetalleDelCuadre> GenerarAsync(DateOnly desde, DateOnly hasta, int? emisorId, short? sedeId)
     {
         var conexion = await _contexto.ObtenerConexionAsync();
         await using var comando = new NpgsqlCommand(
@@ -67,6 +67,7 @@ public sealed class RepositorioCuadre : IRepositorioCuadre
                                AND p.estado = 'Anulado'), 0) AS importe_anulado
             FROM usuario u
             WHERE (@emisor IS NULL OR u.id = @emisor)
+              AND (@sede IS NULL OR u.sede_id = @sede)
               AND (
                   EXISTS (SELECT 1 FROM pasaje p
                           WHERE p.emisor_id = u.id
@@ -82,6 +83,7 @@ public sealed class RepositorioCuadre : IRepositorioCuadre
             Transaction = _contexto.TransaccionActual
         };
         AgregarPeriodo(comando, desde, hasta, emisorId);
+        AgregarSede(comando, sedeId);
 
         var filas = new List<FilaDeCuadre>();
         await using (var lector = await comando.ExecuteReaderAsync())
@@ -126,6 +128,7 @@ public sealed class RepositorioCuadre : IRepositorioCuadre
             LEFT JOIN boleto_viaje b ON b.pasaje_id = p.id
             WHERE p.fecha_salida BETWEEN @desde AND @hasta
               AND (@emisor IS NULL OR p.emisor_id = @emisor)
+              AND (@sede IS NULL OR u.sede_id = @sede)
             ORDER BY p.fecha_salida, p.hora_salida, p.id
             """,
             conexion)
@@ -134,6 +137,7 @@ public sealed class RepositorioCuadre : IRepositorioCuadre
         })
         {
             AgregarPeriodo(comandoPasajes, desde, hasta, emisorId);
+            AgregarSede(comandoPasajes, sedeId);
 
             await using var lector = await comandoPasajes.ExecuteReaderAsync();
             while (await lector.ReadAsync())
@@ -259,6 +263,10 @@ public sealed class RepositorioCuadre : IRepositorioCuadre
 
         return resumen;
     }
+
+    private static void AgregarSede(NpgsqlCommand comando, short? sedeId) =>
+        comando.Parameters.Add("sede", NpgsqlDbType.Smallint).Value =
+            sedeId is null ? DBNull.Value : sedeId.Value;
 
     private static void AgregarPeriodo(NpgsqlCommand comando, DateOnly desde, DateOnly hasta, int? emisorId)
     {

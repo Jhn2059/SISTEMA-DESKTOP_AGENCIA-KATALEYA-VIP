@@ -25,7 +25,7 @@ public interface IRepositorioConfiguracion
 
 public interface IRepositorioCuadre
 {
-    Task<DetalleDelCuadre> GenerarAsync(DateOnly desde, DateOnly hasta, int? emisorId);
+    Task<DetalleDelCuadre> GenerarAsync(DateOnly desde, DateOnly hasta, int? emisorId, short? sedeId);
 
     Task<ResumenDelPanel> ObtenerPanelAsync(DateOnly fecha, int? emisorId);
 }

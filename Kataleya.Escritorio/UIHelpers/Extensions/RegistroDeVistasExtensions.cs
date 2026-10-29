@@ -28,6 +28,7 @@ public static class RegistroDeVistasExtensions
         servicios.AddTransient<RegistroDePasajesPage>();
         servicios.AddTransient<ListaDePasajesPage>();
         servicios.AddTransient<DetalleDePasajePage>();
+        servicios.AddTransient<CuadreDeVentasViewModel>();
         servicios.AddTransient<CuadreDeVentasPage>();
         servicios.AddTransient<RegistroDiferidoPage>();
         servicios.AddTransient<BitacoraViewModel>();
