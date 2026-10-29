@@ -3,8 +3,9 @@
     x:Class="Kataleya.Escritorio.Features.Bitacora.BitacoraPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:bitacora="clr-namespace:Kataleya.Contratos.Bitacora;assembly=Kataleya.Contratos"
-    xmlns:paginas="clr-namespace:Kataleya.Escritorio.UIHelpers.Paginas">
+    xmlns:paginas="clr-namespace:Kataleya.Escritorio.UIHelpers.Paginas"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.Bitacora"
+    x:DataType="vm:BitacoraViewModel">
     <ScrollView VerticalScrollBarVisibility="Never">
         <VerticalStackLayout Padding="24,16,24,24" Spacing="0">
 
@@ -18,30 +19,32 @@
                     <VerticalStackLayout Spacing="4">
                         <Label Text="Usuario" Style="{StaticResource EtiquetaDeCampo}" />
                         <Border Style="{StaticResource CampoDeFormulario}">
-                            <Picker Title="Todos" />
+                            <Picker ItemsSource="{Binding Usuarios}" SelectedIndex="{Binding UsuarioElegido}" />
                         </Border>
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="1" Spacing="4">
                         <Label Text="Desde" Style="{StaticResource EtiquetaDeCampo}" />
                         <Border Style="{StaticResource CampoDeFormulario}">
-                            <DatePicker x:Name="FechaDesde" Format="dd/MM/yyyy" />
+                            <DatePicker Date="{Binding Desde}" Format="dd/MM/yyyy" />
                         </Border>
+                        <Label Text="{Binding ErrorDeFechas}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorDeFechas, Converter={StaticResource TextoNoVacio}}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="2" Spacing="4">
                         <Label Text="Hasta" Style="{StaticResource EtiquetaDeCampo}" />
                         <Border Style="{StaticResource CampoDeFormulario}">
-                            <DatePicker x:Name="FechaHasta" Format="dd/MM/yyyy" />
+                            <DatePicker Date="{Binding Hasta}" Format="dd/MM/yyyy" />
                         </Border>
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="3" Spacing="4">
                         <Label Text="Pasaje" Style="{StaticResource EtiquetaDeCampo}" />
                         <Border Style="{StaticResource CampoDeFormulario}">
-                            <Entry x:Name="CampoPasaje" Placeholder="N.º de pasaje" Keyboard="Numeric" />
+                            <Entry Text="{Binding NumeroDePasaje}" Placeholder="P-0042" ReturnCommand="{Binding FiltrarCommand}" />
                         </Border>
+                        <Label Text="{Binding ErrorDePasaje}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorDePasaje, Converter={StaticResource TextoNoVacio}}" />
                     </VerticalStackLayout>
-                    <Border Grid.Column="4" HeightRequest="36" Padding="16,0" BackgroundColor="{DynamicResource BotonClaro}" StrokeThickness="0" StrokeShape="RoundRectangle 6" VerticalOptions="End">
+                    <Border Grid.Column="4" HeightRequest="36" Padding="16,0" BackgroundColor="{DynamicResource BotonClaro}" StrokeThickness="0" StrokeShape="RoundRectangle 6" VerticalOptions="Start" Margin="0,22,0,0">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="AlFiltrar" />
+                            <TapGestureRecognizer Command="{Binding FiltrarCommand}" />
                         </Border.GestureRecognizers>
                         <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                             <Path Data="{StaticResource IconoFiltro}" WidthRequest="17" HeightRequest="17" Stroke="{DynamicResource BotonClaroTexto}" VerticalOptions="Center" />
@@ -64,20 +67,20 @@
 
                     <BoxView HeightRequest="1" Color="{DynamicResource Borde}" />
 
-                    <CollectionView x:Name="TablaBitacora">
+                    <CollectionView ItemsSource="{Binding Filas}">
                         <CollectionView.EmptyView>
                             <VerticalStackLayout HeightRequest="120" Spacing="8" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,22,0,0">
                                 <Path Data="{StaticResource IconoLupa}" WidthRequest="28" HeightRequest="28" Stroke="{DynamicResource TextoTenue}" HorizontalOptions="Center" />
-                                <Label Text="No hay operaciones registradas con esos filtros." FontSize="14" TextColor="{DynamicResource TextoSuave}" HorizontalTextAlignment="Center" />
+                                <Label Text="No hay registros con esos filtros." FontSize="14" TextColor="{DynamicResource TextoSuave}" HorizontalTextAlignment="Center" />
                             </VerticalStackLayout>
                         </CollectionView.EmptyView>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="bitacora:DatosDeBitacora">
+                            <DataTemplate x:DataType="vm:FilaDeBitacora">
                                 <Grid HeightRequest="38" Padding="12,0" ColumnDefinitions="1.2*,1.1*,1.3*,0.8*,1.4*,1.5*">
-                                    <Label Text="{Binding FechaHora, StringFormat='{0:dd/MM/yyyy HH:mm}'}" FontSize="12" VerticalTextAlignment="Center" />
+                                    <Label Text="{Binding FechaHora}" FontSize="12" VerticalTextAlignment="Center" />
                                     <Label Grid.Column="1" Text="{Binding Usuario}" FontSize="12" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
                                     <Label Grid.Column="2" Text="{Binding Operacion}" FontSize="12" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="3" Text="{Binding PasajeId}" FontSize="12" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="3" Text="{Binding Pasaje}" FontSize="12" VerticalTextAlignment="Center" />
                                     <Label Grid.Column="4" Text="{Binding ValorAnterior}" FontSize="12" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
                                     <Label Grid.Column="5" Text="{Binding ValorNuevo}" FontSize="12" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
                                 </Grid>
