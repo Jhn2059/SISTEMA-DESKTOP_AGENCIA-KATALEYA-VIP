@@ -12,6 +12,7 @@
         Style="{StaticResource Tarjeta}"
         Margin="40"
         Padding="24"
+        MinimumWidthRequest="960"
         MaximumWidthRequest="1080"
         HorizontalOptions="Center"
         VerticalOptions="Center">
