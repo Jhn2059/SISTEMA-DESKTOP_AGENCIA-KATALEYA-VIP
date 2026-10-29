@@ -54,6 +54,9 @@ public partial class CampoDeTexto : ContentView
     public static readonly BindableProperty LongitudMaximaProperty =
         BindableProperty.Create(nameof(LongitudMaxima), typeof(int), typeof(CampoDeTexto), int.MaxValue);
 
+    public static readonly BindableProperty TecladoProperty =
+        BindableProperty.Create(nameof(Teclado), typeof(Keyboard), typeof(CampoDeTexto), Keyboard.Default);
+
     public static readonly BindableProperty TipoDeRetornoProperty =
         BindableProperty.Create(
             nameof(TipoDeRetorno),
@@ -122,6 +125,12 @@ public partial class CampoDeTexto : ContentView
     {
         get => (int)GetValue(LongitudMaximaProperty);
         set => SetValue(LongitudMaximaProperty, value);
+    }
+
+    public Keyboard Teclado
+    {
+        get => (Keyboard)GetValue(TecladoProperty);
+        set => SetValue(TecladoProperty, value);
     }
 
     public ReturnType TipoDeRetorno

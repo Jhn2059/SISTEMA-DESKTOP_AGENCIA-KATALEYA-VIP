@@ -90,6 +90,31 @@ internal sealed class RepositorioBitacoraFalso : IRepositorioBitacora
 
     public Task<bool> ExisteClaveAsync(Guid clave) =>
         Task.FromResult(Registros.Any(registro => registro.ClaveDeOperacion == clave));
+
+    public Task<EntradaDeBitacora?> BuscarPorClaveAsync(Guid clave) =>
+        Task.FromResult(Registros
+            .Where(registro => registro.ClaveDeOperacion == clave)
+            .Select(CrearEntrada)
+            .FirstOrDefault());
+
+    public Task<IReadOnlyList<EntradaDeBitacora>> ConsultarAsync(FiltroDeBitacora filtro) =>
+        Task.FromResult<IReadOnlyList<EntradaDeBitacora>>(Registros
+            .Where(registro => filtro.UsuarioId is null || registro.Usuario.Id == filtro.UsuarioId)
+            .Where(registro => filtro.PasajeId is null || registro.PasajeId == filtro.PasajeId)
+            .Select(CrearEntrada)
+            .ToList());
+
+    private static EntradaDeBitacora CrearEntrada(RegistroDeBitacora registro) =>
+        new()
+        {
+            Id = registro.Id,
+            FechaHora = registro.FechaHora,
+            UsuarioNombre = registro.Usuario.NombreUsuario,
+            Operacion = registro.Operacion,
+            PasajeId = registro.PasajeId,
+            ValorAnterior = registro.ValorAnterior,
+            ValorNuevo = registro.ValorNuevo
+        };
 }
 
 internal sealed class UnidadDeTrabajoFalsa : IUnidadDeTrabajo

@@ -75,7 +75,7 @@
                                 <Button Grid.Column="1" x:Name="BotonAbrirUnidad" Text="Abrir" Style="{StaticResource BotonSecundario}" FontSize="12" Padding="12,0" Clicked="AlAbrirUnidad" />
                             </Grid>
                         </VerticalStackLayout>
-                        <common:CampoDeTexto x:Name="CampoAsiento" Grid.Column="2" Etiqueta="Asiento *" Placeholder="1" Keyboard="Numeric" />
+                        <common:CampoDeTexto x:Name="CampoAsiento" Grid.Column="2" Etiqueta="Asiento *" Placeholder="1" Teclado="Numeric" />
                     </Grid>
 
                     <BoxView HeightRequest="1" Color="{DynamicResource Borde}" Margin="0,4" />

@@ -53,6 +53,7 @@
                     Text="{Binding Texto, Source={x:Reference Raiz}, Mode=TwoWay}"
                     Placeholder="{Binding Placeholder, Source={x:Reference Raiz}}"
                     MaxLength="{Binding LongitudMaxima, Source={x:Reference Raiz}}"
+                    Keyboard="{Binding Teclado, Source={x:Reference Raiz}}"
                     ReturnType="{Binding TipoDeRetorno, Source={x:Reference Raiz}}"
                     Focused="AlEnfocarEntrada"
                     Unfocused="AlDesenfocarEntrada"
