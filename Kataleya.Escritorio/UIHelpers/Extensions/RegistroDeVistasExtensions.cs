@@ -26,6 +26,7 @@ public static class RegistroDeVistasExtensions
         servicios.AddTransient<PanelPrincipalPage>();
         servicios.AddTransient<GestionDeUsuariosViewModel>();
         servicios.AddTransient<GestionDeUsuariosPage>();
+        servicios.AddTransient<RegistroDePasajesViewModel>();
         servicios.AddTransient<RegistroDePasajesPage>();
         servicios.AddTransient<ListaDePasajesViewModel>();
         servicios.AddTransient<ListaDePasajesPage>();

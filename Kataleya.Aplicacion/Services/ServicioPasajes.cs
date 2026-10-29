@@ -257,14 +257,14 @@ public sealed class ServicioPasajes
         if (solicitud.PrecioAcordado <= 0)
         {
             throw new ReglaDeNegocioException(
-                "El precio acordado debe ser mayor que cero.",
+                "Escriba un precio mayor que cero.",
                 "precioAcordado");
         }
 
-        if (solicitud.Integrantes.Count == 0)
+        if (solicitud.Integrantes.Count < 2)
         {
             throw new ReglaDeNegocioException(
-                "Agregue al menos un integrante al grupo.",
+                "Un grupo tiene al menos dos integrantes. Agregue otro o regístrelo como pasaje individual.",
                 "integrantes");
         }
 
@@ -302,7 +302,8 @@ public sealed class ServicioPasajes
         if (capacidad < solicitud.Integrantes.Count)
         {
             throw new ReglaDeNegocioException(
-                "Las unidades no tienen asientos suficientes para todos los integrantes.",
+                $"Hay {solicitud.Integrantes.Count} integrantes y {capacidad} asientos. " +
+                "Agregue otra unidad o elija un vehículo más grande.",
                 "unidades");
         }
 
