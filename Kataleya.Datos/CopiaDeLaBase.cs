@@ -16,7 +16,7 @@ public sealed class CopiaDeLaBase : ICopiaDeLaBase
     [
         "rol", "sede", "usuario", "tipo_vehiculo", "parametro", "tarifa", "correlativo_boleto",
         "grupo", "unidad_salida", "pasaje", "pago", "boleto_viaje", "registro_bitacora",
-        "reporte_anual", "copia_respaldo"
+        "reporte_anual", "copia_respaldo", "preferencias"
     ];
 
     private static readonly byte[] Cabecera = "KTLY1"u8.ToArray();

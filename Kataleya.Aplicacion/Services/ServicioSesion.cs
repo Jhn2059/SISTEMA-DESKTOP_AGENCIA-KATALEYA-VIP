@@ -12,6 +12,7 @@ public sealed class ServicioSesion
     private const string OperacionDeAcceso = "Iniciar sesión";
 
     private readonly IRepositorioUsuarios _repositorioUsuarios;
+    private readonly IRepositorioPreferencias _preferencias;
     private readonly ServicioBitacora _servicioBitacora;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
     private readonly IReloj _reloj;
@@ -19,12 +20,14 @@ public sealed class ServicioSesion
 
     public ServicioSesion(
         IRepositorioUsuarios repositorioUsuarios,
+        IRepositorioPreferencias preferencias,
         ServicioBitacora servicioBitacora,
         IUnidadDeTrabajo unidadDeTrabajo,
         IReloj reloj,
         ContextoDeOperacion contexto)
     {
         _repositorioUsuarios = repositorioUsuarios ?? throw new ArgumentNullException(nameof(repositorioUsuarios));
+        _preferencias = preferencias ?? throw new ArgumentNullException(nameof(preferencias));
         _servicioBitacora = servicioBitacora ?? throw new ArgumentNullException(nameof(servicioBitacora));
         _unidadDeTrabajo = unidadDeTrabajo ?? throw new ArgumentNullException(nameof(unidadDeTrabajo));
         _reloj = reloj ?? throw new ArgumentNullException(nameof(reloj));
@@ -82,7 +85,8 @@ public sealed class ServicioSesion
                 Sede = usuario.Sede.Nombre,
                 Estado = usuario.Estado,
                 FinBloqueo = usuario.FinBloqueo,
-                PuedeDesactivarse = usuario.PuedeDesactivarse()
+                PuedeDesactivarse = usuario.PuedeDesactivarse(),
+                Tema = (await _preferencias.BuscarAsync(usuario.Id))?.Tema
             }
         };
     }

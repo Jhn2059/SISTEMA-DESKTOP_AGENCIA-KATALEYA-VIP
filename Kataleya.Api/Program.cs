@@ -59,6 +59,7 @@ builder.Services.AddScoped<IRepositorioConfiguracion, RepositorioConfiguracion>(
 builder.Services.AddScoped<IRepositorioCuadre, RepositorioCuadre>();
 builder.Services.AddScoped<IRepositorioReportesAnuales, RepositorioReportesAnuales>();
 builder.Services.AddScoped<IRepositorioCopias, RepositorioCopias>();
+builder.Services.AddScoped<IRepositorioPreferencias, RepositorioPreferencias>();
 builder.Services.AddScoped<ICopiaDeLaBase>(servicios => new CopiaDeLaBase(
     servicios.GetRequiredService<FuenteDeDatos>(),
     opcionesDeCopia.ClaveDeCifrado));
@@ -250,6 +251,24 @@ cuentas.MapPut("/{id:int}/contrasena", async (
     }
 
     await servicio.RestablecerContrasenaAsync(usuario, solicitud.ContrasenaNueva);
+    return Results.NoContent();
+});
+
+// El tema lo elige cada cuenta para sí misma, también el Encargado de ventas (CDU-20).
+app.MapPut("/cuentas/{id:int}/tema", async (
+    int id,
+    SolicitudDeTema solicitud,
+    ContextoDeOperacion contexto,
+    ServicioCuentas servicio) =>
+{
+    if (id != contexto.Usuario.Id)
+    {
+        return Results.Problem(
+            statusCode: StatusCodes.Status403Forbidden,
+            title: "No tiene permiso para usar esta función.");
+    }
+
+    await servicio.ElegirTemaAsync(solicitud.Tema);
     return Results.NoContent();
 });
 

@@ -19,4 +19,7 @@ public sealed class DatosDeCuenta
     public DateTime? FinBloqueo { get; set; }
 
     public bool PuedeDesactivarse { get; set; }
+
+    // Sin tema elegido, la aplicación sigue el de Windows.
+    public Tema? Tema { get; set; }
 }

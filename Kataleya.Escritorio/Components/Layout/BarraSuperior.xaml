@@ -50,6 +50,24 @@
             Spacing="10"
             VerticalOptions="Center">
 
+        <HorizontalStackLayout
+            x:Name="AvisoCambiandoTema"
+            Spacing="6"
+            IsVisible="False"
+            VerticalOptions="Center">
+            <ActivityIndicator
+                IsRunning="True"
+                WidthRequest="16"
+                HeightRequest="16"
+                Color="{DynamicResource TextoSuave}"
+                VerticalOptions="Center" />
+            <Label
+                Text="Cambiando el tema…"
+                FontSize="13"
+                TextColor="{DynamicResource TextoSuave}"
+                VerticalOptions="Center" />
+        </HorizontalStackLayout>
+
         <Border
             x:Name="BotonTema"
             WidthRequest="40"

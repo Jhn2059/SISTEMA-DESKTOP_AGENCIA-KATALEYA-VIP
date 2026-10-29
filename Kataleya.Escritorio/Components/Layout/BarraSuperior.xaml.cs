@@ -1,3 +1,5 @@
+using Kataleya.Cliente;
+using Kataleya.Dominio.Enums;
 using Kataleya.Escritorio.UIHelpers;
 #if WINDOWS
 using System.Runtime.InteropServices;
@@ -39,6 +41,7 @@ public partial class BarraSuperior : ContentView
         ActualizarDatos();
         ActualizarIconoTema();
         ServicioDeTema.Cambio += AlCambiarTema;
+        ServicioDeTema.CambioEnCurso += AlCambiarEstadoDelTema;
 #if WINDOWS
         ZonaArrastre.HandlerChanged += AlCambiarHandler;
         Loaded += (_, _) => ActualizarZonasDeEntrada();
@@ -104,8 +107,25 @@ public partial class BarraSuperior : ContentView
         IconoCerrar.Stroke = new SolidColorBrush(ServicioDeTema.Color("Texto"));
     }
 
-    private void AlTocarTema(object? remitente, TappedEventArgs argumentos) =>
-        ServicioDeTema.Alternar();
+    private async void AlTocarTema(object? remitente, TappedEventArgs argumentos) =>
+        await ServicioDeTema.CambiarAsync(GuardarTemaAsync);
+
+    // Sin conexión, el tema queda en esta sesión y se guarda con el próximo cambio (CDU-20).
+    private static async Task GuardarTemaAsync(Tema tema)
+    {
+        if (IPlatformApplication.Current?.Services.GetService(typeof(ClienteApi)) is ClienteApi cliente)
+        {
+            await cliente.ElegirTemaAsync(tema);
+        }
+    }
+
+    private void AlCambiarEstadoDelTema(object? remitente, EventArgs argumentos) =>
+        Dispatcher.Dispatch(() =>
+        {
+            AvisoCambiandoTema.IsVisible = ServicioDeTema.Cambiando;
+            BotonTema.IsEnabled = !ServicioDeTema.Cambiando;
+            BotonTema.Opacity = ServicioDeTema.Cambiando ? 0.45 : 1;
+        });
 
     private void AlEntrarTema(object? remitente, PointerEventArgs argumentos) =>
         BotonTema.BackgroundColor = ServicioDeTema.Color("SuperficieHover");

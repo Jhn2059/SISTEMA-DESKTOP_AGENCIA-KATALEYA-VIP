@@ -200,6 +200,23 @@ public sealed class ClienteApi
             "Desbloquear cuenta",
             idempotente: true);
 
+    // Sin conexión, el tema queda en esta sesión y se guarda con el próximo cambio.
+    public async Task<ResultadoDeLaApi> ElegirTemaAsync(Tema tema)
+    {
+        if (CuentaActual is null)
+        {
+            return new ResultadoDeLaApi { SesionExpirada = true };
+        }
+
+        CuentaActual.Tema = tema;
+
+        return await EnviarSinDatosAsync(
+            HttpMethod.Put,
+            $"cuentas/{CuentaActual.Id}/tema",
+            new SolicitudDeTema { Tema = tema },
+            "Elegir tema");
+    }
+
     public Task<ResultadoDeLaApi> RestablecerContrasenaAsync(
         int idCuenta,
         string contrasenaNueva) =>

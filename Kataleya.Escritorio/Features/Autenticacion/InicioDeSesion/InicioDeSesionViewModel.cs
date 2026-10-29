@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Kataleya.Cliente;
 using Kataleya.Contratos.Session;
 using Kataleya.Escritorio.Servicios;
+using Kataleya.Escritorio.UIHelpers;
 
 namespace Kataleya.Escritorio.Features.Autenticacion.InicioDeSesion;
 
@@ -82,6 +83,7 @@ public partial class InicioDeSesionViewModel : ObservableObject
 
             if (resultado.Cuenta is not null)
             {
+                ServicioDeTema.AplicarDeLaCuenta(resultado.Cuenta.Tema);
                 await _navegacion.IrAlPanelAsync();
                 return;
             }

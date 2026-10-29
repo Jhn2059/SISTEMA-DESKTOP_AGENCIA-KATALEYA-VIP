@@ -262,6 +262,22 @@ public sealed class ServicioCuentasPruebas
         Assert.Equal(1, cuenta.CantidadDeIntentosFallidos);
     }
 
+    [Fact]
+    public async Task El_tema_elegido_vuelve_al_iniciar_sesion()
+    {
+        var escenario = new Escenario();
+        var cuenta = escenario.AgregarUsuario("vendedor1", "Clave1234");
+
+        var primera = await escenario.Sesion.IniciarSesionAsync("vendedor1", "Clave1234");
+        Assert.Null(primera.Cuenta!.Tema);
+
+        escenario.Contexto.Usuario = cuenta;
+        await escenario.Cuentas.ElegirTemaAsync(Tema.Claro);
+
+        var segunda = await escenario.Sesion.IniciarSesionAsync("vendedor1", "Clave1234");
+        Assert.Equal(Tema.Claro, segunda.Cuenta!.Tema);
+    }
+
     private static SolicitudDeCuenta Solicitud(
         string nombreUsuario,
         string contrasena = "Clave1234") =>

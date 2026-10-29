@@ -18,6 +18,7 @@ public sealed class ServicioCuentas
 
     private readonly IRepositorioUsuarios _usuarios;
     private readonly IRepositorioCatalogos _catalogos;
+    private readonly IRepositorioPreferencias _preferencias;
     private readonly ServicioBitacora _bitacora;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
     private readonly ContextoDeOperacion _contexto;
@@ -25,12 +26,14 @@ public sealed class ServicioCuentas
     public ServicioCuentas(
         IRepositorioUsuarios usuarios,
         IRepositorioCatalogos catalogos,
+        IRepositorioPreferencias preferencias,
         ServicioBitacora bitacora,
         IUnidadDeTrabajo unidadDeTrabajo,
         ContextoDeOperacion contexto)
     {
         _usuarios = usuarios ?? throw new ArgumentNullException(nameof(usuarios));
         _catalogos = catalogos ?? throw new ArgumentNullException(nameof(catalogos));
+        _preferencias = preferencias ?? throw new ArgumentNullException(nameof(preferencias));
         _bitacora = bitacora ?? throw new ArgumentNullException(nameof(bitacora));
         _unidadDeTrabajo = unidadDeTrabajo ?? throw new ArgumentNullException(nameof(unidadDeTrabajo));
         _contexto = contexto ?? throw new ArgumentNullException(nameof(contexto));
@@ -228,6 +231,16 @@ public sealed class ServicioCuentas
                 null,
                 Serializar(usuario));
         });
+    }
+
+    // CDU-20: cada cuenta guarda su tema; lo usa al iniciar sesión en cualquier laptop.
+    public async Task ElegirTemaAsync(Tema tema)
+    {
+        var preferencias = await _preferencias.BuscarAsync(_contexto.Usuario.Id)
+            ?? new Preferencias(_contexto.Usuario.Id, tema);
+
+        preferencias.ElegirTema(tema);
+        await _preferencias.GuardarAsync(preferencias);
     }
 
     private async Task<bool> YaSeRegistroAsync() =>

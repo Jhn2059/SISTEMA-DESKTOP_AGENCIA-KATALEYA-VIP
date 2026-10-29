@@ -17,6 +17,8 @@ BEGIN;
 \copy registro_bitacora FROM 'registro_bitacora.csv' WITH (FORMAT csv, HEADER)
 \copy reporte_anual FROM 'reporte_anual.csv' WITH (FORMAT csv, HEADER)
 \copy copia_respaldo FROM 'copia_respaldo.csv' WITH (FORMAT csv, HEADER)
+-- Las copias anteriores al script 10 no traen preferencias.csv: en ese caso se quita esta línea.
+\copy preferencias FROM 'preferencias.csv' WITH (FORMAT csv, HEADER)
 
 -- Las columnas de identidad siguen desde el último id cargado.
 SELECT setval(pg_get_serial_sequence(tabla, 'id'), COALESCE(maximo, 0) + 1, false)

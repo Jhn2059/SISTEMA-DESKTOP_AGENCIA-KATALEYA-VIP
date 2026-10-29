@@ -14,6 +14,7 @@ public partial class InicioDeSesionPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
+        ServicioDeTema.SeguirAlSistema();
         BarraDeTitulo.ModoInicioDeSesion();
         CampoContrasena.RestablecerContrasena();
         Dispatcher.Dispatch(() => CampoUsuario.Enfocar());

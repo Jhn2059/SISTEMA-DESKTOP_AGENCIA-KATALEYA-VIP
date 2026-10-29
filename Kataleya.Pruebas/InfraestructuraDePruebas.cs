@@ -131,6 +131,20 @@ internal sealed class RepositorioBitacoraFalso : IRepositorioBitacora
         };
 }
 
+internal sealed class RepositorioPreferenciasFalso : IRepositorioPreferencias
+{
+    private readonly Dictionary<int, Preferencias> _preferencias = [];
+
+    public Task<Preferencias?> BuscarAsync(int idUsuario) =>
+        Task.FromResult(_preferencias.GetValueOrDefault(idUsuario));
+
+    public Task GuardarAsync(Preferencias preferencias)
+    {
+        _preferencias[preferencias.IdUsuario] = preferencias;
+        return Task.CompletedTask;
+    }
+}
+
 internal sealed class UnidadDeTrabajoFalsa : IUnidadDeTrabajo
 {
     public Task EjecutarEnTransaccionAsync(Func<Task> trabajo) =>
@@ -154,6 +168,7 @@ internal sealed class Escenario
         Usuarios = new RepositorioUsuariosFalso();
         Catalogos = new RepositorioCatalogosFalso();
         Bitacora = new RepositorioBitacoraFalso();
+        Preferencias = new RepositorioPreferenciasFalso();
 
         Administradora = Sembrar(1, "admin", "Admin1234", EstadoCuenta.Activa, esCuentaPrincipal: true, rol: 0);
         Contexto.Usuario = Administradora;
@@ -164,10 +179,11 @@ internal sealed class Escenario
         Cuentas = new ServicioCuentas(
             Usuarios,
             Catalogos,
+            Preferencias,
             servicioBitacora,
             unidad,
             Contexto);
-        Sesion = new ServicioSesion(Usuarios, servicioBitacora, unidad, Reloj, new ContextoDeOperacion());
+        Sesion = new ServicioSesion(Usuarios, Preferencias, servicioBitacora, unidad, Reloj, new ContextoDeOperacion());
     }
 
     public RelojFalso Reloj { get; }
@@ -179,6 +195,8 @@ internal sealed class Escenario
     public RepositorioCatalogosFalso Catalogos { get; }
 
     public RepositorioBitacoraFalso Bitacora { get; }
+
+    public RepositorioPreferenciasFalso Preferencias { get; }
 
     public Usuario Administradora { get; }
 

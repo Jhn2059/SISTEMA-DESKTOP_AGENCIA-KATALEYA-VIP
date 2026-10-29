@@ -1,9 +1,10 @@
+using Kataleya.Dominio.Enums;
+
 namespace Kataleya.Escritorio.UIHelpers;
 
+// El tema es de cada cuenta (CDU-20): el inicio de sesión y la cuenta que no eligió uno siguen el de Windows.
 public static class ServicioDeTema
 {
-    private const string ClaveDePreferencia = "tema";
-
     private static readonly IReadOnlyDictionary<string, string> PaletaOscura =
         new Dictionary<string, string>
         {
@@ -110,15 +111,54 @@ public static class ServicioDeTema
 
     public static event EventHandler? Cambio;
 
+    public static event EventHandler? CambioEnCurso;
+
     public static bool EsOscuro { get; private set; } = true;
 
-    public static void Inicializar()
+    public static bool Cambiando { get; private set; }
+
+    public static void Inicializar() =>
+        SeguirAlSistema();
+
+    public static void SeguirAlSistema() =>
+        Aplicar(Application.Current?.PlatformAppTheme == AppTheme.Dark);
+
+    public static void AplicarDeLaCuenta(Tema? tema)
     {
-        var guardado = Preferences.Default.Get(ClaveDePreferencia, "oscuro");
-        Aplicar(string.Equals(guardado, "claro", StringComparison.OrdinalIgnoreCase) ? false : true, guardar: false);
+        if (tema is null)
+        {
+            SeguirAlSistema();
+            return;
+        }
+
+        Aplicar(tema == Tema.Oscuro);
     }
 
-    public static void Alternar() => Aplicar(!EsOscuro);
+    // Primero aplica el tema en toda la ventana y después lo guarda; los clics de mientras no hacen nada.
+    public static async Task CambiarAsync(Func<Tema, Task> guardar)
+    {
+        ArgumentNullException.ThrowIfNull(guardar);
+
+        if (Cambiando)
+        {
+            return;
+        }
+
+        Cambiando = true;
+        CambioEnCurso?.Invoke(null, EventArgs.Empty);
+
+        try
+        {
+            Aplicar(!EsOscuro);
+            await Task.Yield();
+            await guardar(EsOscuro ? Tema.Oscuro : Tema.Claro);
+        }
+        finally
+        {
+            Cambiando = false;
+            CambioEnCurso?.Invoke(null, EventArgs.Empty);
+        }
+    }
 
     public static Color Color(string clave)
     {
@@ -131,7 +171,7 @@ public static class ServicioDeTema
         return Colors.Transparent;
     }
 
-    private static void Aplicar(bool oscuro, bool guardar = true)
+    private static void Aplicar(bool oscuro)
     {
         EsOscuro = oscuro;
 
@@ -144,11 +184,6 @@ public static class ServicioDeTema
         }
 
         Application.Current.UserAppTheme = oscuro ? AppTheme.Dark : AppTheme.Light;
-
-        if (guardar)
-        {
-            Preferences.Default.Set(ClaveDePreferencia, oscuro ? "oscuro" : "claro");
-        }
 
         Cambio?.Invoke(null, EventArgs.Empty);
     }
