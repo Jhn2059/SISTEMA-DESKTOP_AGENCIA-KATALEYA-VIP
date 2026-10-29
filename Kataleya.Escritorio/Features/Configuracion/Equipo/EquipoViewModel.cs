@@ -118,7 +118,7 @@ public partial class EquipoViewModel : ObservableObject
         if (estado != EstadoImpresora.Lista)
         {
             await _dialogos.MostrarMensajeAsync(
-                "No se pudo imprimir",
+                estado == EstadoImpresora.SinPapel ? "IMP-02" : "IMP-01",
                 estado == EstadoImpresora.SinPapel
                     ? "La impresora no tiene papel. Revísela y vuelva a pulsar «Imprimir prueba»."
                     : "La impresora no responde. Revísela y vuelva a pulsar «Imprimir prueba».");

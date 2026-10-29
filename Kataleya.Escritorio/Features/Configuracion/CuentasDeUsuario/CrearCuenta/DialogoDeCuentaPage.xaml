@@ -4,82 +4,101 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:contratos="clr-namespace:Kataleya.Contratos.Cuentas;assembly=Kataleya.Contratos"
+    xmlns:common="clr-namespace:Kataleya.Escritorio.Components.Common"
     xmlns:ui="clr-namespace:Kataleya.Escritorio.UIHelpers.Behaviors"
     xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.CrearCuenta"
     x:DataType="vm:DialogoDeCuentaViewModel"
     ui:CicloDeVidaDePagina.AlDesaparecer="{Binding AlDesaparecerCommand}"
-    Title="Nueva cuenta"
-    Shell.NavBarIsVisible="False">
-    <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="10">
-            <Label Text="Nueva cuenta" FontSize="22" FontAttributes="Bold" />
+    Title="Crear cuenta"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{DynamicResource Fondo}">
+    <Border
+        Style="{StaticResource Tarjeta}"
+        WidthRequest="560"
+        Padding="24"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
+        <VerticalStackLayout Spacing="14">
+            <HorizontalStackLayout Spacing="12">
+                <Border
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 22"
+                    BackgroundColor="{DynamicResource InfoFondo}">
+                    <Path
+                        Data="{StaticResource IconoPersonaMas}"
+                        WidthRequest="22"
+                        HeightRequest="22"
+                        Aspect="Uniform"
+                        Stroke="{DynamicResource Info}"
+                        StrokeThickness="1.75"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" />
+                </Border>
+                <Label
+                    Text="Crear cuenta"
+                    FontFamily="InterSemiBold"
+                    FontSize="16"
+                    TextColor="{DynamicResource Texto}"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
 
-            <Label Text="Nombre completo" />
-            <Entry
-                Text="{Binding Nombre}"
+            <common:CampoDeTexto
+                Etiqueta="Nombre de la persona *"
                 Placeholder="Nombre y apellidos"
-                MaxLength="100" />
-            <Label
-                Text="{Binding ErrorNombre}"
-                TextColor="{DynamicResource Error}"
-                FontSize="12"
-                IsVisible="{Binding ErrorNombre, Converter={StaticResource TextoNoVacio}}" />
+                LongitudMaxima="100"
+                Texto="{Binding Nombre}"
+                MensajeDeError="{Binding ErrorNombre}" />
 
-            <Label Text="Nombre de usuario" />
-            <Entry
-                Text="{Binding NombreUsuario}"
-                Placeholder="Usuario para ingresar"
-                MaxLength="30" />
-            <Label
-                Text="{Binding ErrorNombreUsuario}"
-                TextColor="{DynamicResource Error}"
-                FontSize="12"
-                IsVisible="{Binding ErrorNombreUsuario, Converter={StaticResource TextoNoVacio}}" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <common:CampoDeTexto
+                    Etiqueta="Nombre de usuario *"
+                    Placeholder="ventas02"
+                    LongitudMaxima="30"
+                    Texto="{Binding NombreUsuario}"
+                    MensajeDeError="{Binding ErrorNombreUsuario}" />
+                <common:CampoDeTexto
+                    Grid.Column="1"
+                    Etiqueta="Contraseña inicial *"
+                    Placeholder="Mínimo 8 caracteres"
+                    Icono="{StaticResource IconoCandado}"
+                    EsContrasena="True"
+                    Texto="{Binding Contrasena}"
+                    MensajeDeError="{Binding ErrorContrasena}" />
+            </Grid>
 
-            <Label Text="Contraseña inicial" />
-            <Entry
-                Text="{Binding Contrasena}"
-                Placeholder="Mínimo 8 caracteres"
-                IsPassword="True" />
-            <Label
-                Text="{Binding ErrorContrasena}"
-                TextColor="{DynamicResource Error}"
-                FontSize="12"
-                IsVisible="{Binding ErrorContrasena, Converter={StaticResource TextoNoVacio}}" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Rol *" Style="{StaticResource EtiquetaDeCampo}" />
+                    <Border Style="{StaticResource CampoDeFormulario}">
+                        <Picker
+                            ItemsSource="{Binding Roles}"
+                            SelectedItem="{Binding RolSeleccionado, Mode=TwoWay}"
+                            ItemDisplayBinding="{Binding Nombre, x:DataType=contratos:DatosDeRol}"
+                            Title="Seleccione" />
+                    </Border>
+                    <Label Text="{Binding ErrorRol}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorRol, Converter={StaticResource TextoNoVacio}}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="5">
+                    <Label Text="Sede *" Style="{StaticResource EtiquetaDeCampo}" />
+                    <Border Style="{StaticResource CampoDeFormulario}">
+                        <Picker
+                            ItemsSource="{Binding Sedes}"
+                            SelectedItem="{Binding SedeSeleccionada, Mode=TwoWay}"
+                            ItemDisplayBinding="{Binding Nombre, x:DataType=contratos:DatosDeSede}"
+                            Title="Seleccione" />
+                    </Border>
+                    <Label Text="{Binding ErrorSede}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorSede, Converter={StaticResource TextoNoVacio}}" />
+                </VerticalStackLayout>
+            </Grid>
 
-            <Label Text="Rol" />
-            <Picker
-                ItemsSource="{Binding Roles}"
-                SelectedItem="{Binding RolSeleccionado, Mode=TwoWay}"
-                ItemDisplayBinding="{Binding Nombre, x:DataType=contratos:DatosDeRol}"
-                Title="Seleccione un rol" />
-            <Label
-                Text="{Binding ErrorRol}"
-                TextColor="{DynamicResource Error}"
-                FontSize="12"
-                IsVisible="{Binding ErrorRol, Converter={StaticResource TextoNoVacio}}" />
+            <Label Text="{Binding ErrorGeneral}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorGeneral, Converter={StaticResource TextoNoVacio}}" />
 
-            <Label Text="Sede" />
-            <Picker
-                ItemsSource="{Binding Sedes}"
-                SelectedItem="{Binding SedeSeleccionada, Mode=TwoWay}"
-                ItemDisplayBinding="{Binding Nombre, x:DataType=contratos:DatosDeSede}"
-                Title="Seleccione una sede" />
-            <Label
-                Text="{Binding ErrorSede}"
-                TextColor="{DynamicResource Error}"
-                FontSize="12"
-                IsVisible="{Binding ErrorSede, Converter={StaticResource TextoNoVacio}}" />
-
-            <Label
-                Text="{Binding ErrorGeneral}"
-                TextColor="{DynamicResource Error}"
-                IsVisible="{Binding ErrorGeneral, Converter={StaticResource TextoNoVacio}}" />
-
-            <HorizontalStackLayout HorizontalOptions="End" Spacing="8" Margin="0,8,0,0">
-                <Button Text="Cancelar" Command="{Binding CancelarCommand}" />
-                <Button Text="Crear cuenta" Command="{Binding CrearCommand}" />
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="10">
+                <Button Text="Cancelar" Style="{StaticResource BotonSecundario}" Command="{Binding CancelarCommand}" />
+                <Button Text="Crear cuenta" Style="{StaticResource BotonPrimario}" Command="{Binding CrearCommand}" />
             </HorizontalStackLayout>
         </VerticalStackLayout>
-    </ScrollView>
+    </Border>
 </ContentPage>

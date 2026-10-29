@@ -3,37 +3,63 @@
     x:Class="Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.RestablecerContrasena.DialogoDeContrasenaPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:common="clr-namespace:Kataleya.Escritorio.Components.Common"
     xmlns:ui="clr-namespace:Kataleya.Escritorio.UIHelpers.Behaviors"
     xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.RestablecerContrasena"
     x:DataType="vm:DialogoDeContrasenaViewModel"
     ui:CicloDeVidaDePagina.AlDesaparecer="{Binding AlDesaparecerCommand}"
     Title="Restablecer contraseña"
-    Shell.NavBarIsVisible="False">
-    <VerticalStackLayout Padding="24" Spacing="10">
-        <Label Text="Restablecer contraseña" FontSize="22" FontAttributes="Bold" />
-        <Label
-            Text="{Binding NombreUsuario, StringFormat='Cuenta: {0}'}"
-            TextColor="{DynamicResource TextoSuave}" />
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{DynamicResource Fondo}">
+    <Border
+        Style="{StaticResource Tarjeta}"
+        WidthRequest="460"
+        Padding="24"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
+        <VerticalStackLayout Spacing="14">
+            <HorizontalStackLayout Spacing="12">
+                <Border
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 22"
+                    BackgroundColor="{DynamicResource InfoFondo}">
+                    <Path
+                        Data="{StaticResource IconoLlave}"
+                        WidthRequest="22"
+                        HeightRequest="22"
+                        Aspect="Uniform"
+                        Stroke="{DynamicResource Info}"
+                        StrokeThickness="1.75"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" />
+                </Border>
+                <Label
+                    Text="Restablecer contraseña"
+                    FontFamily="InterSemiBold"
+                    FontSize="16"
+                    TextColor="{DynamicResource Texto}"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
 
-        <Label Text="Contraseña nueva" Margin="0,10,0,0" />
-        <Entry
-            Text="{Binding Contrasena}"
-            Placeholder="Mínimo 8 caracteres"
-            IsPassword="True" />
-        <Label
-            Text="{Binding ErrorContrasena}"
-            TextColor="{DynamicResource Error}"
-            FontSize="12"
-            IsVisible="{Binding ErrorContrasena, Converter={StaticResource TextoNoVacio}}" />
+            <Label Text="{Binding NombreUsuario, StringFormat='Cuenta: {0}'}" FontSize="14" TextColor="{DynamicResource TextoSuave}" />
 
-        <Label
-            Text="Entregue la contraseña nueva al usuario."
-            TextColor="{DynamicResource TextoSuave}"
-            FontSize="12" />
+            <common:CampoDeTexto
+                Etiqueta="Contraseña nueva *"
+                Placeholder="Mínimo 8 caracteres"
+                Icono="{StaticResource IconoCandado}"
+                EsContrasena="True"
+                Texto="{Binding Contrasena}"
+                MensajeDeError="{Binding ErrorContrasena}"
+                ComandoAlCompletar="{Binding AceptarCommand}" />
 
-        <HorizontalStackLayout HorizontalOptions="End" Spacing="8" Margin="0,8,0,0">
-            <Button Text="Cancelar" Command="{Binding CancelarCommand}" />
-            <Button Text="Restablecer" Command="{Binding AceptarCommand}" />
-        </HorizontalStackLayout>
-    </VerticalStackLayout>
+            <Label Text="Mínimo 8 caracteres. Entregue la contraseña nueva al usuario." FontSize="12" TextColor="{DynamicResource TextoSuave}" />
+
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="10">
+                <Button Text="Cancelar" Style="{StaticResource BotonSecundario}" Command="{Binding CancelarCommand}" />
+                <Button Text="Restablecer" Style="{StaticResource BotonPrimario}" Command="{Binding AceptarCommand}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Border>
 </ContentPage>
