@@ -39,3 +39,12 @@ jobs:
         with:
           name: kataleya-win-x64
           path: publicacion/win-x64
+      - name: Armar el instalador
+        run: |
+          choco install innosetup --no-progress -y
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" instalador\kataleya.iss
+      - name: Guardar instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: kataleya-instalador
+          path: publicacion/Instalar-Kataleya-*.exe
