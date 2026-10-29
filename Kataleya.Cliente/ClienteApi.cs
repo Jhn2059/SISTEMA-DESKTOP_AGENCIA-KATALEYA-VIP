@@ -349,7 +349,7 @@ public sealed class ClienteApi
     public Task<ResultadoDeLaApi<DatosDePasaje>> MarcarNoPresentadoAsync(long id) =>
         EnviarAsync<DatosDePasaje>(
             HttpMethod.Post,
-            $"pasajes/{id}/no-presentado",
+            $"pasajes/{id}/no-se-presento",
             null,
             "Marcar no presentado",
             idempotente: true);

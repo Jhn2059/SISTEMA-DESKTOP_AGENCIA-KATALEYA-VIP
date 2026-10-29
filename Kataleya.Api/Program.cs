@@ -361,7 +361,7 @@ pasajes.MapPost("/{id:long}/modificacion", async (
     Results.Ok(await servicio.ModificarAsync(id, cambios)))
     .AddEndpointFilter<FiltroDeAdministrador>();
 
-pasajes.MapPost("/{id:long}/no-presentado", async (
+pasajes.MapPost("/{id:long}/no-se-presento", async (
     long id,
     ServicioPasajes servicio) =>
     Results.Ok(await servicio.MarcarNoSePresentoAsync(id)))
