@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Kataleya.Escritorio.Features.Pasajes.Dialogos.DialogoDeModificacionPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ui="clr-namespace:Kataleya.Escritorio.UIHelpers.Behaviors"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.Pasajes.Dialogos"
+    x:DataType="vm:DialogoDeModificacionViewModel"
+    ui:CicloDeVidaDePagina.AlDesaparecer="{Binding AlDesaparecerCommand}"
+    Title="Modificar pasaje"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{DynamicResource Fondo}">
+    <Border
+        Style="{StaticResource Tarjeta}"
+        WidthRequest="560"
+        Padding="24"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
+        <VerticalStackLayout Spacing="14">
+            <HorizontalStackLayout Spacing="12">
+                <Border
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 22"
+                    BackgroundColor="{DynamicResource InfoFondo}">
+                    <Path
+                        Data="{StaticResource IconoEditar}"
+                        WidthRequest="22"
+                        HeightRequest="22"
+                        Aspect="Uniform"
+                        Stroke="{DynamicResource Info}"
+                        StrokeThickness="1.75"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" />
+                </Border>
+                <Label
+                    Text="{Binding Titulo}"
+                    FontFamily="InterSemiBold"
+                    FontSize="16"
+                    TextColor="{DynamicResource Texto}"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Border
+                IsVisible="{Binding Aviso, Converter={StaticResource TextoNoVacio}}"
+                Padding="12,10"
+                BackgroundColor="{DynamicResource AdvertenciaFondo}"
+                Stroke="{DynamicResource AdvertenciaBorde}"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 8">
+                <Label Text="{Binding Aviso}" FontSize="13" TextColor="{DynamicResource AdvertenciaTexto}" LineBreakMode="WordWrap" />
+            </Border>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" IsEnabled="{Binding PuedeCambiarLaSalida}">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Fecha de salida *" Style="{StaticResource EtiquetaDeCampo}" />
+                    <Border Style="{StaticResource CampoDeFormulario}">
+                        <DatePicker Date="{Binding Fecha}" Format="dd/MM/yyyy" />
+                    </Border>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="5">
+                    <Label Text="Horario *" Style="{StaticResource EtiquetaDeCampo}" />
+                    <Border Style="{StaticResource CampoDeFormulario}">
+                        <Picker ItemsSource="{Binding Horarios}" SelectedIndex="{Binding HorarioElegido}" />
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+
+            <Grid ColumnDefinitions="2*,*" ColumnSpacing="12">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Unidad de la salida *" Style="{StaticResource EtiquetaDeCampo}" />
+                    <Border Style="{StaticResource CampoDeFormulario}">
+                        <Picker ItemsSource="{Binding Unidades}" SelectedIndex="{Binding UnidadElegida}" />
+                    </Border>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="5">
+                    <Label Text="Asiento *" Style="{StaticResource EtiquetaDeCampo}" />
+                    <Border Style="{StaticResource CampoDeFormulario}">
+                        <Picker ItemsSource="{Binding Asientos}" SelectedIndex="{Binding AsientoElegido}" />
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+
+            <Grid ColumnDefinitions="2*,*" ColumnSpacing="12" IsEnabled="{Binding PuedeCambiarLaSalida}">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Lugar de embarque *" Style="{StaticResource EtiquetaDeCampo}" />
+                    <Border Style="{StaticResource CampoDeFormulario}">
+                        <Entry Text="{Binding LugarDeEmbarque}" />
+                    </Border>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="5">
+                    <Label Text="Teléfono" Style="{StaticResource EtiquetaDeCampo}" />
+                    <Border Style="{StaticResource CampoDeFormulario}">
+                        <Entry Text="{Binding Telefono}" Keyboard="Telephone" />
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+
+            <Label
+                Text="{Binding Error}"
+                Style="{StaticResource TextoDeError}"
+                IsVisible="{Binding Error, Converter={StaticResource TextoNoVacio}}" />
+
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="10">
+                <Button Text="Cancelar" Style="{StaticResource BotonSecundario}" Command="{Binding CancelarCommand}" />
+                <Button Text="Guardar cambios" Style="{StaticResource BotonPrimario}" Command="{Binding AceptarCommand}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Border>
+</ContentPage>

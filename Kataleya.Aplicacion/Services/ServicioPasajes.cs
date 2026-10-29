@@ -577,12 +577,16 @@ public sealed class ServicioPasajes
             Advertencias = advertencias,
             SeDevuelveElAdelanto = seDevuelve,
             ImporteADevolver = seDevuelve ? pagado : 0m,
-            HorasParaLaSalida = (int)Math.Floor(horas)
+            HorasParaLaSalida = (int)Math.Floor(horas),
+            HorasDeAviso = aviso
         };
     }
 
-    public async Task<DatosDePasaje> AnularAsync(long id, string motivo)
+    public async Task<DatosDePasaje> AnularAsync(long id, SolicitudDeAnulacion solicitud)
     {
+        ArgumentNullException.ThrowIfNull(solicitud);
+
+        var motivo = solicitud.Motivo;
         if (string.IsNullOrWhiteSpace(motivo))
         {
             throw new ReglaDeNegocioException("Escriba el motivo de la anulación.", "motivo");
@@ -600,7 +604,8 @@ public sealed class ServicioPasajes
         var pagado = await _pasajes.TotalPagadoAsync(grupo is null ? pasaje.Id : null, grupo?.Id);
         var horas = (FechasLocales.Combinar(pasaje.FechaSalida, pasaje.HoraSalida) - _reloj.Ahora).TotalHours;
         var aviso = await ObtenerHorasDeAvisoAsync();
-        var seDevuelve = pagado > 0 && horas >= aviso;
+        // RF-04: con menos horas de aviso el adelanto se retiene, salvo que el Administrador lo devuelva como excepción.
+        var seDevuelve = pagado > 0 && (horas >= aviso || solicitud.DevolverComoExcepcion);
         var estadoAnterior = pasaje.Estado;
 
         await _unidadDeTrabajo.EjecutarEnTransaccionAsync(async () =>
@@ -639,7 +644,8 @@ public sealed class ServicioPasajes
                 {
                     Estado = nameof(EstadoPasaje.Anulado),
                     Motivo = motivo.Trim(),
-                    Devuelto = seDevuelve ? pagado : 0m
+                    Devuelto = seDevuelve ? pagado : 0m,
+                    Excepcion = seDevuelve && horas < aviso
                 }),
                 pasaje.Id);
         });

@@ -7,7 +7,6 @@ using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Pasajes;
 using Kataleya.Dominio.Enums;
 using Kataleya.Escritorio.Servicios;
-using Kataleya.Escritorio.UIHelpers;
 using Kataleya.Escritorio.UIHelpers.Paginas;
 using Microsoft.Maui.Graphics;
 
@@ -42,7 +41,7 @@ public partial class ListaDePasajesViewModel : ObservableObject
     public ObservableCollection<string> Horarios { get; } = [Todos];
 
     public IReadOnlyList<string> Estados { get; } =
-        [Todos, .. EstadosDelFiltro.Select(NombreDelEstado)];
+        [Todos, .. EstadosDelFiltro.Select(EstadoVisible.Nombre)];
 
     public IReadOnlyList<string> Tipos { get; } = [Todos, "Individual", "Grupo"];
 
@@ -91,17 +90,6 @@ public partial class ListaDePasajesViewModel : ObservableObject
 
         await BuscarAsync();
     }
-
-    public static string NombreDelEstado(EstadoPasaje estado) =>
-        estado switch
-        {
-            EstadoPasaje.Reservado => "Reservado",
-            EstadoPasaje.ReservadoConAdelanto => "Reservado con adelanto",
-            EstadoPasaje.Pagado => "Pagado",
-            EstadoPasaje.Anulado => "Anulado",
-            EstadoPasaje.NoSePresento => "No se presentó",
-            _ => estado.ToString()
-        };
 
     private async Task CargarCatalogosAsync()
     {
@@ -280,14 +268,6 @@ public sealed class FilaDePasaje
     public static FilaDePasaje Crear(DatosDePasaje pasaje)
     {
         var esIntegrante = pasaje.GrupoId is not null && !pasaje.EsResponsable;
-        var (fondo, texto) = pasaje.Estado switch
-        {
-            EstadoPasaje.Pagado => ("ExitoFondo", "Exito"),
-            EstadoPasaje.ReservadoConAdelanto => ("AdvertenciaFondo", "AdvertenciaTexto"),
-            EstadoPasaje.Reservado => ("InfoFondo", "InfoTexto"),
-            EstadoPasaje.NoSePresento => ("PeligroHover", "PeligroTexto"),
-            _ => ("SuperficieActiva", "TextoSuave")
-        };
 
         return new FilaDePasaje(pasaje)
         {
@@ -299,9 +279,9 @@ public sealed class FilaDePasaje
             Importe = esIntegrante ? "—" : Soles(pasaje.Importe),
             Pagado = esIntegrante ? "—" : Soles(pasaje.Pagado),
             Saldo = esIntegrante ? "—" : Soles(pasaje.Saldo),
-            Estado = ListaDePasajesViewModel.NombreDelEstado(pasaje.Estado),
-            FondoDelEstado = ServicioDeTema.Color(fondo),
-            TextoDelEstado = ServicioDeTema.Color(texto)
+            Estado = EstadoVisible.Nombre(pasaje.Estado),
+            FondoDelEstado = EstadoVisible.Fondo(pasaje.Estado),
+            TextoDelEstado = EstadoVisible.Texto(pasaje.Estado)
         };
     }
 

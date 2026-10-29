@@ -1,4 +1,5 @@
 using Kataleya.Contratos.Cuentas;
+using Kataleya.Contratos.Pasajes;
 
 namespace Kataleya.Escritorio.Servicios;
 
@@ -15,6 +16,12 @@ public interface IDialogos
         IReadOnlyDictionary<string, string>? errores = null);
 
     Task<string?> PedirContrasenaDelReporteAsync(int anio);
+
+    Task<SolicitudDeCobro?> PedirCobroAsync(DatosDePasaje pasaje);
+
+    Task<SolicitudDeAnulacion?> PedirAnulacionAsync(DatosDePasaje pasaje, RevisionDeAnulacion revision);
+
+    Task<CambiosDelPasaje?> PedirCambiosAsync(DatosDePasaje pasaje, bool soloAsiento);
 
     Task<bool> ConfirmarAsync(
         string titulo,

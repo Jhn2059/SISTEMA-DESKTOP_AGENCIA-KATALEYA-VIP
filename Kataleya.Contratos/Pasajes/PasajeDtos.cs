@@ -298,6 +298,8 @@ public sealed class SolicitudDeCobro
 public sealed class SolicitudDeAnulacion
 {
     public string Motivo { get; set; } = string.Empty;
+
+    public bool DevolverComoExcepcion { get; set; }
 }
 
 public sealed class RevisionDeAnulacion
@@ -309,6 +311,8 @@ public sealed class RevisionDeAnulacion
     public decimal ImporteADevolver { get; set; }
 
     public int HorasParaLaSalida { get; set; }
+
+    public int HorasDeAviso { get; set; }
 }
 
 public sealed class ResultadoDeRevision

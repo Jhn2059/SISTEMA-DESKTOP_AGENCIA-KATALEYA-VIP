@@ -301,11 +301,11 @@ public sealed class ClienteApi
             null,
             "Revisar anulación");
 
-    public Task<ResultadoDeLaApi<DatosDePasaje>> AnularAsync(long id, string motivo) =>
+    public Task<ResultadoDeLaApi<DatosDePasaje>> AnularAsync(long id, SolicitudDeAnulacion solicitud) =>
         EnviarAsync<DatosDePasaje>(
             HttpMethod.Post,
             $"pasajes/{id}/anulacion",
-            new SolicitudDeAnulacion { Motivo = motivo },
+            solicitud,
             "Anular pasaje",
             idempotente: true);
 

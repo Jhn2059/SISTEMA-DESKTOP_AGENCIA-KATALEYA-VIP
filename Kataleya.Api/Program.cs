@@ -320,7 +320,7 @@ pasajes.MapPost("/{id:long}/anulacion", async (
     long id,
     Kataleya.Contratos.Pasajes.SolicitudDeAnulacion solicitud,
     ServicioPasajes servicio) =>
-    Results.Ok(await servicio.AnularAsync(id, solicitud.Motivo)))
+    Results.Ok(await servicio.AnularAsync(id, solicitud)))
     .AddEndpointFilter<FiltroDeAdministrador>();
 
 pasajes.MapPost("/{id:long}/cobros", async (

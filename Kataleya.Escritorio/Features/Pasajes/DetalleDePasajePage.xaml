@@ -4,19 +4,17 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:paginas="clr-namespace:Kataleya.Escritorio.UIHelpers.Paginas"
-    xmlns:pasajes="clr-namespace:Kataleya.Contratos.Pasajes;assembly=Kataleya.Contratos">
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.Pasajes"
+    x:DataType="vm:DetalleDePasajeViewModel">
     <ScrollView VerticalScrollBarVisibility="Never">
         <VerticalStackLayout Padding="24,16,24,24" Spacing="0">
 
             <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">
                 <Label Text="Detalle del pasaje" Style="{StaticResource TituloDePagina}" VerticalOptions="Center" />
-                <Border Grid.Column="1" HeightRequest="24" Padding="8,0,10,0" BackgroundColor="{DynamicResource AdvertenciaFondo}" Stroke="{DynamicResource AdvertenciaBorde}" StrokeThickness="1" StrokeShape="RoundRectangle 12" VerticalOptions="Center">
-                    <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
-                        <Path Data="{StaticResource IconoReloj}" WidthRequest="13" HeightRequest="13" Stroke="{DynamicResource Advertencia}" VerticalOptions="Center" />
-                        <Label x:Name="LblEstado" Text="Sin pasaje seleccionado" FontFamily="InterMedium" FontSize="12" TextColor="{DynamicResource AdvertenciaTexto}" VerticalOptions="Center" />
-                    </HorizontalStackLayout>
+                <Border Grid.Column="1" HeightRequest="24" Padding="10,0" BackgroundColor="{Binding FondoDelEstado}" StrokeThickness="0" StrokeShape="RoundRectangle 12" VerticalOptions="Center">
+                    <Label Text="{Binding Estado}" FontFamily="InterMedium" FontSize="12" TextColor="{Binding TextoDelEstado}" VerticalOptions="Center" />
                 </Border>
-                <Button Grid.Column="3" Text="←  Volver a la lista" Style="{StaticResource BotonSecundario}" Clicked="AlVolver" />
+                <Button Grid.Column="3" Text="←  Volver a la lista" Style="{StaticResource BotonSecundario}" Command="{Binding VolverCommand}" />
             </Grid>
 
             <Border Style="{StaticResource Tarjeta}" Margin="0,12,0,0">
@@ -26,25 +24,25 @@
                         <VerticalStackLayout Spacing="5">
                             <Label Text="Pasajero" Style="{StaticResource EtiquetaDeCampo}" />
                             <Border Style="{StaticResource CampoSoloLectura}">
-                                <Label x:Name="LblPasajero" Text="—" FontSize="14" VerticalOptions="Center" />
+                                <Label Text="{Binding Pasajero}" FontSize="14" VerticalOptions="Center" />
                             </Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="1" Spacing="5">
                             <Label Text="Documento" Style="{StaticResource EtiquetaDeCampo}" />
                             <Border Style="{StaticResource CampoSoloLectura}">
-                                <Label x:Name="LblDocumento" Text="—" FontSize="14" VerticalOptions="Center" />
+                                <Label Text="{Binding Documento}" FontSize="14" VerticalOptions="Center" />
                             </Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="2" Spacing="5">
                             <Label Text="Teléfono" Style="{StaticResource EtiquetaDeCampo}" />
                             <Border Style="{StaticResource CampoSoloLectura}">
-                                <Label x:Name="LblTelefono" Text="—" FontSize="14" VerticalOptions="Center" />
+                                <Label Text="{Binding Telefono}" FontSize="14" VerticalOptions="Center" />
                             </Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="3" Spacing="5">
                             <Label Text="N.º de boleto" Style="{StaticResource EtiquetaDeCampo}" />
                             <Border Style="{StaticResource CampoSoloLectura}">
-                                <Label x:Name="LblBoleto" Text="—" FontSize="14" VerticalOptions="Center" />
+                                <Label Text="{Binding Boleto}" FontSize="14" VerticalOptions="Center" />
                             </Border>
                         </VerticalStackLayout>
                     </Grid>
@@ -52,23 +50,23 @@
                     <Grid ColumnDefinitions="2*,1.2*,1.2*,0.9*,1.6*" ColumnSpacing="14">
                         <VerticalStackLayout Spacing="5">
                             <Label Text="Salida" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}"><Label x:Name="LblSalida" Text="—" FontSize="14" VerticalOptions="Center" /></Border>
+                            <Border Style="{StaticResource CampoSoloLectura}"><Label Text="{Binding Salida}" FontSize="14" VerticalOptions="Center" /></Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="1" Spacing="5">
                             <Label Text="Unidad y asiento" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}"><Label x:Name="LblUnidad" Text="—" FontSize="14" VerticalOptions="Center" /></Border>
+                            <Border Style="{StaticResource CampoSoloLectura}"><Label Text="{Binding UnidadYAsiento}" FontSize="14" VerticalOptions="Center" /></Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="2" Spacing="5">
                             <Label Text="Lugar de embarque" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}"><Label x:Name="LblEmbarque" Text="—" FontSize="14" VerticalOptions="Center" /></Border>
+                            <Border Style="{StaticResource CampoSoloLectura}"><Label Text="{Binding Embarque}" FontSize="14" VerticalOptions="Center" /></Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="3" Spacing="5">
                             <Label Text="Grupo" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}"><Label x:Name="LblGrupo" Text="—" FontSize="14" VerticalOptions="Center" /></Border>
+                            <Border Style="{StaticResource CampoSoloLectura}"><Label Text="{Binding Grupo}" FontSize="14" VerticalOptions="Center" /></Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="4" Spacing="5">
                             <Label Text="Emisor" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}"><Label x:Name="LblEmisor" Text="—" FontSize="14" VerticalOptions="Center" /></Border>
+                            <Border Style="{StaticResource CampoSoloLectura}"><Label Text="{Binding Emisor}" FontSize="14" VerticalOptions="Center" /></Border>
                         </VerticalStackLayout>
                     </Grid>
                 </VerticalStackLayout>
@@ -92,18 +90,18 @@
                                     <Label Grid.Column="4" Text="Cobró" FontFamily="InterSemiBold" FontSize="12" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
                                 </Grid>
                                 <BoxView HeightRequest="1" Color="{DynamicResource Borde}" />
-                                <CollectionView x:Name="ListaPagos" HeightRequest="180">
+                                <CollectionView ItemsSource="{Binding Pagos}" HeightRequest="180">
                                     <CollectionView.EmptyView>
                                         <Label Text="Sin pagos registrados." FontSize="13" TextColor="{DynamicResource TextoSuave}" HorizontalTextAlignment="Center" Margin="0,18" />
                                     </CollectionView.EmptyView>
                                     <CollectionView.ItemTemplate>
-                                        <DataTemplate x:DataType="pasajes:DatosDePago">
+                                        <DataTemplate x:DataType="vm:FilaDePago">
                                             <Grid HeightRequest="34" Padding="10,0" ColumnDefinitions="1.4*,0.9*,0.9*,0.8*,1*">
-                                                <Label Text="{Binding FechaHora, StringFormat='{0:dd/MM/yyyy HH:mm}'}" FontSize="12" VerticalTextAlignment="Center" />
-                                                <Label Grid.Column="1" Text="{Binding TipoMovimiento}" FontSize="12" VerticalTextAlignment="Center" />
+                                                <Label Text="{Binding FechaHora}" FontSize="12" VerticalTextAlignment="Center" />
+                                                <Label Grid.Column="1" Text="{Binding Tipo}" FontSize="12" VerticalTextAlignment="Center" />
                                                 <Label Grid.Column="2" Text="{Binding Medio}" FontSize="12" VerticalTextAlignment="Center" />
-                                                <Label Grid.Column="3" Text="{Binding Importe, StringFormat='S/ {0:N2}'}" FontSize="12" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
-                                                <Label Grid.Column="4" Text="{Binding CobradoPor}" FontSize="12" HorizontalTextAlignment="End" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                                <Label Grid.Column="3" Text="{Binding Monto}" FontSize="12" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                                <Label Grid.Column="4" Text="{Binding Cobro}" FontSize="12" HorizontalTextAlignment="End" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
                                             </Grid>
                                         </DataTemplate>
                                     </CollectionView.ItemTemplate>
@@ -115,19 +113,19 @@
                             <Border Style="{StaticResource TarjetaCompacta}" Padding="10">
                                 <VerticalStackLayout Spacing="2">
                                     <Label Text="Importe" FontSize="12" TextColor="{DynamicResource TextoSuave}" />
-                                    <Label x:Name="LblImporte" Text="S/ 0.00" FontFamily="InterBold" FontSize="18" />
+                                    <Label Text="{Binding Importe}" FontFamily="InterBold" FontSize="18" />
                                 </VerticalStackLayout>
                             </Border>
                             <Border Grid.Column="1" Style="{StaticResource TarjetaCompacta}" Padding="10">
                                 <VerticalStackLayout Spacing="2">
                                     <Label Text="Pagado" FontSize="12" TextColor="{DynamicResource TextoSuave}" />
-                                    <Label x:Name="LblPagado" Text="S/ 0.00" FontFamily="InterBold" FontSize="18" TextColor="{DynamicResource Exito}" />
+                                    <Label Text="{Binding Pagado}" FontFamily="InterBold" FontSize="18" TextColor="{DynamicResource Exito}" />
                                 </VerticalStackLayout>
                             </Border>
                             <Border Grid.Column="2" Style="{StaticResource TarjetaCompacta}" Padding="10">
                                 <VerticalStackLayout Spacing="2">
                                     <Label Text="Saldo" FontSize="12" TextColor="{DynamicResource TextoSuave}" />
-                                    <Label x:Name="LblSaldo" Text="S/ 0.00" FontFamily="InterBold" FontSize="18" TextColor="{DynamicResource Advertencia}" />
+                                    <Label Text="{Binding Saldo}" FontFamily="InterBold" FontSize="18" TextColor="{DynamicResource Advertencia}" />
                                 </VerticalStackLayout>
                             </Border>
                         </Grid>
@@ -141,25 +139,27 @@
                             <Label Text="Acciones" FontFamily="InterSemiBold" FontSize="15" VerticalOptions="Center" />
                         </HorizontalStackLayout>
 
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                            <Button x:Name="BotonCobrar" Text="Cobrar saldo" Style="{StaticResource BotonPrimario}" IsEnabled="False" Opacity="0.45" Clicked="AlCobrar" />
-                            <Button x:Name="BotonModificar" Grid.Column="1" Text="Modificar" Style="{StaticResource BotonSecundario}" IsEnabled="False" Opacity="0.45" Clicked="AlModificar" />
-                        </Grid>
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                            <Button x:Name="BotonImprimir" Text="Imprimir boleto" Style="{StaticResource BotonSecundario}" IsEnabled="False" Opacity="0.45" Clicked="AlImprimir" />
-                            <Button x:Name="BotonReimprimir" Grid.Column="1" Text="Reimprimir" Style="{StaticResource BotonSecundario}" IsEnabled="False" Opacity="0.45" Clicked="AlReimprimir" />
-                        </Grid>
-                        <Grid x:Name="FilaAnulacion" ColumnDefinitions="Auto,*" ColumnSpacing="8">
-                            <Button x:Name="BotonAnular" Text="Anular" Style="{StaticResource BotonPeligro}" IsEnabled="False" Opacity="0.45" Clicked="AlAnular" />
-                            <Button x:Name="BotonNoPresentado" Grid.Column="1" Text="Marcar «No se presentó»" Style="{StaticResource BotonSecundario}" IsEnabled="False" Opacity="0.45" Clicked="AlNoPresentado" />
-                        </Grid>
+                        <HorizontalStackLayout Spacing="8">
+                            <Button Text="Cobrar saldo" Style="{StaticResource BotonPrimario}" Command="{Binding CobrarCommand}" />
+                            <Button Text="Modificar" Style="{StaticResource BotonSecundario}" Command="{Binding ModificarCommand}" IsVisible="{Binding EsAdministrador}" />
+                            <Button Text="Cambiar asiento" Style="{StaticResource BotonSecundario}" Command="{Binding CambiarAsientoCommand}" IsVisible="{Binding EsAdministrador}" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="8">
+                            <Button Text="Imprimir boleto" Style="{StaticResource BotonSecundario}" Command="{Binding ImprimirCommand}" />
+                            <Button Text="Reimprimir" Style="{StaticResource BotonSecundario}" Command="{Binding ReimprimirCommand}" />
+                        </HorizontalStackLayout>
+                        <BoxView HeightRequest="1" Color="{DynamicResource Borde}" IsVisible="{Binding EsAdministrador}" />
+                        <HorizontalStackLayout Spacing="8" IsVisible="{Binding EsAdministrador}">
+                            <Button Text="Anular" Style="{StaticResource BotonPeligro}" Command="{Binding AnularCommand}" />
+                            <Button Text="Marcar «No se presentó»" Style="{StaticResource BotonSecundario}" Command="{Binding MarcarNoPresentadoCommand}" />
+                        </HorizontalStackLayout>
 
-                        <Label x:Name="LblAviso" Text="Cargando pasaje…" FontSize="12" TextColor="{DynamicResource TextoSuave}" LineHeight="1.2" />
+                        <Label Text="{Binding Ayuda}" FontSize="12" TextColor="{DynamicResource TextoSuave}" LineHeight="1.2" />
 
-                        <Border Padding="10" BackgroundColor="{DynamicResource InfoFondo}" Stroke="{DynamicResource InfoBorde}" StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                        <Border IsVisible="{Binding InfoDeLaSalida, Converter={StaticResource TextoNoVacio}}" Padding="10" BackgroundColor="{DynamicResource InfoFondo}" Stroke="{DynamicResource InfoBorde}" StrokeThickness="1" StrokeShape="RoundRectangle 8">
                             <Grid ColumnDefinitions="16,*" ColumnSpacing="8">
-                                <Path Data="{StaticResource IconoInfo}" WidthRequest="16" HeightRequest="16" Stroke="{DynamicResource InfoTexto}" VerticalOptions="Start" Margin="0,2,0,0" />
-                                <Label Grid.Column="1" Text="La anulación devuelve el importe pagado solo si se avisa con la anticipación configurada. El boleto solo se imprime cuando el pasaje está pagado." FontFamily="InterMedium" FontSize="12" TextColor="{DynamicResource InfoTexto}" LineHeight="1.2" />
+                                <Path Data="{StaticResource IconoReloj}" WidthRequest="16" HeightRequest="16" Stroke="{DynamicResource InfoTexto}" VerticalOptions="Start" Margin="0,2,0,0" />
+                                <Label Grid.Column="1" Text="{Binding InfoDeLaSalida}" FontFamily="InterMedium" FontSize="12" TextColor="{DynamicResource InfoTexto}" LineHeight="1.2" />
                             </Grid>
                         </Border>
                     </VerticalStackLayout>
