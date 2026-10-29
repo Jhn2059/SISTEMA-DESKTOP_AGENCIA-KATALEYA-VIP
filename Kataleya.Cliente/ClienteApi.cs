@@ -410,6 +410,16 @@ public sealed class ClienteApi
             "Guardar tarifa",
             idempotente: true);
 
+    public Task<ResultadoDeLaApi<DatosDeTarifa>> FijarTarifaRegularAsync(
+        SentidoDelViaje sentido,
+        decimal importe) =>
+        EnviarAsync<DatosDeTarifa>(
+            HttpMethod.Put,
+            $"configuracion/tarifas/regular/{sentido}",
+            new SolicitudDeTarifaRegular { Importe = importe },
+            "Fijar tarifa regular",
+            idempotente: true);
+
     public Task<ResultadoDeLaApi> EliminarTarifaAsync(int id) =>
         EnviarSinDatosAsync(
             HttpMethod.Delete,
@@ -441,6 +451,29 @@ public sealed class ClienteApi
             new SolicitudDeParametro { Valor = valor },
             "Guardar parámetro",
             idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDeParametro>> AgregarHorarioAsync(string hora) =>
+        EnviarAsync<DatosDeParametro>(
+            HttpMethod.Post,
+            "configuracion/parametros/horarios",
+            new SolicitudDeHorario { Hora = hora },
+            "Agregar horario",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDeParametro>> QuitarHorarioAsync(string hora) =>
+        EnviarAsync<DatosDeParametro>(
+            HttpMethod.Delete,
+            $"configuracion/parametros/horarios/{Uri.EscapeDataString(hora)}",
+            null,
+            "Quitar horario",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<int>> ContarPasajesDelHorarioAsync(string hora) =>
+        EnviarAsync<int>(
+            HttpMethod.Get,
+            $"pasajes/cantidad?hora={Uri.EscapeDataString(hora)}",
+            null,
+            "Contar pasajes del horario");
 
     public Task<ResultadoDeLaApi<DatosDelCuadre>> ObtenerCuadreAsync(
         FiltroDeCuadre? filtro = null) =>

@@ -1,7 +1,7 @@
 using Kataleya.Contratos.Pasajes;
 using Kataleya.Escritorio.Features.Bitacora;
+using Kataleya.Escritorio.Features.Configuracion;
 using Kataleya.Escritorio.Features.CuadreDeVentas;
-using Kataleya.Escritorio.Features.GestionDeUsuarios;
 using Kataleya.Escritorio.Features.PanelPrincipal;
 using Kataleya.Escritorio.Features.Pasajes;
 using Kataleya.Escritorio.Features.RegistroDePasajes;
@@ -33,19 +33,6 @@ public static class NavegacionDeModulos
                 await RetrocederHastaAsync(panel);
             }
 
-            return;
-        }
-
-        if (opcion == "configuracion")
-        {
-            var configuracion = pila.OfType<GestionDeUsuariosPage>().LastOrDefault();
-            if (configuracion is not null)
-            {
-                await RetrocederHastaAsync(configuracion);
-                return;
-            }
-
-            await navegacion.PushAsync(Servicios.GetRequiredService<GestionDeUsuariosPage>());
             return;
         }
 
@@ -83,6 +70,7 @@ public static class NavegacionDeModulos
             "cuadre-ventas" => Servicios.GetRequiredService<CuadreDeVentasPage>(),
             "registro-diferido" => Servicios.GetRequiredService<RegistroDiferidoPage>(),
             "bitacora" => Servicios.GetRequiredService<BitacoraPage>(),
+            "configuracion" => Servicios.GetRequiredService<ConfiguracionPage>(),
             _ => null
         };
 

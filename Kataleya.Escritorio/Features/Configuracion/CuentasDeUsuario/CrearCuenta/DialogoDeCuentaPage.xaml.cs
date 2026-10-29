@@ -1,4 +1,4 @@
-namespace Kataleya.Escritorio.Features.GestionDeUsuarios.CrearCuenta;
+namespace Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.CrearCuenta;
 
 public partial class DialogoDeCuentaPage : ContentPage
 {

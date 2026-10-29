@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Kataleya.Escritorio.Servicios;
 
-namespace Kataleya.Escritorio.Features.GestionDeUsuarios.RestablecerContrasena;
+namespace Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.RestablecerContrasena;
 
 public partial class DialogoDeContrasenaViewModel : ObservableObject
 {

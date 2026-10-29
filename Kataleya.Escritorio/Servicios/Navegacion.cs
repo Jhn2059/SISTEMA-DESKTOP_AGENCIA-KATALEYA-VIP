@@ -1,4 +1,4 @@
-using Kataleya.Escritorio.Features.GestionDeUsuarios;
+using Kataleya.Escritorio.Features.Configuracion;
 using Kataleya.Escritorio.Features.PanelPrincipal;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,9 +26,24 @@ public sealed class Navegacion : INavegacion
     public Task IrAlInicioDeSesionAsync() =>
         Shell.Current.Navigation.PopToRootAsync();
 
-    public async Task IrAGestionDeUsuariosAsync()
+    public async Task IrAConfiguracionAsync(PestanaDeConfiguracion pestana)
     {
-        var pagina = _servicios.GetRequiredService<GestionDeUsuariosPage>();
+        var pagina = Shell.Current.Navigation.NavigationStack.OfType<ConfiguracionPage>().LastOrDefault();
+
+        if (pagina is not null)
+        {
+            pagina.Pestana = pestana;
+
+            while (Shell.Current.Navigation.NavigationStack[^1] != pagina)
+            {
+                await Shell.Current.Navigation.PopAsync();
+            }
+
+            return;
+        }
+
+        pagina = _servicios.GetRequiredService<ConfiguracionPage>();
+        pagina.Pestana = pestana;
         await Shell.Current.Navigation.PushAsync(pagina);
     }
 

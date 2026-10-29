@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Kataleya.Escritorio.Features.Configuracion.TarifasYParametros.DialogoDeTarifaPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ui="clr-namespace:Kataleya.Escritorio.UIHelpers.Behaviors"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.Configuracion.TarifasYParametros"
+    x:DataType="vm:DialogoDeTarifaViewModel"
+    ui:CicloDeVidaDePagina.AlDesaparecer="{Binding AlDesaparecerCommand}"
+    Title="{Binding Titulo}"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{DynamicResource Fondo}">
+    <Border
+        Style="{StaticResource Tarjeta}"
+        WidthRequest="560"
+        Padding="24"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
+        <VerticalStackLayout Spacing="14">
+            <HorizontalStackLayout Spacing="12">
+                <Border
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 22"
+                    BackgroundColor="{DynamicResource InfoFondo}">
+                    <Path
+                        Data="{StaticResource IconoCalendario}"
+                        WidthRequest="22"
+                        HeightRequest="22"
+                        Aspect="Uniform"
+                        Stroke="{DynamicResource Info}"
+                        StrokeThickness="1.75"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" />
+                </Border>
+                <Label
+                    Text="{Binding Titulo}"
+                    FontFamily="InterSemiBold"
+                    FontSize="16"
+                    TextColor="{DynamicResource Texto}"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Nombre *" Style="{StaticResource EtiquetaDeCampo}" />
+                <Border Style="{StaticResource CampoDeFormulario}">
+                    <Entry Text="{Binding Nombre}" Placeholder="Fiestas Patrias" MaxLength="80" />
+                </Border>
+                <Label Text="{Binding ErrorNombre}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorNombre, Converter={StaticResource TextoNoVacio}}" />
+            </VerticalStackLayout>
+
+            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="5">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Importe *" Style="{StaticResource EtiquetaDeCampo}" />
+                    <Border Style="{StaticResource CampoDeFormulario}">
+                        <Entry Text="{Binding Importe}" Placeholder="S/ 0.00" Keyboard="Numeric" />
+                    </Border>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="5">
+                    <Label Text="Desde *" Style="{StaticResource EtiquetaDeCampo}" />
+                    <Border Style="{StaticResource CampoDeFormulario}">
+                        <DatePicker Date="{Binding Desde}" Format="dd/MM/yyyy" />
+                    </Border>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="2" Spacing="5">
+                    <Label Text="Hasta *" Style="{StaticResource EtiquetaDeCampo}" />
+                    <Border Style="{StaticResource CampoDeFormulario}">
+                        <DatePicker Date="{Binding Hasta}" Format="dd/MM/yyyy" />
+                    </Border>
+                </VerticalStackLayout>
+                <Label Grid.Row="1" Text="{Binding ErrorImporte}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorImporte, Converter={StaticResource TextoNoVacio}}" />
+                <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding ErrorFechas}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorFechas, Converter={StaticResource TextoNoVacio}}" />
+            </Grid>
+
+            <VerticalStackLayout Spacing="5" WidthRequest="250" HorizontalOptions="Start">
+                <Label Text="Sentido *" Style="{StaticResource EtiquetaDeCampo}" />
+                <Border Style="{StaticResource CampoDeFormulario}">
+                    <Picker ItemsSource="{Binding NombresDeSentidos}" SelectedIndex="{Binding SentidoElegido}" />
+                </Border>
+            </VerticalStackLayout>
+
+            <Label Text="{Binding ErrorGeneral}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorGeneral, Converter={StaticResource TextoNoVacio}}" />
+
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="10">
+                <Button Text="Cancelar" Style="{StaticResource BotonSecundario}" Command="{Binding CancelarCommand}" />
+                <Button Text="Guardar tarifa" Style="{StaticResource BotonPrimario}" Command="{Binding GuardarCommand}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Border>
+</ContentPage>

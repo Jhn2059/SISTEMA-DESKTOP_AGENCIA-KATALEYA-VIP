@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Dominio.Enums;
 
-namespace Kataleya.Escritorio.Features.GestionDeUsuarios;
+namespace Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario;
 
 public partial class CuentaEnLista : ObservableObject
 {

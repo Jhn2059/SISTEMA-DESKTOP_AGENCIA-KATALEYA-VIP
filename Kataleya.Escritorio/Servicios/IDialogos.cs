@@ -1,3 +1,4 @@
+using Kataleya.Contratos.Configuracion;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Pasajes;
 
@@ -22,6 +23,10 @@ public interface IDialogos
     Task<SolicitudDeAnulacion?> PedirAnulacionAsync(DatosDePasaje pasaje, RevisionDeAnulacion revision);
 
     Task<CambiosDelPasaje?> PedirCambiosAsync(DatosDePasaje pasaje, bool soloAsiento);
+
+    Task<SolicitudDeTarifa?> PedirTarifaProgramadaAsync(
+        DatosDeTarifa? tarifa,
+        IReadOnlyDictionary<string, string>? errores = null);
 
     Task<bool> ConfirmarAsync(
         string titulo,

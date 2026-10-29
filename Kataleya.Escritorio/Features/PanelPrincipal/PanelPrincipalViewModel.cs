@@ -215,10 +215,6 @@ public partial class PanelPrincipalViewModel : ObservableObject
         });
 
     [RelayCommand]
-    private Task AbrirGestionDeUsuariosAsync() =>
-        _navegacion.IrAGestionDeUsuariosAsync();
-
-    [RelayCommand]
     private async Task CerrarSesionAsync()
     {
         _cliente.CerrarSesion();

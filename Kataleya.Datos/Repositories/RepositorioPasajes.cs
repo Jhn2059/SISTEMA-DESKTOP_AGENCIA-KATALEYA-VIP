@@ -690,6 +690,29 @@ public sealed class RepositorioPasajes : IRepositorioPasajes
         return (int)(await comando.ExecuteScalarAsync())!;
     }
 
+    // Pasajes no anulados de las próximas salidas en ese horario (CDU-16 A3).
+    public async Task<int> ContarDelHorarioAsync(TimeOnly hora, DateTime desdeEnHoraDePeru)
+    {
+        var conexion = await _contexto.ObtenerConexionAsync();
+        await using var comando = new NpgsqlCommand(
+            """
+            SELECT count(*)::int
+            FROM pasaje
+            WHERE hora_salida = @hora
+              AND fecha_salida + hora_salida >= @desde
+              AND estado <> 'Anulado'
+            """,
+            conexion)
+        {
+            Transaction = _contexto.TransaccionActual
+        };
+        comando.Parameters.Add("hora", NpgsqlDbType.Time).Value = hora;
+        comando.Parameters.Add("desde", NpgsqlDbType.Timestamp).Value =
+            DateTime.SpecifyKind(desdeEnHoraDePeru, DateTimeKind.Unspecified);
+
+        return (int)(await comando.ExecuteScalarAsync())!;
+    }
+
     private static void AgregarParametrosDelAnio(NpgsqlCommand comando, int anio)
     {
         comando.Parameters.Add("desde", NpgsqlDbType.Date).Value = new DateOnly(anio, 1, 1);

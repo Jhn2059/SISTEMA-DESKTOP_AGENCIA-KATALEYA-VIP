@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Escritorio.Servicios;
 
-namespace Kataleya.Escritorio.Features.GestionDeUsuarios.CrearCuenta;
+namespace Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.CrearCuenta;
 
 public partial class DialogoDeCuentaViewModel : ObservableObject
 {

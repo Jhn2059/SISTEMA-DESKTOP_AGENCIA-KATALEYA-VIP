@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage
-    x:Class="Kataleya.Escritorio.Features.GestionDeUsuarios.RestablecerContrasena.DialogoDeContrasenaPage"
+    x:Class="Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.RestablecerContrasena.DialogoDeContrasenaPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:ui="clr-namespace:Kataleya.Escritorio.UIHelpers.Behaviors"
-    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.GestionDeUsuarios.RestablecerContrasena"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.RestablecerContrasena"
     x:DataType="vm:DialogoDeContrasenaViewModel"
     ui:CicloDeVidaDePagina.AlDesaparecer="{Binding AlDesaparecerCommand}"
     Title="Restablecer contraseña"

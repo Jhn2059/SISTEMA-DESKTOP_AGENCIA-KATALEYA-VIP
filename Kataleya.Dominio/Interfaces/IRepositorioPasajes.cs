@@ -46,6 +46,8 @@ public interface IRepositorioPasajes
     Task<IReadOnlyList<Pasaje>> BuscarDelAnioAsync(int anio);
 
     Task<int> EliminarDelAnioAsync(int anio);
+
+    Task<int> ContarDelHorarioAsync(TimeOnly hora, DateTime desdeEnHoraDePeru);
 }
 
 public interface IRepositorioUnidades

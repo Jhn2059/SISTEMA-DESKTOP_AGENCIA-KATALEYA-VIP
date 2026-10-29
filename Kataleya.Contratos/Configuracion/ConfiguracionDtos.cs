@@ -38,6 +38,11 @@ public sealed class SolicitudDeTarifa
     public SentidoDelViaje Sentido { get; set; }
 }
 
+public sealed class SolicitudDeTarifaRegular
+{
+    public decimal Importe { get; set; }
+}
+
 public sealed class DatosDeTipoDeVehiculo
 {
     public short Id { get; set; }
@@ -61,4 +66,9 @@ public sealed class DatosDeParametro
 public sealed class SolicitudDeParametro
 {
     public string Valor { get; set; } = string.Empty;
+}
+
+public sealed class SolicitudDeHorario
+{
+    public string Hora { get; set; } = string.Empty;
 }

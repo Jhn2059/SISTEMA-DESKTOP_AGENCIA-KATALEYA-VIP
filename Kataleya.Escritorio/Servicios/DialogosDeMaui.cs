@@ -1,7 +1,9 @@
+using Kataleya.Contratos.Configuracion;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Pasajes;
-using Kataleya.Escritorio.Features.GestionDeUsuarios.CrearCuenta;
-using Kataleya.Escritorio.Features.GestionDeUsuarios.RestablecerContrasena;
+using Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.CrearCuenta;
+using Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.RestablecerContrasena;
+using Kataleya.Escritorio.Features.Configuracion.TarifasYParametros;
 using Kataleya.Escritorio.Features.PanelPrincipal.ReporteAnual;
 using Kataleya.Escritorio.Features.Pasajes.Dialogos;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,6 +68,16 @@ public sealed class DialogosDeMaui : IDialogos
         var pagina = _servicios.GetRequiredService<DialogoDeModificacionPage>();
         await Shell.Current.Navigation.PushModalAsync(pagina);
         await pagina.Modelo.InicializarAsync(pasaje, soloAsiento);
+        return await pagina.Modelo.Resultado;
+    }
+
+    public async Task<SolicitudDeTarifa?> PedirTarifaProgramadaAsync(
+        DatosDeTarifa? tarifa,
+        IReadOnlyDictionary<string, string>? errores = null)
+    {
+        var pagina = _servicios.GetRequiredService<DialogoDeTarifaPage>();
+        pagina.Modelo.Inicializar(tarifa, errores);
+        await Shell.Current.Navigation.PushModalAsync(pagina);
         return await pagina.Modelo.Resultado;
     }
 

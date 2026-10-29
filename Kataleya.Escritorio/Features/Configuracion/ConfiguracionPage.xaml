@@ -1,0 +1,643 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<paginas:PaginaDeModulo
+    x:Class="Kataleya.Escritorio.Features.Configuracion.ConfiguracionPage"
+    x:Name="PaginaActiva"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:paginas="clr-namespace:Kataleya.Escritorio.UIHelpers.Paginas"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.Configuracion"
+    xmlns:tarifas="clr-namespace:Kataleya.Escritorio.Features.Configuracion.TarifasYParametros"
+    xmlns:cuentas="clr-namespace:Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario"
+    xmlns:equipo="clr-namespace:Kataleya.Escritorio.Features.Configuracion.Equipo"
+    x:DataType="vm:ConfiguracionViewModel">
+    <ScrollView VerticalScrollBarVisibility="Never">
+        <VerticalStackLayout Padding="24,16,24,8" Spacing="0">
+            <Grid ColumnDefinitions="*,Auto">
+                <HorizontalStackLayout Spacing="14" VerticalOptions="Center">
+                    <Label Text="Configuración" Style="{StaticResource TituloDePagina}" VerticalOptions="Center" />
+                    <Label Text="Ajustes del sistema" Style="{StaticResource SubtituloDePagina}" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <Border
+                    Grid.Column="1"
+                    IsVisible="{Binding Tarifas.MensajeDeExito, Converter={StaticResource TextoNoVacio}}"
+                    MaximumWidthRequest="420"
+                    Padding="14,10"
+                    BackgroundColor="{DynamicResource ExitoFondo}"
+                    Stroke="{DynamicResource ExitoBorde}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8">
+                    <Grid ColumnDefinitions="18,*,Auto" ColumnSpacing="10">
+                        <Path Data="{StaticResource IconoCheckCirculo}" WidthRequest="16" HeightRequest="16" Stroke="{DynamicResource Exito}" VerticalOptions="Start" Margin="0,1,0,0" />
+                        <Label Grid.Column="1" Text="{Binding Tarifas.MensajeDeExito}" FontSize="13" TextColor="{DynamicResource Exito}" LineBreakMode="WordWrap" />
+                        <Button
+                            Grid.Column="2"
+                            Text="×"
+                            FontSize="16"
+                            WidthRequest="24"
+                            HeightRequest="24"
+                            Padding="0"
+                            BackgroundColor="Transparent"
+                            BorderWidth="0"
+                            TextColor="{DynamicResource Exito}"
+                            VerticalOptions="Start"
+                            SemanticProperties.Description="Cerrar aviso"
+                            Command="{Binding Tarifas.CerrarAvisoCommand}" />
+                    </Grid>
+                </Border>
+            </Grid>
+            <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="26" Margin="0,10,0,0">
+                <VerticalStackLayout Spacing="6">
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ElegirPestanaCommand}" CommandParameter="{x:Static vm:PestanaDeConfiguracion.TarifasYParametros}" />
+                    </VerticalStackLayout.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="8">
+                        <Path Data="{StaticResource IconoEtiqueta}" WidthRequest="17" HeightRequest="17" Stroke="{DynamicResource TextoSuave}" VerticalOptions="Center">
+                            <Path.Triggers>
+                                <DataTrigger TargetType="Path" Binding="{Binding EnTarifas}" Value="True">
+                                    <Setter Property="Stroke" Value="{DynamicResource Info}" />
+                                </DataTrigger>
+                            </Path.Triggers>
+                        </Path>
+                        <Label Text="Tarifas y parámetros" FontFamily="InterMedium" FontSize="14" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding EnTarifas}" Value="True">
+                                    <Setter Property="TextColor" Value="{DynamicResource Texto}" />
+                                    <Setter Property="FontFamily" Value="InterSemiBold" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </HorizontalStackLayout>
+                    <BoxView HeightRequest="2" Color="{DynamicResource Info}" IsVisible="{Binding EnTarifas}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="6">
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ElegirPestanaCommand}" CommandParameter="{x:Static vm:PestanaDeConfiguracion.CuentasDeUsuario}" />
+                    </VerticalStackLayout.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="8">
+                        <Path Data="{StaticResource IconoUsuarios}" WidthRequest="17" HeightRequest="17" Stroke="{DynamicResource TextoSuave}" VerticalOptions="Center">
+                            <Path.Triggers>
+                                <DataTrigger TargetType="Path" Binding="{Binding EnCuentas}" Value="True">
+                                    <Setter Property="Stroke" Value="{DynamicResource Info}" />
+                                </DataTrigger>
+                            </Path.Triggers>
+                        </Path>
+                        <Label Text="Cuentas de usuario" FontFamily="InterMedium" FontSize="14" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding EnCuentas}" Value="True">
+                                    <Setter Property="TextColor" Value="{DynamicResource Texto}" />
+                                    <Setter Property="FontFamily" Value="InterSemiBold" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </HorizontalStackLayout>
+                    <BoxView HeightRequest="2" Color="{DynamicResource Info}" IsVisible="{Binding EnCuentas}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="2" Spacing="6">
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ElegirPestanaCommand}" CommandParameter="{x:Static vm:PestanaDeConfiguracion.Equipo}" />
+                    </VerticalStackLayout.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="8">
+                        <Path Data="{StaticResource IconoImpresora}" WidthRequest="17" HeightRequest="17" Stroke="{DynamicResource TextoSuave}" VerticalOptions="Center">
+                            <Path.Triggers>
+                                <DataTrigger TargetType="Path" Binding="{Binding EnEquipo}" Value="True">
+                                    <Setter Property="Stroke" Value="{DynamicResource Info}" />
+                                </DataTrigger>
+                            </Path.Triggers>
+                        </Path>
+                        <Label Text="Equipo" FontFamily="InterMedium" FontSize="14" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding EnEquipo}" Value="True">
+                                    <Setter Property="TextColor" Value="{DynamicResource Texto}" />
+                                    <Setter Property="FontFamily" Value="InterSemiBold" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </HorizontalStackLayout>
+                    <BoxView HeightRequest="2" Color="{DynamicResource Info}" IsVisible="{Binding EnEquipo}" />
+                </VerticalStackLayout>
+            </Grid>
+            <BoxView HeightRequest="1" Color="{DynamicResource Borde}" Margin="0,0,0,12" />
+
+            <Grid IsVisible="{Binding EnTarifas}">
+                <ContentView BindingContext="{Binding Tarifas}">
+                    <VerticalStackLayout x:DataType="tarifas:TarifasYParametrosViewModel" Spacing="12">
+                        <Label
+                            Text="{Binding MensajeDeError}"
+                            TextColor="{DynamicResource Error}"
+                            FontSize="13"
+                            IsVisible="{Binding MensajeDeError, Converter={StaticResource TextoNoVacio}}" />
+
+                        <Grid ColumnDefinitions="*,410" ColumnSpacing="16">
+                            <VerticalStackLayout Spacing="12">
+                                <Border Style="{StaticResource Tarjeta}">
+                                    <VerticalStackLayout Spacing="10">
+                                        <Label Text="Tarifa regular (si no hay una programada)" FontFamily="InterMedium" FontSize="14" />
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="24">
+                                    <VerticalStackLayout Spacing="5">
+                                        <Label Text="Huancayo → Ica" Style="{StaticResource EtiquetaDeCampo}" />
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <Border Style="{StaticResource CampoDeFormulario}">
+                                                <Entry Text="{Binding TarifaIda}" Placeholder="S/ 0.00" Keyboard="Numeric" ReturnCommand="{Binding GuardarTarifaIdaCommand}" />
+                                            </Border>
+                                            <Button Grid.Column="1" Text="Guardar" Style="{StaticResource BotonSecundario}" Command="{Binding GuardarTarifaIdaCommand}" />
+                                        </Grid>
+                                        <Label Text="{Binding ErrorTarifaIda}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorTarifaIda, Converter={StaticResource TextoNoVacio}}" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="5">
+                                        <Label Text="Ica → Huancayo" Style="{StaticResource EtiquetaDeCampo}" />
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <Border Style="{StaticResource CampoDeFormulario}">
+                                                <Entry Text="{Binding TarifaVuelta}" Placeholder="S/ 0.00" Keyboard="Numeric" ReturnCommand="{Binding GuardarTarifaVueltaCommand}" />
+                                            </Border>
+                                            <Button Grid.Column="1" Text="Guardar" Style="{StaticResource BotonSecundario}" Command="{Binding GuardarTarifaVueltaCommand}" />
+                                        </Grid>
+                                        <Label Text="{Binding ErrorTarifaVuelta}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorTarifaVuelta, Converter={StaticResource TextoNoVacio}}" />
+                                    </VerticalStackLayout>
+                                        </Grid>
+                                        <Label Text="El precio de un grupo no sale de estas tarifas: se acuerda en el momento, según el destino." FontSize="12" TextColor="{DynamicResource TextoSuave}" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <Border Style="{StaticResource Tarjeta}">
+                                    <VerticalStackLayout Spacing="12">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Path Data="{StaticResource IconoCalendario}" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                            <Label Text="Tarifas programadas" FontFamily="InterSemiBold" FontSize="15" VerticalOptions="Center" />
+                                            <Label Text="Se aplican según la fecha del viaje." FontSize="12" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <Border Padding="0" BackgroundColor="{DynamicResource Superficie}" Stroke="{DynamicResource Borde}" StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                                            <VerticalStackLayout Spacing="0">
+                                                <Grid HeightRequest="36" Padding="8,0" BackgroundColor="{DynamicResource EncabezadoTabla}" ColumnDefinitions="1.6*,0.9*,0.95*,0.95*,1.2*,0.9*" ColumnSpacing="8">
+                                                    <Label Text="Nombre" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="1" Text="Importe" FontFamily="InterSemiBold" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="2" Text="Desde" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="3" Text="Hasta" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="4" Text="Sentido" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="5" Text="Fijada por" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
+                                                </Grid>
+                                                <Label
+                                                    Text="No hay tarifas programadas."
+                                                    IsVisible="{Binding NoHayTarifasProgramadas}"
+                                                    FontSize="13"
+                                                    Margin="0,14"
+                                                    HorizontalTextAlignment="Center"
+                                                    TextColor="{DynamicResource TextoSuave}" />
+                                                <VerticalStackLayout Spacing="0" BindableLayout.ItemsSource="{Binding TarifasProgramadas}">
+                                                    <BindableLayout.ItemTemplate>
+                                                        <DataTemplate x:DataType="tarifas:FilaDeTarifa">
+                                                            <Border Padding="8,0" HeightRequest="36" BackgroundColor="{DynamicResource Superficie}" Stroke="Transparent" StrokeThickness="0">
+                                                                <Border.GestureRecognizers>
+                                                                    <TapGestureRecognizer
+                                                                        Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.Tarifas.SeleccionarTarifaCommand}"
+                                                                        CommandParameter="{Binding .}" />
+                                                                </Border.GestureRecognizers>
+                                                                <Border.Triggers>
+                                                                    <DataTrigger TargetType="Border" Binding="{Binding EsFilaAlterna}" Value="True">
+                                                                        <Setter Property="BackgroundColor" Value="{DynamicResource SuperficieAlterna}" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger TargetType="Border" Binding="{Binding EsSeleccionada}" Value="True">
+                                                                        <Setter Property="BackgroundColor" Value="{DynamicResource Seleccion}" />
+                                                                        <Setter Property="Stroke" Value="{DynamicResource SeleccionBorde}" />
+                                                                        <Setter Property="StrokeThickness" Value="2" />
+                                                                    </DataTrigger>
+                                                                </Border.Triggers>
+                                                                <Grid ColumnDefinitions="1.6*,0.9*,0.95*,0.95*,1.2*,0.9*" ColumnSpacing="8">
+                                                                    <Label Text="{Binding Nombre}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                                                    <Label Grid.Column="1" Text="{Binding Importe}" FontSize="13" LineBreakMode="TailTruncation" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                                                    <Label Grid.Column="2" Text="{Binding Desde}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                                                    <Label Grid.Column="3" Text="{Binding Hasta}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                                                    <Label Grid.Column="4" Text="{Binding Sentido}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                                                    <Label Grid.Column="5" Text="{Binding FijadaPor}" FontSize="13" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </BindableLayout.ItemTemplate>
+                                                </VerticalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Border>
+                                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="12">
+                                            <Button Text="+  Agregar tarifa" Style="{StaticResource BotonSecundario}" Command="{Binding AgregarTarifaCommand}" />
+                                            <Button Grid.Column="1" Text="Editar" Style="{StaticResource BotonSecundario}" Command="{Binding EditarTarifaCommand}" />
+                                            <Button Grid.Column="2" Text="Quitar" Style="{StaticResource BotonPeligro}" HorizontalOptions="End" Command="{Binding QuitarTarifaCommand}" />
+                                        </Grid>
+                                        <Label Text="Si no hay tarifa programada para la fecha del viaje, se cobra la regular." FontSize="12" TextColor="{DynamicResource TextoSuave}" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <Border Style="{StaticResource Tarjeta}">
+                                    <VerticalStackLayout Spacing="12">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Path Data="{StaticResource IconoConfiguracion}" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                            <Label Text="Parámetros del negocio" FontFamily="InterSemiBold" FontSize="15" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="12">
+                                    <VerticalStackLayout Spacing="5">
+                                        <Label Text="Plazo máximo de reserva *" Style="{StaticResource EtiquetaDeCampo}" />
+                                        <Border Style="{StaticResource CampoDeFormulario}">
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                                                <Entry Text="{Binding PlazoDeReserva}" Keyboard="Numeric" MaxLength="2" />
+                                                <Label Grid.Column="1" Text="días" FontSize="14" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center" />
+                                            </Grid>
+                                        </Border>
+                                        <Label Text="{Binding ErrorPlazo}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorPlazo, Converter={StaticResource TextoNoVacio}}" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="5">
+                                        <Label Text="Aviso previo para anular o cambiar *" Style="{StaticResource EtiquetaDeCampo}" />
+                                        <Border Style="{StaticResource CampoDeFormulario}">
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                                                <Entry Text="{Binding AvisoPrevioEnHoras}" Keyboard="Numeric" MaxLength="2" />
+                                                <Label Grid.Column="1" Text="horas" FontSize="14" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center" />
+                                            </Grid>
+                                        </Border>
+                                        <Label Text="{Binding ErrorAviso}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorAviso, Converter={StaticResource TextoNoVacio}}" />
+                                    </VerticalStackLayout>
+                                            <Button Grid.Column="2" Text="Guardar cambios" Style="{StaticResource BotonPrimario}" VerticalOptions="Start" Margin="0,22,0,0" Command="{Binding GuardarParametrosCommand}" />
+                                        </Grid>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="12">
+                                <Border Style="{StaticResource Tarjeta}">
+                                    <VerticalStackLayout Spacing="10">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Path Data="{StaticResource IconoReloj}" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                            <Label Text="Horarios de salida" FontFamily="InterSemiBold" FontSize="15" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <Label Text="Los mismos en ambos sentidos." FontSize="12" TextColor="{DynamicResource TextoSuave}" />
+                                        <FlexLayout Direction="Row" Wrap="Wrap" AlignItems="Start" BindableLayout.ItemsSource="{Binding HorariosDeSalida}">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="tarifas:HorarioVisible">
+                                                    <Border Margin="0,0,8,8" Padding="12,0,6,0" HeightRequest="30" BackgroundColor="{DynamicResource Superficie}" Stroke="{DynamicResource BordeControl}" StrokeThickness="1" StrokeShape="RoundRectangle 15">
+                                                        <HorizontalStackLayout Spacing="4">
+                                                            <Label Text="{Binding Hora}" FontSize="14" VerticalTextAlignment="Center" />
+                                                            <Button
+                                                                Text="×"
+                                                                FontSize="16"
+                                                                WidthRequest="24"
+                                                                HeightRequest="24"
+                                                                Padding="0"
+                                                                BackgroundColor="Transparent"
+                                                                BorderWidth="0"
+                                                                TextColor="{DynamicResource TextoSuave}"
+                                                                IsEnabled="{Binding SePuedeQuitar}"
+                                                                SemanticProperties.Description="Quitar horario"
+                                                                Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.Tarifas.QuitarHorarioCommand}"
+                                                                CommandParameter="{Binding .}" />
+                                                        </HorizontalStackLayout>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </FlexLayout>
+                                        <Label Text="Hora de salida (24 h)" Style="{StaticResource EtiquetaDeCampo}" />
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <Border Style="{StaticResource CampoDeFormulario}">
+                                                <Entry Text="{Binding NuevoHorario}" Placeholder="07:30" MaxLength="5" ReturnCommand="{Binding AgregarHorarioCommand}" />
+                                            </Border>
+                                            <Button Grid.Column="1" Text="+  Agregar horario" Style="{StaticResource BotonSecundario}" Command="{Binding AgregarHorarioCommand}" />
+                                        </Grid>
+                                        <Label Text="{Binding ErrorHorario}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorHorario, Converter={StaticResource TextoNoVacio}}" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <Border Style="{StaticResource Tarjeta}">
+                                    <VerticalStackLayout Spacing="10">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Path Data="{StaticResource IconoBus}" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                            <Label Text="Tipos de vehículo" FontFamily="InterSemiBold" FontSize="15" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <Label Text="Número de asientos de cada tipo. Son fijos: se cargan al instalar el sistema." FontSize="12" TextColor="{DynamicResource TextoSuave}" />
+                                        <FlexLayout Direction="Row" Wrap="Wrap" AlignItems="Start" BindableLayout.ItemsSource="{Binding TiposDeVehiculo}">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="x:String">
+                                                    <Border Margin="0,0,8,8" Padding="12,0" HeightRequest="30" BackgroundColor="{DynamicResource Superficie}" Stroke="{DynamicResource BordeControl}" StrokeThickness="1" StrokeShape="RoundRectangle 15">
+                                                        <Label Text="{Binding .}" FontSize="14" VerticalTextAlignment="Center" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </FlexLayout>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </ContentView>
+            </Grid>
+
+            <Grid IsVisible="{Binding EnCuentas}">
+                <ContentView BindingContext="{Binding Cuentas}">
+                    <VerticalStackLayout x:DataType="cuentas:CuentasDeUsuarioViewModel" Spacing="0">
+                        <VerticalStackLayout Margin="0,0,0,0" Spacing="4">
+                            <Label
+                                Text="{Binding MensajeDeError}"
+                                TextColor="{DynamicResource Error}"
+                                IsVisible="{Binding MensajeDeError, Converter={StaticResource TextoNoVacio}}" />
+                            <Label
+                                Text="{Binding MensajeDeExito}"
+                                TextColor="{DynamicResource Exito}"
+                                IsVisible="{Binding MensajeDeExito, Converter={StaticResource TextoNoVacio}}" />
+                            <ActivityIndicator
+                                IsRunning="{Binding EstaCargando}"
+                                IsVisible="{Binding EstaCargando}"
+                                HorizontalOptions="Start" />
+                        </VerticalStackLayout>
+
+                        <Border
+                            BackgroundColor="{DynamicResource Superficie}"
+                            Stroke="{DynamicResource Borde}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 10">
+                            <VerticalStackLayout Spacing="0">
+                                <Grid
+                                    HeightRequest="40"
+                                    Padding="12,0"
+                                    ColumnDefinitions="150*,250*,200*,150*,312*"
+                                    BackgroundColor="{DynamicResource EncabezadoTabla}">
+                                    <Label Text="Usuario" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="1" Text="Persona" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="2" Text="Rol" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="3" Text="Sede" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="4" Text="Estado" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
+                                </Grid>
+
+                                <VerticalStackLayout
+                                    Spacing="0"
+                                    BindableLayout.ItemsSource="{Binding Cuentas}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="cuentas:CuentaEnLista">
+                                            <Border
+                                                Padding="12,0"
+                                                HeightRequest="40"
+                                                BackgroundColor="{DynamicResource Superficie}"
+                                                Stroke="Transparent"
+                                                StrokeThickness="0">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.Cuentas.SeleccionarCommand}"
+                                                        CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                                <Border.Triggers>
+                                                    <DataTrigger
+                                                        TargetType="Border"
+                                                        Binding="{Binding EsFilaAlterna}"
+                                                        Value="True">
+                                                        <Setter Property="BackgroundColor" Value="{DynamicResource SuperficieAlterna}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger
+                                                        TargetType="Border"
+                                                        Binding="{Binding EsSeleccionada}"
+                                                        Value="True">
+                                                        <Setter Property="BackgroundColor" Value="{DynamicResource Seleccion}" />
+                                                        <Setter Property="Stroke" Value="{DynamicResource SeleccionBorde}" />
+                                                        <Setter Property="StrokeThickness" Value="2" />
+                                                    </DataTrigger>
+                                                </Border.Triggers>
+                                                <Grid ColumnDefinitions="150*,250*,200*,150*,312*">
+                                                    <Label Text="{Binding NombreUsuario}" FontSize="14" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="1" Text="{Binding Nombre}" FontSize="14" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="2" Text="{Binding Rol}" FontSize="14" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="3" Text="{Binding Sede}" FontSize="14" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
+                                                    <HorizontalStackLayout Grid.Column="4" Spacing="8" VerticalOptions="Center">
+                                                        <Border
+                                                            HeightRequest="22"
+                                                            Padding="7,0,9,0"
+                                                            BackgroundColor="{DynamicResource ExitoFondo}"
+                                                            Stroke="{DynamicResource ExitoBorde}"
+                                                            StrokeThickness="1"
+                                                            StrokeShape="RoundRectangle 11">
+                                                            <Border.Triggers>
+                                                                <DataTrigger TargetType="Border" Binding="{Binding EsBloqueada}" Value="True">
+                                                                    <Setter Property="BackgroundColor" Value="{DynamicResource AdvertenciaFondo}" />
+                                                                    <Setter Property="Stroke" Value="{DynamicResource AdvertenciaBorde}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger TargetType="Border" Binding="{Binding EsDesactivada}" Value="True">
+                                                                    <Setter Property="BackgroundColor" Value="{DynamicResource SuperficieActiva}" />
+                                                                    <Setter Property="Stroke" Value="{DynamicResource BordeDeshabilitado}" />
+                                                                </DataTrigger>
+                                                            </Border.Triggers>
+                                                            <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                                                <Grid WidthRequest="14" HeightRequest="14" VerticalOptions="Center">
+                                                                    <Path Data="{StaticResource IconoCheckCirculo}" WidthRequest="14" HeightRequest="14" Aspect="Uniform" Stroke="{DynamicResource Exito}" IsVisible="{Binding EsActiva}" />
+                                                                    <Path Data="{StaticResource IconoCandado}" WidthRequest="14" HeightRequest="14" Aspect="Uniform" Stroke="{DynamicResource Advertencia}" IsVisible="{Binding EsBloqueada}" />
+                                                                    <Path Data="{StaticResource IconoProhibido}" WidthRequest="14" HeightRequest="14" Aspect="Uniform" Stroke="{DynamicResource TextoSuave}" IsVisible="{Binding EsDesactivada}" />
+                                                                </Grid>
+                                                                <Label Text="{Binding Estado}" FontFamily="InterMedium" FontSize="13" TextColor="{DynamicResource Exito}" VerticalOptions="Center">
+                                                                    <Label.Triggers>
+                                                                        <DataTrigger TargetType="Label" Binding="{Binding EsBloqueada}" Value="True">
+                                                                            <Setter Property="TextColor" Value="{DynamicResource AdvertenciaTexto}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger TargetType="Label" Binding="{Binding EsDesactivada}" Value="True">
+                                                                            <Setter Property="TextColor" Value="{DynamicResource DeshabilitadoTexto}" />
+                                                                        </DataTrigger>
+                                                                    </Label.Triggers>
+                                                                </Label>
+                                                            </HorizontalStackLayout>
+                                                        </Border>
+                                                        <Label Text="{Binding DetalleEstado}" IsVisible="{Binding TieneDetalleEstado}" FontSize="12" TextColor="{DynamicResource TextoSuave}" LineBreakMode="TailTruncation" VerticalOptions="Center" />
+                                                    </HorizontalStackLayout>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Grid Margin="0,16,0,0" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                                <Border x:Name="BotonCrear" HeightRequest="36" Padding="16,0" BackgroundColor="{DynamicResource BotonClaro}" StrokeThickness="0" StrokeShape="RoundRectangle 6">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding CrearCuentaCommand}" />
+                                        <PointerGestureRecognizer PointerEntered="AlEntrarBotonClaro" PointerExited="AlSalirBotonClaro" />
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                        <Path Data="{StaticResource IconoPersonaMas}" WidthRequest="20" HeightRequest="20" Aspect="Uniform" Stroke="{DynamicResource BotonClaroTexto}" VerticalOptions="Center" />
+                                        <Label Text="Crear cuenta" FontFamily="InterSemiBold" FontSize="14" TextColor="{DynamicResource BotonClaroTexto}" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </Border>
+
+                                <Border x:Name="BotonReactivar" HeightRequest="36" Padding="16,0" BackgroundColor="{DynamicResource BotonOscuro}" Stroke="{DynamicResource BordeControl}" StrokeThickness="1" StrokeShape="RoundRectangle 6" IsEnabled="{Binding PuedeReactivarSeleccionada}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ReactivarCommand}" CommandParameter="{Binding CuentaSeleccionada}" />
+                                        <PointerGestureRecognizer PointerEntered="AlEntrarBotonOscuro" PointerExited="AlSalirBotonOscuro" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding PuedeReactivarSeleccionada}" Value="False">
+                                            <Setter Property="Opacity" Value="0.45" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                        <Path Data="{StaticResource IconoRefrescar}" WidthRequest="20" HeightRequest="20" Aspect="Uniform" VerticalOptions="Center" />
+                                        <Label Text="Reactivar" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </Border>
+
+                                <Border x:Name="BotonDesbloquear" HeightRequest="36" Padding="16,0" BackgroundColor="{DynamicResource BotonOscuro}" Stroke="{DynamicResource BordeControl}" StrokeThickness="1" StrokeShape="RoundRectangle 6" IsEnabled="{Binding PuedeDesbloquearSeleccionada}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding DesbloquearCommand}" CommandParameter="{Binding CuentaSeleccionada}" />
+                                        <PointerGestureRecognizer PointerEntered="AlEntrarBotonOscuro" PointerExited="AlSalirBotonOscuro" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding PuedeDesbloquearSeleccionada}" Value="False">
+                                            <Setter Property="Opacity" Value="0.45" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                        <Path Data="{StaticResource IconoCandadoAbierto}" WidthRequest="20" HeightRequest="20" Aspect="Uniform" VerticalOptions="Center" />
+                                        <Label Text="Desbloquear" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </Border>
+
+                                <Border x:Name="BotonRestablecer" HeightRequest="36" Padding="16,0" BackgroundColor="{DynamicResource BotonOscuro}" Stroke="{DynamicResource BordeControl}" StrokeThickness="1" StrokeShape="RoundRectangle 6" IsEnabled="{Binding PuedeRestablecerSeleccionada}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding RestablecerContrasenaCommand}" CommandParameter="{Binding CuentaSeleccionada}" />
+                                        <PointerGestureRecognizer PointerEntered="AlEntrarBotonOscuro" PointerExited="AlSalirBotonOscuro" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding PuedeRestablecerSeleccionada}" Value="False">
+                                            <Setter Property="Opacity" Value="0.45" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                        <Path Data="{StaticResource IconoLlave}" WidthRequest="20" HeightRequest="20" Aspect="Uniform" VerticalOptions="Center" />
+                                        <Label Text="Restablecer contraseña" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </HorizontalStackLayout>
+
+                            <Border x:Name="BotonDesactivar" Grid.Column="1" HorizontalOptions="End" HeightRequest="36" Padding="16,0" BackgroundColor="{DynamicResource BotonOscuro}" Stroke="{DynamicResource Peligro}" StrokeThickness="1" StrokeShape="RoundRectangle 6" IsEnabled="{Binding PuedeDesactivarSeleccionada}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding DesactivarCommand}" CommandParameter="{Binding CuentaSeleccionada}" />
+                                    <PointerGestureRecognizer PointerEntered="AlEntrarBotonPeligro" PointerExited="AlSalirBotonPeligro" />
+                                </Border.GestureRecognizers>
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding PuedeDesactivarSeleccionada}" Value="False">
+                                        <Setter Property="Opacity" Value="0.45" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                    <Path Data="{StaticResource IconoProhibido}" WidthRequest="20" HeightRequest="20" Aspect="Uniform" Stroke="{DynamicResource PeligroTexto}" VerticalOptions="Center" />
+                                    <Label Text="Desactivar" FontFamily="InterSemiBold" FontSize="14" TextColor="{DynamicResource PeligroTexto}" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Border>
+                        </Grid>
+
+                        <Label
+                            Text="{Binding NotaAdministradora}"
+                            IsVisible="{Binding MostrarNotaAdministradora}"
+                            HorizontalTextAlignment="End"
+                            FontSize="12"
+                            TextColor="{DynamicResource TextoSuave}" />
+
+                        <Border
+                            Margin="0,16,0,0"
+                            MinimumHeightRequest="56"
+                            Padding="12,8"
+                            BackgroundColor="{DynamicResource InfoFondo}"
+                            Stroke="{DynamicResource InfoBorde}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 8">
+                            <Grid ColumnDefinitions="18,*" ColumnSpacing="10">
+                                <Path Data="{StaticResource IconoInfo}" WidthRequest="18" HeightRequest="18" Aspect="Uniform" Stroke="{DynamicResource InfoTexto}" VerticalOptions="Center" />
+                                <Label
+                                    Grid.Column="1"
+                                    Text="Una cuenta desactivada no se borra: conserva la autoría de lo que emitió. La cuenta de la administradora no se puede desactivar. Tras 5 intentos fallidos, la cuenta se bloquea 3 minutos y luego se desbloquea sola; también puede desbloquearla aquí. La contraseña debe tener 8 caracteres como mínimo."
+                                    FontFamily="InterMedium"
+                                    FontSize="13"
+                                    LineHeight="1.23"
+                                    TextColor="{DynamicResource InfoTexto}"
+                                    VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </ContentView>
+            </Grid>
+
+            <Grid IsVisible="{Binding EnEquipo}">
+                <ContentView BindingContext="{Binding Equipo}">
+                    <Grid x:DataType="equipo:EquipoViewModel" ColumnDefinitions="*,*" ColumnSpacing="16">
+                        <Border Style="{StaticResource Tarjeta}" VerticalOptions="Start">
+                            <VerticalStackLayout Spacing="12">
+                                <HorizontalStackLayout Spacing="8">
+                                    <Path Data="{StaticResource IconoImpresora}" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                                    <Label Text="Impresora de etiquetas" FontFamily="InterSemiBold" FontSize="16" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Label Text="Se guarda solo en esta laptop." FontSize="13" TextColor="{DynamicResource TextoSuave}" />
+                                <Label Text="Impresora *" Style="{StaticResource EtiquetaDeCampo}" />
+                                <Border Style="{StaticResource CampoDeFormulario}">
+                                    <Picker ItemsSource="{Binding Impresoras}" SelectedIndex="{Binding ImpresoraElegida}" Title="Sin impresoras detectadas" />
+                                </Border>
+                                <Label Text="Ancho del papel *" Style="{StaticResource EtiquetaDeCampo}" />
+                                <Border Style="{StaticResource CampoDeFormulario}" WidthRequest="230" HorizontalOptions="Start">
+                                    <Picker ItemsSource="{Binding AnchosDePapel}" SelectedIndex="{Binding AnchoElegido}" />
+                                </Border>
+                                <Border Padding="10,8" BackgroundColor="{DynamicResource AdvertenciaFondo}" Stroke="{DynamicResource AdvertenciaBorde}" StrokeThickness="1" StrokeShape="RoundRectangle 6">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding ImpresoraLista}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource ExitoFondo}" />
+                                            <Setter Property="Stroke" Value="{DynamicResource ExitoBorde}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <HorizontalStackLayout Spacing="7">
+                                        <Path Data="{StaticResource IconoAlerta}" WidthRequest="15" HeightRequest="15" Stroke="{DynamicResource AdvertenciaTexto}" VerticalOptions="Center">
+                                            <Path.Triggers>
+                                                <DataTrigger TargetType="Path" Binding="{Binding ImpresoraLista}" Value="True">
+                                                    <Setter Property="Data" Value="{StaticResource IconoCheckCirculo}" />
+                                                    <Setter Property="Stroke" Value="{DynamicResource Exito}" />
+                                                </DataTrigger>
+                                            </Path.Triggers>
+                                        </Path>
+                                        <Label Text="{Binding EstadoDeLaImpresora}" FontSize="13" TextColor="{DynamicResource AdvertenciaTexto}" VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding ImpresoraLista}" Value="True">
+                                                    <Setter Property="TextColor" Value="{DynamicResource Exito}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                </Border>
+                                <Button Text="Imprimir prueba" Style="{StaticResource BotonSecundario}" HorizontalOptions="Start" Command="{Binding ImprimirPruebaCommand}" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource Tarjeta}" VerticalOptions="Start">
+                            <VerticalStackLayout Spacing="12">
+                                <HorizontalStackLayout Spacing="8">
+                                    <Path Data="{StaticResource IconoCopiar}" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                                    <Label Text="Copia semanal de los datos" FontFamily="InterSemiBold" FontSize="16" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Label Text="La hace sola la Web API cada domingo y la guarda en Google Drive." FontSize="13" TextColor="{DynamicResource TextoSuave}" />
+                                <Border Padding="10,8" BackgroundColor="{DynamicResource AdvertenciaFondo}" Stroke="{DynamicResource AdvertenciaBorde}" StrokeThickness="1" StrokeShape="RoundRectangle 6">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding UltimaCopiaCorrecta}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource ExitoFondo}" />
+                                            <Setter Property="Stroke" Value="{DynamicResource ExitoBorde}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <HorizontalStackLayout Spacing="7">
+                                        <Path Data="{StaticResource IconoAlerta}" WidthRequest="15" HeightRequest="15" Stroke="{DynamicResource AdvertenciaTexto}" VerticalOptions="Center">
+                                            <Path.Triggers>
+                                                <DataTrigger TargetType="Path" Binding="{Binding UltimaCopiaCorrecta}" Value="True">
+                                                    <Setter Property="Data" Value="{StaticResource IconoCheckCirculo}" />
+                                                    <Setter Property="Stroke" Value="{DynamicResource Exito}" />
+                                                </DataTrigger>
+                                            </Path.Triggers>
+                                        </Path>
+                                        <Label Text="{Binding UltimaCopia}" FontSize="13" TextColor="{DynamicResource AdvertenciaTexto}" VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding UltimaCopiaCorrecta}" Value="True">
+                                                    <Setter Property="TextColor" Value="{DynamicResource Exito}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                </Border>
+                                <Label Text="Si hay que recuperar los datos de una copia, avise al equipo de soporte." FontSize="12" TextColor="{DynamicResource TextoSuave}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+                </ContentView>
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</paginas:PaginaDeModulo>

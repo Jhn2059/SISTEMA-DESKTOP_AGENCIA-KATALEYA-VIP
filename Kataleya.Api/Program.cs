@@ -302,6 +302,10 @@ pasajes.MapGet("", async (
     ServicioPasajes servicio) =>
     Results.Ok(await servicio.ConsultarAsync(filtro)));
 
+pasajes.MapGet("/cantidad", async (TimeOnly hora, ServicioPasajes servicio) =>
+    Results.Ok(await servicio.ContarPasajesDelHorarioAsync(hora)))
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
 pasajes.MapGet("/grupos/{id:long}", async (long id, ServicioPasajes servicio) =>
     Results.Ok(await servicio.ObtenerGrupoAsync(id)));
 
@@ -412,6 +416,13 @@ configuracionAdministrativa.MapPut("/tarifas/{id:int}", async (
     Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
         await servicio.GuardarTarifaAsync(id, solicitud))));
 
+configuracionAdministrativa.MapPut("/tarifas/regular/{sentido}", async (
+    Kataleya.Dominio.Enums.SentidoDelViaje sentido,
+    Kataleya.Contratos.Configuracion.SolicitudDeTarifaRegular solicitud,
+    ServicioConfiguracion servicio) =>
+    Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
+        await servicio.FijarTarifaRegularAsync(sentido, solicitud.Importe))));
+
 configuracionAdministrativa.MapDelete("/tarifas/{id:int}", async (
     int id,
     ServicioConfiguracion servicio) =>
@@ -436,6 +447,18 @@ configuracionAdministrativa.MapPut("/parametros/{nombre}", async (
     ServicioConfiguracion servicio) =>
     Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
         await servicio.GuardarParametroAsync(nombre, solicitud))));
+
+configuracionAdministrativa.MapPost("/parametros/horarios", async (
+    Kataleya.Contratos.Configuracion.SolicitudDeHorario solicitud,
+    ServicioConfiguracion servicio) =>
+    Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
+        await servicio.AgregarHorarioAsync(solicitud.Hora))));
+
+configuracionAdministrativa.MapDelete("/parametros/horarios/{hora}", async (
+    string hora,
+    ServicioConfiguracion servicio) =>
+    Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
+        await servicio.QuitarHorarioAsync(hora))));
 
 app.MapGet("/cuadre", async (
     [AsParameters] Kataleya.Contratos.Cuadre.FiltroDeCuadre filtro,

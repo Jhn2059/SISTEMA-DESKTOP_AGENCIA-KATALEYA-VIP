@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Kataleya.Aplicacion.Excepciones;
 using Kataleya.Aplicacion.Mapeo;
@@ -10,6 +11,11 @@ namespace Kataleya.Aplicacion.Services;
 
 public sealed class ServicioConfiguracion
 {
+    private const string Horarios = "horarios_salida";
+    private const string PlazoDeReserva = "plazo_maximo_reserva_dias";
+    private const string AvisoPrevio = "aviso_previo_horas";
+    private static readonly string[] FormatosDeHora = ["H:mm", "HH:mm"];
+
     private readonly IRepositorioConfiguracion _configuracion;
     private readonly IRepositorioCatalogos _catalogos;
     private readonly RegistradorDeBitacora _bitacora;
@@ -39,11 +45,15 @@ public sealed class ServicioConfiguracion
     public async Task<Tarifa> GuardarTarifaAsync(int? id, SolicitudDeTarifa solicitud)
     {
         ArgumentNullException.ThrowIfNull(solicitud);
-        ArgumentException.ThrowIfNullOrWhiteSpace(solicitud.Nombre);
+
+        if (string.IsNullOrWhiteSpace(solicitud.Nombre))
+        {
+            throw new ReglaDeNegocioException("Escriba el nombre de la tarifa.", "nombre");
+        }
 
         if (solicitud.Importe <= 0)
         {
-            throw new ReglaDeNegocioException("El importe debe ser mayor que cero.", "importe");
+            throw new ReglaDeNegocioException("Escriba un importe mayor que cero.", "importe");
         }
 
         if (solicitud.Tipo == TipoDeTarifa.Programada)
@@ -58,8 +68,8 @@ public sealed class ServicioConfiguracion
             if (solicitud.VigenciaHasta < solicitud.VigenciaDesde)
             {
                 throw new ReglaDeNegocioException(
-                    "La fecha final de vigencia no puede ser anterior a la inicial.",
-                    "vigencia");
+                    "La fecha final no puede ser anterior a la inicial.",
+                    "vigenciaHasta");
             }
 
             await ValidarSuperposicionAsync(id, solicitud);
@@ -112,6 +122,25 @@ public sealed class ServicioConfiguracion
 
         return await _configuracion.BuscarTarifaAsync(tarifa.Id)
             ?? throw new InvalidOperationException("No se encontró la tarifa guardada.");
+    }
+
+    // Una tarifa regular por sentido, que se cambia en su propia tarjeta (RF-29).
+    public Task<Tarifa> FijarTarifaRegularAsync(SentidoDelViaje sentido, decimal importe)
+    {
+        if (sentido == SentidoDelViaje.Ambos)
+        {
+            throw new ReglaDeNegocioException("Elija Huancayo → Ica o Ica → Huancayo.", "sentido");
+        }
+
+        return GuardarTarifaAsync(null, new SolicitudDeTarifa
+        {
+            Tipo = TipoDeTarifa.Regular,
+            Nombre = sentido == SentidoDelViaje.Ida
+                ? "Tarifa regular Huancayo - Ica"
+                : "Tarifa regular Ica - Huancayo",
+            Importe = importe,
+            Sentido = sentido
+        });
     }
 
     public async Task EliminarTarifaAsync(int id)
@@ -168,10 +197,73 @@ public sealed class ServicioConfiguracion
         ArgumentNullException.ThrowIfNull(solicitud);
         ArgumentException.ThrowIfNullOrWhiteSpace(nombre);
 
+        var valor = solicitud.Valor.Trim();
+
+        switch (nombre.Trim())
+        {
+            case PlazoDeReserva:
+                ValidarEntero(valor, 1, 30, "Escriba un plazo de 1 a 30 días.", nombre);
+                break;
+            case AvisoPrevio:
+                ValidarEntero(valor, 0, 24, "Escriba un aviso de 0 a 24 horas.", nombre);
+                break;
+            case Horarios:
+                valor = string.Join(",", LeerHorariosEscritos(valor));
+                break;
+        }
+
+        return await GuardarValorAsync(nombre.Trim(), valor, "Cambio de parámetro");
+    }
+
+    // CDU-16 A1: el horario vale para los dos sentidos y se guarda en orden.
+    public async Task<ParametroDelNegocio> AgregarHorarioAsync(string hora)
+    {
+        if (!IntentarLeerHora(hora, out var nueva))
+        {
+            throw new ReglaDeNegocioException(
+                "Escriba la hora en formato de 24 horas, por ejemplo 07:30.",
+                "hora");
+        }
+
+        var horarios = await ListarHorariosAsync();
+
+        if (horarios.Contains(nueva))
+        {
+            throw new ReglaDeNegocioException("Ese horario ya existe.", "hora");
+        }
+
+        horarios.Add(nueva);
+        return await GuardarValorAsync(Horarios, UnirHorarios(horarios), "Agregar horario");
+    }
+
+    // CDU-16 A3: los pasajes ya registrados en ese horario lo conservan.
+    public async Task<ParametroDelNegocio> QuitarHorarioAsync(string hora)
+    {
+        var horarios = await ListarHorariosAsync();
+
+        if (!IntentarLeerHora(hora, out var quitada) || !horarios.Contains(quitada))
+        {
+            throw new ReglaDeNegocioException("Ese horario ya no existe.", "hora");
+        }
+
+        if (horarios.Count == 1)
+        {
+            throw new ReglaDeNegocioException("Debe quedar al menos un horario de salida.", "hora");
+        }
+
+        horarios.Remove(quitada);
+        return await GuardarValorAsync(Horarios, UnirHorarios(horarios), "Quitar horario");
+    }
+
+    private async Task<ParametroDelNegocio> GuardarValorAsync(string nombre, string valor, string operacion)
+    {
+        var parametros = await _configuracion.ListarParametrosAsync();
+        var anterior = parametros.FirstOrDefault(p => p.Nombre == nombre)?.Valor;
+
         var parametro = new ParametroDelNegocio
         {
-            Nombre = nombre.Trim(),
-            Valor = solicitud.Valor.Trim(),
+            Nombre = nombre,
+            Valor = valor,
             UsuarioId = _contexto.IdUsuario,
             FechaHora = _reloj.Ahora
         };
@@ -180,12 +272,74 @@ public sealed class ServicioConfiguracion
         {
             await _configuracion.GuardarParametroAsync(parametro);
             await _bitacora.RegistrarAsync(
-                "Cambio de parámetro",
-                null,
+                operacion,
+                anterior is null ? null : JsonSerializer.Serialize(new { Nombre = nombre, Valor = anterior }),
                 JsonSerializer.Serialize(new { parametro.Nombre, parametro.Valor }));
         });
 
         return parametro;
+    }
+
+    private async Task<SortedSet<TimeOnly>> ListarHorariosAsync()
+    {
+        var parametros = await _configuracion.ListarParametrosAsync();
+        var valor = parametros.FirstOrDefault(p => p.Nombre == Horarios)?.Valor ?? string.Empty;
+        var horarios = new SortedSet<TimeOnly>();
+
+        foreach (var texto in valor.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (IntentarLeerHora(texto, out var hora))
+            {
+                horarios.Add(hora);
+            }
+        }
+
+        return horarios;
+    }
+
+    private static IEnumerable<string> LeerHorariosEscritos(string valor)
+    {
+        var horarios = new SortedSet<TimeOnly>();
+
+        foreach (var texto in valor.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (!IntentarLeerHora(texto, out var hora))
+            {
+                throw new ReglaDeNegocioException(
+                    "Escriba la hora en formato de 24 horas, por ejemplo 07:30.",
+                    "hora");
+            }
+
+            horarios.Add(hora);
+        }
+
+        if (horarios.Count == 0)
+        {
+            throw new ReglaDeNegocioException("Debe quedar al menos un horario de salida.", "hora");
+        }
+
+        return horarios.Select(hora => hora.ToString("HH:mm", CultureInfo.InvariantCulture));
+    }
+
+    private static string UnirHorarios(IEnumerable<TimeOnly> horarios) =>
+        string.Join(",", horarios.Select(hora => hora.ToString("HH:mm", CultureInfo.InvariantCulture)));
+
+    private static bool IntentarLeerHora(string? texto, out TimeOnly hora) =>
+        TimeOnly.TryParseExact(
+            (texto ?? string.Empty).Trim(),
+            FormatosDeHora,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out hora);
+
+    private static void ValidarEntero(string valor, int minimo, int maximo, string mensaje, string campo)
+    {
+        if (!int.TryParse(valor, NumberStyles.None, CultureInfo.InvariantCulture, out var numero) ||
+            numero < minimo ||
+            numero > maximo)
+        {
+            throw new ReglaDeNegocioException(mensaje, campo);
+        }
     }
 
     private async Task ValidarSuperposicionAsync(int? id, SolicitudDeTarifa solicitud)
@@ -205,8 +359,11 @@ public sealed class ServicioConfiguracion
         if (superpuesta is not null)
         {
             throw new ReglaDeNegocioException(
-                $"Las fechas se cruzan con la tarifa programada \"{superpuesta.Nombre}\".",
-                "vigencia");
+                $"Esas fechas se cruzan con la tarifa «{superpuesta.Nombre}» " +
+                $"({superpuesta.VigenciaDesde?.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)} a " +
+                $"{superpuesta.VigenciaHasta?.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)}) " +
+                "del mismo sentido. Cambie las fechas o quite esa tarifa.",
+                "vigenciaDesde");
         }
     }
 }

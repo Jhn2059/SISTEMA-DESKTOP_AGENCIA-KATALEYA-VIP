@@ -6,9 +6,10 @@ using Kataleya.Contratos.Cuentas;
 using Kataleya.Dominio.DataObjects;
 using Kataleya.Escritorio.Servicios;
 
-namespace Kataleya.Escritorio.Features.GestionDeUsuarios;
+namespace Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario;
 
-public partial class GestionDeUsuariosViewModel : ObservableObject
+// Pestaña «Cuentas de usuario» de Configuración (IU-P10; CDU-09 y CDU-17 a CDU-19).
+public partial class CuentasDeUsuarioViewModel : ObservableObject
 {
     private readonly ClienteApi _cliente;
     private readonly IDialogos _dialogos;
@@ -30,7 +31,7 @@ public partial class GestionDeUsuariosViewModel : ObservableObject
     [ObservableProperty]
     private CuentaEnLista? cuentaSeleccionada;
 
-    public GestionDeUsuariosViewModel(
+    public CuentasDeUsuarioViewModel(
         ClienteApi cliente,
         IDialogos dialogos,
         INavegacion navegacion)
@@ -43,8 +44,6 @@ public partial class GestionDeUsuariosViewModel : ObservableObject
     public ObservableCollection<CuentaEnLista> Cuentas { get; } = [];
 
     public bool PuedeOperar => !EstaCargando;
-
-    public bool EsAdministrador => _cliente.EsAdministrador;
 
     public bool TieneSeleccion => CuentaSeleccionada is not null;
 
@@ -269,17 +268,6 @@ public partial class GestionDeUsuariosViewModel : ObservableObject
     [RelayCommand]
     private void Seleccionar(CuentaEnLista? cuenta) =>
         CuentaSeleccionada = cuenta;
-
-    [RelayCommand]
-    private Task VolverAsync() =>
-        _navegacion.VolverAsync();
-
-    [RelayCommand]
-    private async Task CerrarSesionAsync()
-    {
-        _cliente.CerrarSesion();
-        await _navegacion.IrAlInicioDeSesionAsync();
-    }
 
     partial void OnCuentaSeleccionadaChanged(CuentaEnLista? valorAnterior, CuentaEnLista? valorNuevo)
     {

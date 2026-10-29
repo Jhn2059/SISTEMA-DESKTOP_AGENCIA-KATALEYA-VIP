@@ -1,3 +1,5 @@
+using Kataleya.Escritorio.Features.Configuracion;
+
 namespace Kataleya.Escritorio.Servicios;
 
 public interface INavegacion
@@ -6,7 +8,7 @@ public interface INavegacion
 
     Task IrAlInicioDeSesionAsync();
 
-    Task IrAGestionDeUsuariosAsync();
+    Task IrAConfiguracionAsync(PestanaDeConfiguracion pestana);
 
     Task VolverAsync();
 

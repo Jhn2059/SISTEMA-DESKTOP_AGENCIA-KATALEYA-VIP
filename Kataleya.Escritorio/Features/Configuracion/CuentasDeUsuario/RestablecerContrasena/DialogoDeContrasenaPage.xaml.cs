@@ -1,4 +1,4 @@
-namespace Kataleya.Escritorio.Features.GestionDeUsuarios.RestablecerContrasena;
+namespace Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.RestablecerContrasena;
 
 public partial class DialogoDeContrasenaPage : ContentPage
 {

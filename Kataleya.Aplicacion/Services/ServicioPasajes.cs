@@ -1142,6 +1142,9 @@ public sealed class ServicioPasajes
         return _emisor;
     }
 
+    public Task<int> ContarPasajesDelHorarioAsync(TimeOnly hora) =>
+        _pasajes.ContarDelHorarioAsync(hora, FechasLocales.EnHoraDePeru(_reloj.Ahora));
+
     private Task<int> ObtenerHorasDeAvisoAsync() =>
         ObtenerParametroAsync("aviso_previo_horas", 3);
 

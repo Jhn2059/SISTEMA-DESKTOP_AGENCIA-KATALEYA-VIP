@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage
-    x:Class="Kataleya.Escritorio.Features.GestionDeUsuarios.CrearCuenta.DialogoDeCuentaPage"
+    x:Class="Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.CrearCuenta.DialogoDeCuentaPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:contratos="clr-namespace:Kataleya.Contratos.Cuentas;assembly=Kataleya.Contratos"
     xmlns:ui="clr-namespace:Kataleya.Escritorio.UIHelpers.Behaviors"
-    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.GestionDeUsuarios.CrearCuenta"
+    xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.Configuracion.CuentasDeUsuario.CrearCuenta"
     x:DataType="vm:DialogoDeCuentaViewModel"
     ui:CicloDeVidaDePagina.AlDesaparecer="{Binding AlDesaparecerCommand}"
     Title="Nueva cuenta"
