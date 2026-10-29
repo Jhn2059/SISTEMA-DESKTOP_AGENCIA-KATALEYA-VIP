@@ -41,10 +41,19 @@ builder.Services.AddScoped<ContextoDeOperacion>();
 builder.Services.AddScoped<IRepositorioUsuarios, RepositorioUsuarios>();
 builder.Services.AddScoped<IRepositorioCatalogos, RepositorioCatalogos>();
 builder.Services.AddScoped<IRepositorioBitacora, RepositorioBitacora>();
+builder.Services.AddScoped<IRepositorioPasajes, RepositorioPasajes>();
+builder.Services.AddScoped<IRepositorioUnidades, RepositorioUnidades>();
+builder.Services.AddScoped<IRepositorioConfiguracion, RepositorioConfiguracion>();
+builder.Services.AddScoped<IRepositorioCuadre, RepositorioCuadre>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 builder.Services.AddScoped<ServicioBitacora>();
+builder.Services.AddScoped<RegistradorDeBitacora>();
 builder.Services.AddScoped<ServicioSesion>();
 builder.Services.AddScoped<ServicioCuentas>();
+builder.Services.AddScoped<ServicioConfiguracion>();
+builder.Services.AddScoped<ServicioInventario>();
+builder.Services.AddScoped<ServicioPasajes>();
+builder.Services.AddScoped<ServicioReportes>();
 builder.Services.AddOptions<OpcionesDeSesion>()
     .Bind(builder.Configuration.GetSection(OpcionesDeSesion.Seccion));
 builder.Services.AddSingleton<ServicioDeLlaves>();
@@ -238,6 +247,210 @@ sedes.MapGet("", async (IRepositorioCatalogos catalogos) =>
     return Results.Ok(lista.Select(MapearSede).ToList());
 });
 
+var pasajes = app.MapGroup("/pasajes");
+
+pasajes.MapPost("/reservas", async (
+    Kataleya.Contratos.Pasajes.SolicitudDePasaje solicitud,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.RegistrarReservaAsync(solicitud)));
+
+pasajes.MapPost("/ventas", async (
+    Kataleya.Contratos.Pasajes.SolicitudDePasaje solicitud,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.RegistrarVentaAsync(solicitud)));
+
+pasajes.MapPost("/diferidos", async (
+    Kataleya.Contratos.Pasajes.SolicitudDePasaje solicitud,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.RegistrarDiferidoAsync(solicitud)))
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
+pasajes.MapPost("/grupos/reservas", async (
+    Kataleya.Contratos.Pasajes.SolicitudDeGrupo solicitud,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.RegistrarGrupoAsync(solicitud, esVenta: false)));
+
+pasajes.MapPost("/grupos/ventas", async (
+    Kataleya.Contratos.Pasajes.SolicitudDeGrupo solicitud,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.RegistrarGrupoAsync(solicitud, esVenta: true)));
+
+pasajes.MapGet("", async (
+    [AsParameters] Kataleya.Contratos.Pasajes.FiltroDePasajes filtro,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.ConsultarAsync(filtro)));
+
+pasajes.MapGet("/grupos/{id:long}", async (long id, ServicioPasajes servicio) =>
+    Results.Ok(await servicio.ObtenerGrupoAsync(id)));
+
+pasajes.MapGet("/{id:long}", async (long id, ServicioPasajes servicio) =>
+{
+    var pasaje = await servicio.BuscarAsync(id);
+    return pasaje is null ? NoEncontrado("El pasaje no existe.") : Results.Ok(pasaje);
+});
+
+pasajes.MapGet("/{id:long}/revision-de-anulacion", async (
+    long id,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.RevisarAnulacionAsync(id)));
+
+pasajes.MapPost("/{id:long}/anulacion", async (
+    long id,
+    Kataleya.Contratos.Pasajes.SolicitudDeAnulacion solicitud,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.AnularAsync(id, solicitud.Motivo)))
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
+pasajes.MapPost("/{id:long}/cobros", async (
+    long id,
+    Kataleya.Contratos.Pasajes.SolicitudDeCobro solicitud,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.RegistrarCobroAsync(id, solicitud)));
+
+pasajes.MapPost("/{id:long}/modificacion", async (
+    long id,
+    Kataleya.Contratos.Pasajes.CambiosDelPasaje cambios,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.ModificarAsync(id, cambios)))
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
+pasajes.MapPost("/{id:long}/no-presentado", async (
+    long id,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.MarcarNoSePresentoAsync(id)))
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
+app.MapPost("/boletos/{serie}/{numero:long}/reimpresiones", async (
+    string serie,
+    long numero,
+    ServicioPasajes servicio) =>
+    Results.Ok(await servicio.RegistrarReimpresionAsync(serie, numero)));
+
+app.MapPost("/boletos/{serie}/{numero:long}/fallas", async (
+    string serie,
+    long numero,
+    Kataleya.Contratos.Pasajes.SolicitudDeFallaDeBoleto solicitud,
+    ServicioPasajes servicio) =>
+{
+    await servicio.RegistrarFallaDeBoletoAsync(serie, numero, solicitud.Descripcion);
+    return Results.NoContent();
+});
+
+var inventario = app.MapGroup("/inventario");
+
+inventario.MapGet("/unidades", async (
+    DateOnly fecha,
+    TimeOnly hora,
+    ServicioInventario servicio) =>
+    Results.Ok(await servicio.ListarAsync(fecha, hora)));
+
+inventario.MapPost("/unidades", async (
+    Kataleya.Contratos.Pasajes.SolicitudDeUnidad solicitud,
+    ServicioInventario servicio) =>
+    Results.Ok(await servicio.AbrirAsync(solicitud.Fecha, solicitud.Hora, solicitud.TipoVehiculoId)));
+
+inventario.MapGet("/unidades/{id:long}/asientos", async (
+    long id,
+    ServicioInventario servicio) =>
+    Results.Ok(await servicio.AsientosOcupadosAsync(id)));
+
+var configuracion = app.MapGroup("/configuracion");
+var configuracionAdministrativa = configuracion.MapGroup("")
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
+configuracion.MapGet("/tarifas", async (ServicioConfiguracion servicio) =>
+    Results.Ok((await servicio.ListarTarifasAsync())
+        .Select(t => Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(t))
+        .ToList()));
+
+configuracion.MapGet("/tarifas/vigente", async (
+    DateOnly? fecha,
+    Kataleya.Dominio.Enums.SentidoDelViaje? sentido,
+    IReloj reloj,
+    ServicioConfiguracion servicio) =>
+{
+    var dia = fecha ?? DateOnly.FromDateTime(reloj.Ahora);
+    var tarifa = await servicio.ObtenerTarifaVigenteAsync(
+        dia,
+        sentido ?? Kataleya.Dominio.Enums.SentidoDelViaje.Ida);
+    return Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(tarifa));
+});
+
+configuracionAdministrativa.MapPost("/tarifas", async (
+    Kataleya.Contratos.Configuracion.SolicitudDeTarifa solicitud,
+    ServicioConfiguracion servicio) =>
+    Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
+        await servicio.GuardarTarifaAsync(null, solicitud))));
+
+configuracionAdministrativa.MapPut("/tarifas/{id:int}", async (
+    int id,
+    Kataleya.Contratos.Configuracion.SolicitudDeTarifa solicitud,
+    ServicioConfiguracion servicio) =>
+    Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
+        await servicio.GuardarTarifaAsync(id, solicitud))));
+
+configuracionAdministrativa.MapDelete("/tarifas/{id:int}", async (
+    int id,
+    ServicioConfiguracion servicio) =>
+{
+    await servicio.EliminarTarifaAsync(id);
+    return Results.NoContent();
+});
+
+configuracion.MapGet("/tipos-de-vehiculo", async (ServicioConfiguracion servicio) =>
+    Results.Ok((await servicio.ListarTiposDeVehiculoAsync())
+        .Select(t => Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(t))
+        .ToList()));
+
+configuracionAdministrativa.MapPost("/tipos-de-vehiculo", async (
+    Kataleya.Contratos.Configuracion.SolicitudDeTipoDeVehiculo solicitud,
+    ServicioConfiguracion servicio) =>
+    Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
+        await servicio.GuardarTipoDeVehiculoAsync(null, solicitud))));
+
+configuracionAdministrativa.MapPut("/tipos-de-vehiculo/{id:int}", async (
+    int id,
+    Kataleya.Contratos.Configuracion.SolicitudDeTipoDeVehiculo solicitud,
+    ServicioConfiguracion servicio) =>
+    Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
+        await servicio.GuardarTipoDeVehiculoAsync((short)id, solicitud))));
+
+configuracionAdministrativa.MapDelete("/tipos-de-vehiculo/{id:int}", async (
+    int id,
+    ServicioConfiguracion servicio) =>
+{
+    await servicio.EliminarTipoDeVehiculoAsync((short)id);
+    return Results.NoContent();
+});
+
+configuracion.MapGet("/parametros", async (ServicioConfiguracion servicio) =>
+    Results.Ok((await servicio.ListarParametrosAsync())
+        .Select(p => Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(p))
+        .ToList()));
+
+configuracionAdministrativa.MapPut("/parametros/{nombre}", async (
+    string nombre,
+    Kataleya.Contratos.Configuracion.SolicitudDeParametro solicitud,
+    ServicioConfiguracion servicio) =>
+    Results.Ok(Kataleya.Aplicacion.Mapeo.Mapeador.ADatos(
+        await servicio.GuardarParametroAsync(nombre, solicitud))));
+
+app.MapGet("/cuadre", async (
+    [AsParameters] Kataleya.Contratos.Cuadre.FiltroDeCuadre filtro,
+    ServicioReportes servicio) =>
+    Results.Ok(await servicio.GenerarCuadreAsync(filtro)));
+
+app.MapGet("/panel", async (
+    DateOnly? fecha,
+    ServicioReportes servicio) =>
+    Results.Ok(await servicio.ObtenerPanelAsync(fecha)));
+
+app.MapGet("/bitacora", async (
+    [AsParameters] Kataleya.Contratos.Bitacora.FiltroDeBitacora filtro,
+    ServicioReportes servicio) =>
+    Results.Ok(await servicio.ConsultarBitacoraAsync(filtro)))
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
 app.Run();
 
 static Dictionary<string, string[]> ValidarCuenta(SolicitudDeCuenta solicitud)
@@ -288,6 +501,11 @@ static IResult NoEncontrada() =>
     Results.Problem(
         statusCode: StatusCodes.Status404NotFound,
         title: "No se encontró la cuenta.");
+
+static IResult NoEncontrado(string mensaje) =>
+    Results.Problem(
+        statusCode: StatusCodes.Status404NotFound,
+        title: mensaje);
 
 static DatosDeCuenta MapearCuenta(Usuario usuario) =>
     new()

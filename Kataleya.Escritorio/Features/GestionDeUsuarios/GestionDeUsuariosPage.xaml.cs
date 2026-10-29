@@ -1,23 +1,18 @@
-using Kataleya.Cliente;
+﻿using Kataleya.Cliente;
 using Kataleya.Escritorio.Components.Layout;
 using Kataleya.Escritorio.UIHelpers;
+using Kataleya.Escritorio.UIHelpers.Paginas;
+using Microsoft.Maui.Controls.Shapes;
+using Ruta = Microsoft.Maui.Controls.Shapes.Path;
 using Microsoft.Maui.Graphics;
 
 namespace Kataleya.Escritorio.Features.GestionDeUsuarios;
 
 public partial class GestionDeUsuariosPage : ContentPage
 {
-    private static readonly Color FondoBotonClaro = Color.FromArgb("#F1F2F4");
-    private static readonly Color FondoBotonClaroHover = Color.FromArgb("#FFFFFF");
-    private static readonly Color FondoBotonOscuro = Color.FromArgb("#1A1E25");
-    private static readonly Color FondoBotonOscuroHover = Color.FromArgb("#232935");
-    private static readonly Color BordeBotonOscuro = Color.FromArgb("#646B78");
-    private static readonly Color BordeBotonOscuroHover = Color.FromArgb("#8A909A");
-    private static readonly Color FondoBotonPeligroHover = Color.FromArgb("#251014");
-    private static readonly Color BordeBotonPeligroHover = Color.FromArgb("#F87171");
-
     private readonly ClienteApi _cliente;
     private bool _lateralVisible = true;
+    private string _pestanaActiva = "cuentas";
 
     public GestionDeUsuariosPage(GestionDeUsuariosViewModel modelo, ClienteApi cliente)
     {
@@ -26,7 +21,7 @@ public partial class GestionDeUsuariosPage : ContentPage
         BindingContext = modelo;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
 
@@ -41,6 +36,9 @@ public partial class GestionDeUsuariosPage : ContentPage
             cuenta?.Sede ?? string.Empty,
             AlternarLateral,
             ConfirmarCierreDeSesionAsync);
+
+        MostrarPestana(_pestanaActiva);
+        await CargarConfiguracionAsync();
     }
 
     private void AlSolicitarMenu(object? remitente, EventArgs argumentos) =>
@@ -53,46 +51,52 @@ public partial class GestionDeUsuariosPage : ContentPage
         Lateral.IsVisible = _lateralVisible;
     }
 
-    private async void AlTocarOpcion(object? remitente, OpcionSeleccionadaEventArgs argumentos)
+    private async void AlTocarOpcion(object? remitente, OpcionSeleccionadaEventArgs argumentos) =>
+        await NavegacionDeModulos.IrAsync(argumentos.Opcion);
+
+    private void AlElegirTarifas(object? remitente, TappedEventArgs argumentos) =>
+        MostrarPestana("tarifas");
+
+    private void AlElegirCuentas(object? remitente, TappedEventArgs argumentos) =>
+        MostrarPestana("cuentas");
+
+    private void AlElegirEquipo(object? remitente, TappedEventArgs argumentos) =>
+        MostrarPestana("equipo");
+
+    private void MostrarPestana(string pestana)
     {
-        if (BindingContext is not GestionDeUsuariosViewModel modelo)
-        {
-            return;
-        }
+        _pestanaActiva = pestana;
 
-        if (argumentos.Opcion == "panel")
-        {
-            await modelo.VolverCommand.ExecuteAsync(null);
-            return;
-        }
+        var tarifas = pestana == "tarifas";
+        var cuentas = pestana == "cuentas";
+        var equipo = pestana == "equipo";
 
-        if (argumentos.Opcion == "usuarios")
-        {
-            return;
-        }
+        PanelTarifas.IsVisible = tarifas;
+        PanelCuentas.IsVisible = cuentas;
+        PanelEquipo.IsVisible = equipo;
 
-        await DisplayAlertAsync(
-            "Próximamente",
-            $"La pantalla «{NombreDeOpcion(argumentos.Opcion)}» se implementará en la siguiente entrega.",
-            "Entendido");
+        LineaTabTarifas.IsVisible = tarifas;
+        LineaTabCuentas.IsVisible = cuentas;
+        LineaTabEquipo.IsVisible = equipo;
+
+        PintarPestana(LblTabTarifas, IconoTabTarifas, tarifas);
+        PintarPestana(LblTabCuentas, IconoTabCuentas, cuentas);
+        PintarPestana(LblTabEquipo, IconoTabEquipo, equipo);
     }
 
-    private static string NombreDeOpcion(string opcion) => opcion switch
+    private static void PintarPestana(Label etiqueta, Ruta icono, bool activa)
     {
-        "registrar-pasaje" => "Registrar pasaje",
-        "pasajes" => "Pasajes",
-        "cuadre-ventas" => "Cuadre de ventas",
-        "registro-diferido" => "Registro diferido",
-        "tarifas" => "Tarifas y parámetros",
-        "bitacora" => "Bitácora",
-        _ => opcion
-    };
+        var color = activa ? ServicioDeTema.Color("Texto") : ServicioDeTema.Color("TextoSuave");
+        etiqueta.TextColor = color;
+        icono.Stroke = color;
+        etiqueta.FontFamily = activa ? "InterSemiBold" : "InterMedium";
+    }
 
     private void AlEntrarBotonClaro(object? remitente, PointerEventArgs argumentos) =>
-        BotonCrear.BackgroundColor = FondoBotonClaroHover;
+        BotonCrear.BackgroundColor = ServicioDeTema.Color("BotonClaroHover");
 
     private void AlSalirBotonClaro(object? remitente, PointerEventArgs argumentos) =>
-        BotonCrear.BackgroundColor = FondoBotonClaro;
+        BotonCrear.BackgroundColor = ServicioDeTema.Color("BotonClaro");
 
     private void AlEntrarBotonOscuro(object? remitente, PointerEventArgs argumentos)
     {
@@ -101,8 +105,8 @@ public partial class GestionDeUsuariosPage : ContentPage
             return;
         }
 
-        borde.BackgroundColor = FondoBotonOscuroHover;
-        borde.Stroke = new SolidColorBrush(BordeBotonOscuroHover);
+        borde.BackgroundColor = ServicioDeTema.Color("BotonOscuroHover");
+        borde.Stroke = new SolidColorBrush(ServicioDeTema.Color("BordeControlHover"));
     }
 
     private void AlSalirBotonOscuro(object? remitente, PointerEventArgs argumentos)
@@ -112,20 +116,20 @@ public partial class GestionDeUsuariosPage : ContentPage
             return;
         }
 
-        borde.BackgroundColor = FondoBotonOscuro;
-        borde.Stroke = new SolidColorBrush(BordeBotonOscuro);
+        borde.BackgroundColor = ServicioDeTema.Color("BotonOscuro");
+        borde.Stroke = new SolidColorBrush(ServicioDeTema.Color("BordeControl"));
     }
 
     private void AlEntrarBotonPeligro(object? remitente, PointerEventArgs argumentos)
     {
-        BotonDesactivar.BackgroundColor = FondoBotonPeligroHover;
-        BotonDesactivar.Stroke = new SolidColorBrush(BordeBotonPeligroHover);
+        BotonDesactivar.BackgroundColor = ServicioDeTema.Color("PeligroHover");
+        BotonDesactivar.Stroke = new SolidColorBrush(ServicioDeTema.Color("PeligroBordeHover"));
     }
 
     private void AlSalirBotonPeligro(object? remitente, PointerEventArgs argumentos)
     {
-        BotonDesactivar.BackgroundColor = FondoBotonOscuro;
-        BotonDesactivar.Stroke = new SolidColorBrush(Color.FromArgb("#EF4444"));
+        BotonDesactivar.BackgroundColor = ServicioDeTema.Color("BotonOscuro");
+        BotonDesactivar.Stroke = new SolidColorBrush(ServicioDeTema.Color("Peligro"));
     }
 
     private void AlSolicitarCierreDeSesion(object? remitente, EventArgs argumentos) =>

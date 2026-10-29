@@ -31,4 +31,10 @@ public sealed class ServicioBitacora
 
     public Task<bool> ExisteAsync(Guid clave) =>
         _repositorio.ExisteClaveAsync(clave);
+
+    public Task<EntradaDeBitacora?> BuscarPorClaveAsync(Guid clave) =>
+        _repositorio.BuscarPorClaveAsync(clave);
+
+    public Task<IReadOnlyList<EntradaDeBitacora>> ConsultarAsync(FiltroDeBitacora filtro) =>
+        _repositorio.ConsultarAsync(filtro);
 }

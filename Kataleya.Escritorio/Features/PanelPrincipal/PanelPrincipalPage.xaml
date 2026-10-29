@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage
     x:Class="Kataleya.Escritorio.Features.PanelPrincipal.PanelPrincipalPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:components="clr-namespace:Kataleya.Escritorio.Components.Layout"
+    xmlns:panel="clr-namespace:Kataleya.Contratos.Panel;assembly=Kataleya.Contratos"
     xmlns:ui="clr-namespace:Kataleya.Escritorio.UIHelpers.Behaviors"
     xmlns:vm="clr-namespace:Kataleya.Escritorio.Features.PanelPrincipal"
     x:DataType="vm:PanelPrincipalViewModel"
@@ -13,7 +14,7 @@
         x:Name="Raiz"
         ColumnDefinitions="232,*"
         RowDefinitions="58,*,32"
-        BackgroundColor="{StaticResource Fondo}">
+        BackgroundColor="{DynamicResource Fondo}">
 
         <components:BarraLateral
             x:Name="Lateral"
@@ -35,6 +36,7 @@
             Grid.RowSpan="2"
             Source="fondo_oscuro.png"
             Aspect="AspectFill"
+            IsVisible="{AppThemeBinding Light=False, Dark=True}"
             InputTransparent="True"
             SemanticProperties.Description="" />
 
@@ -72,19 +74,19 @@
                             FontFamily="InterBold"
                             FontSize="28"
                             LineHeight="1.2"
-                            TextColor="{StaticResource Texto}" />
+                            TextColor="{DynamicResource Texto}" />
                         <Label
                             Text="Este es el resumen de la operación de hoy."
                             FontSize="14"
-                            TextColor="{StaticResource TextoSuave}" />
+                            TextColor="{DynamicResource TextoSuave}" />
                     </VerticalStackLayout>
 
                     <Border
                         Grid.Column="1"
                         WidthRequest="257"
                         HeightRequest="64"
-                        BackgroundColor="{StaticResource Superficie}"
-                        Stroke="{StaticResource Borde}"
+                        BackgroundColor="{DynamicResource Superficie}"
+                        Stroke="{DynamicResource Borde}"
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 10">
                         <Grid ColumnDefinitions="28,*" ColumnSpacing="14" Padding="16,0">
@@ -93,7 +95,7 @@
                                 WidthRequest="24"
                                 HeightRequest="24"
                                 Aspect="Uniform"
-                                Stroke="{StaticResource TextoSuave}"
+                                Stroke="{DynamicResource TextoSuave}"
                                 HorizontalOptions="Center"
                                 VerticalOptions="Center" />
                             <VerticalStackLayout
@@ -104,12 +106,12 @@
                                     x:Name="LblDia"
                                     FontFamily="InterMedium"
                                     FontSize="13"
-                                    TextColor="{StaticResource TextoSuave}" />
+                                    TextColor="{DynamicResource TextoSuave}" />
                                 <Label
                                     x:Name="LblFecha"
                                     FontFamily="InterSemiBold"
                                     FontSize="14"
-                                    TextColor="{StaticResource Texto}" />
+                                    TextColor="{DynamicResource Texto}" />
                             </VerticalStackLayout>
                         </Grid>
                     </Border>
@@ -126,8 +128,8 @@
                         FlexLayout.Grow="1"
                         HeightRequest="92"
                         Margin="0,0,14,14"
-                        BackgroundColor="{StaticResource Superficie}"
-                        Stroke="{StaticResource Borde}"
+                        BackgroundColor="{DynamicResource Superficie}"
+                        Stroke="{DynamicResource Borde}"
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 10">
                         <Grid ColumnDefinitions="24,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="4" Padding="16,18">
@@ -136,7 +138,7 @@
                                 WidthRequest="24"
                                 HeightRequest="24"
                                 Aspect="Uniform"
-                                Stroke="#3B82F6"
+                                Stroke="{DynamicResource Info}"
                                 VerticalOptions="Start"
                                 Margin="0,2,0,0" />
                             <Label
@@ -144,14 +146,14 @@
                                 Text="Reservas registradas"
                                 FontFamily="InterMedium"
                                 FontSize="13"
-                                TextColor="{StaticResource TextoSuave}" />
+                                TextColor="{DynamicResource TextoSuave}" />
                             <Label
                                 Grid.Row="1"
                                 Grid.Column="1"
-                                Text="0"
+                                Text="{Binding ReservasRegistradas}"
                                 FontFamily="InterBold"
                                 FontSize="26"
-                                TextColor="{StaticResource Texto}" />
+                                TextColor="{DynamicResource Texto}" />
                         </Grid>
                     </Border>
 
@@ -160,8 +162,8 @@
                         FlexLayout.Grow="1"
                         HeightRequest="92"
                         Margin="0,0,14,14"
-                        BackgroundColor="{StaticResource Superficie}"
-                        Stroke="{StaticResource Borde}"
+                        BackgroundColor="{DynamicResource Superficie}"
+                        Stroke="{DynamicResource Borde}"
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 10">
                         <Grid ColumnDefinitions="24,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="4" Padding="16,18">
@@ -170,7 +172,7 @@
                                 WidthRequest="24"
                                 HeightRequest="24"
                                 Aspect="Uniform"
-                                Stroke="#22C55E"
+                                Stroke="{DynamicResource IconoVenta}"
                                 VerticalOptions="Start"
                                 Margin="0,2,0,0" />
                             <Label
@@ -178,14 +180,14 @@
                                 Text="Ventas"
                                 FontFamily="InterMedium"
                                 FontSize="13"
-                                TextColor="{StaticResource TextoSuave}" />
+                                TextColor="{DynamicResource TextoSuave}" />
                             <Label
                                 Grid.Row="1"
                                 Grid.Column="1"
-                                Text="0"
+                                Text="{Binding Ventas}"
                                 FontFamily="InterBold"
                                 FontSize="26"
-                                TextColor="{StaticResource Texto}" />
+                                TextColor="{DynamicResource Texto}" />
                         </Grid>
                     </Border>
 
@@ -194,8 +196,8 @@
                         FlexLayout.Grow="1"
                         HeightRequest="92"
                         Margin="0,0,14,14"
-                        BackgroundColor="{StaticResource Superficie}"
-                        Stroke="{StaticResource Borde}"
+                        BackgroundColor="{DynamicResource Superficie}"
+                        Stroke="{DynamicResource Borde}"
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 10">
                         <Grid ColumnDefinitions="24,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="4" Padding="16,18">
@@ -204,7 +206,7 @@
                                 WidthRequest="24"
                                 HeightRequest="24"
                                 Aspect="Uniform"
-                                Stroke="#22C55E"
+                                Stroke="{DynamicResource IconoVenta}"
                                 VerticalOptions="Start"
                                 Margin="0,2,0,0" />
                             <Label
@@ -212,14 +214,14 @@
                                 Text="Cobrado en efectivo"
                                 FontFamily="InterMedium"
                                 FontSize="13"
-                                TextColor="{StaticResource TextoSuave}" />
+                                TextColor="{DynamicResource TextoSuave}" />
                             <Label
                                 Grid.Row="1"
                                 Grid.Column="1"
-                                Text="S/ 0.00"
+                                Text="{Binding Efectivo}"
                                 FontFamily="InterBold"
                                 FontSize="26"
-                                TextColor="{StaticResource Texto}" />
+                                TextColor="{DynamicResource Texto}" />
                         </Grid>
                     </Border>
 
@@ -228,8 +230,8 @@
                         FlexLayout.Grow="1"
                         HeightRequest="92"
                         Margin="0,0,14,14"
-                        BackgroundColor="{StaticResource Superficie}"
-                        Stroke="{StaticResource Borde}"
+                        BackgroundColor="{DynamicResource Superficie}"
+                        Stroke="{DynamicResource Borde}"
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 10">
                         <Grid ColumnDefinitions="24,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="4" Padding="16,18">
@@ -238,7 +240,7 @@
                                 WidthRequest="24"
                                 HeightRequest="24"
                                 Aspect="Uniform"
-                                Stroke="#A855F7"
+                                Stroke="{DynamicResource IconoYape}"
                                 VerticalOptions="Start"
                                 Margin="0,2,0,0" />
                             <Label
@@ -246,14 +248,14 @@
                                 Text="Cobrado por Yape"
                                 FontFamily="InterMedium"
                                 FontSize="13"
-                                TextColor="{StaticResource TextoSuave}" />
+                                TextColor="{DynamicResource TextoSuave}" />
                             <Label
                                 Grid.Row="1"
                                 Grid.Column="1"
-                                Text="S/ 0.00"
+                                Text="{Binding Yape}"
                                 FontFamily="InterBold"
                                 FontSize="26"
-                                TextColor="{StaticResource Texto}" />
+                                TextColor="{DynamicResource Texto}" />
                         </Grid>
                     </Border>
 
@@ -262,8 +264,8 @@
                         FlexLayout.Grow="1"
                         HeightRequest="92"
                         Margin="0,0,0,14"
-                        BackgroundColor="{StaticResource Superficie}"
-                        Stroke="{StaticResource Borde}"
+                        BackgroundColor="{DynamicResource Superficie}"
+                        Stroke="{DynamicResource Borde}"
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 10">
                         <Grid ColumnDefinitions="24,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="4" Padding="16,18">
@@ -272,7 +274,7 @@
                                 WidthRequest="24"
                                 HeightRequest="24"
                                 Aspect="Uniform"
-                                Stroke="{StaticResource Advertencia}"
+                                Stroke="{DynamicResource Advertencia}"
                                 VerticalOptions="Start"
                                 Margin="0,2,0,0" />
                             <Label
@@ -280,14 +282,14 @@
                                 Text="Adelantos por cobrar"
                                 FontFamily="InterMedium"
                                 FontSize="13"
-                                TextColor="{StaticResource TextoSuave}" />
+                                TextColor="{DynamicResource TextoSuave}" />
                             <Label
                                 Grid.Row="1"
                                 Grid.Column="1"
-                                Text="S/ 0.00"
+                                Text="{Binding Adelantos}"
                                 FontFamily="InterBold"
                                 FontSize="26"
-                                TextColor="{StaticResource Texto}" />
+                                TextColor="{DynamicResource Texto}" />
                         </Grid>
                     </Border>
                 </FlexLayout>
@@ -295,8 +297,8 @@
                 <Border
                     Margin="0,24,0,0"
                     Padding="20,20,24,24"
-                    BackgroundColor="{StaticResource Superficie}"
-                    Stroke="{StaticResource Borde}"
+                    BackgroundColor="{DynamicResource Superficie}"
+                    Stroke="{DynamicResource Borde}"
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 12">
                     <VerticalStackLayout Spacing="0">
@@ -306,7 +308,7 @@
                                 WidthRequest="24"
                                 HeightRequest="24"
                                 Aspect="Uniform"
-                                Stroke="{StaticResource TextoSuave}"
+                                Stroke="{DynamicResource TextoSuave}"
                                 VerticalOptions="Center" />
                             <Label
                                 Text="Pasajes por horario de salida (hoy)"
@@ -317,14 +319,14 @@
 
                         <Border
                             Margin="0,20,0,0"
-                            BackgroundColor="{StaticResource Superficie}"
-                            Stroke="{StaticResource Borde}"
+                            BackgroundColor="{DynamicResource Superficie}"
+                            Stroke="{DynamicResource Borde}"
                             StrokeThickness="1"
                             StrokeShape="RoundRectangle 10">
                             <VerticalStackLayout Spacing="0">
                                 <Border
                                     HeightRequest="40"
-                                    BackgroundColor="{StaticResource SuperficieActiva}"
+                                    BackgroundColor="{DynamicResource SuperficieActiva}"
                                     StrokeThickness="0"
                                     StrokeShape="RoundRectangle 9,9,0,0">
                                     <Grid ColumnDefinitions="*,*,*,*,*">
@@ -336,55 +338,24 @@
                                     </Grid>
                                 </Border>
 
-                                <BoxView HeightRequest="1" Color="{StaticResource Borde}" />
+                                <BoxView HeightRequest="1" Color="{DynamicResource Borde}" />
 
-                                <Grid HeightRequest="40" ColumnDefinitions="*,*,*,*,*">
-                                    <Label Text="06:00" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="1" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="2" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="3" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="4" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                </Grid>
-
-                                <BoxView HeightRequest="1" Color="#23262C" />
-
-                                <Grid HeightRequest="40" ColumnDefinitions="*,*,*,*,*" BackgroundColor="{StaticResource SuperficieAlterna}">
-                                    <Label Text="10:00" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="1" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="2" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="3" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="4" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                </Grid>
-
-                                <BoxView HeightRequest="1" Color="#23262C" />
-
-                                <Grid HeightRequest="40" ColumnDefinitions="*,*,*,*,*">
-                                    <Label Text="13:00" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="1" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="2" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="3" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="4" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                </Grid>
-
-                                <BoxView HeightRequest="1" Color="#23262C" />
-
-                                <Grid HeightRequest="40" ColumnDefinitions="*,*,*,*,*" BackgroundColor="{StaticResource SuperficieAlterna}">
-                                    <Label Text="15:00" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="1" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="2" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="3" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="4" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                </Grid>
-
-                                <BoxView HeightRequest="1" Color="#23262C" />
-
-                                <Grid HeightRequest="40" ColumnDefinitions="*,*,*,*,*">
-                                    <Label Text="20:00" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="1" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="2" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="3" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="4" Text="0" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                </Grid>
+                                <CollectionView ItemsSource="{Binding Horarios}">
+                                    <CollectionView.EmptyView>
+                                        <Label Text="No hay horarios registrados." FontSize="13" TextColor="{DynamicResource TextoSuave}" HorizontalTextAlignment="Center" Margin="0,16" />
+                                    </CollectionView.EmptyView>
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="panel:DatosDeHorario">
+                                            <Grid HeightRequest="40" ColumnDefinitions="*,*,*,*,*">
+                                                <Label Text="{Binding Hora}" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                <Label Grid.Column="1" Text="{Binding Pasajes}" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                <Label Grid.Column="2" Text="{Binding Pagados}" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                <Label Grid.Column="3" Text="{Binding Reservados}" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                <Label Grid.Column="4" Text="{Binding ConAdelanto}" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
                             </VerticalStackLayout>
                         </Border>
 
@@ -394,7 +365,7 @@
                                 HeightRequest="44"
                                 MinimumWidthRequest="198"
                                 Padding="22,0"
-                                BackgroundColor="{StaticResource BotonClaro}"
+                                BackgroundColor="{DynamicResource BotonClaro}"
                                 StrokeThickness="0"
                                 StrokeShape="RoundRectangle 6"
                                 AutomationProperties.Name="Registrar pasaje">
@@ -408,13 +379,13 @@
                                         WidthRequest="20"
                                         HeightRequest="20"
                                         Aspect="Uniform"
-                                        Stroke="{StaticResource BotonClaroTexto}"
+                                        Stroke="{DynamicResource BotonClaroTexto}"
                                         VerticalOptions="Center" />
                                     <Label
                                         Text="Registrar pasaje"
                                         FontFamily="InterSemiBold"
                                         FontSize="15"
-                                        TextColor="{StaticResource BotonClaroTexto}"
+                                        TextColor="{DynamicResource BotonClaroTexto}"
                                         VerticalOptions="Center" />
                                 </HorizontalStackLayout>
                             </Border>
@@ -424,8 +395,8 @@
                                 HeightRequest="44"
                                 MinimumWidthRequest="163"
                                 Padding="22,0"
-                                BackgroundColor="{StaticResource BotonOscuro}"
-                                Stroke="{StaticResource BordeControl}"
+                                BackgroundColor="{DynamicResource BotonOscuro}"
+                                Stroke="{DynamicResource BordeControl}"
                                 StrokeThickness="1"
                                 StrokeShape="RoundRectangle 6"
                                 AutomationProperties.Name="Ver pasajes">
@@ -458,11 +429,11 @@
                 HorizontalOptions="Center"
                 VerticalOptions="Center"
                 Spacing="14">
-                <Label Text="Empresa Turismo VIP Kataleya SV E.I.R.L." FontSize="12" TextColor="{StaticResource TextoSuave}" VerticalOptions="Center" />
-                <Label Text="|" FontSize="12" TextColor="{StaticResource TextoTenue}" VerticalOptions="Center" />
-                <Label Text="Uniendo a las familias peruanas" FontSize="12" TextColor="{StaticResource TextoSuave}" VerticalOptions="Center" />
-                <Label Text="|" FontSize="12" TextColor="{StaticResource TextoTenue}" VerticalOptions="Center" />
-                <Label Text="Ica - Hyo. - viceversa" FontSize="12" TextColor="{StaticResource TextoSuave}" VerticalOptions="Center" />
+                <Label Text="Empresa Turismo VIP Kataleya SV E.I.R.L." FontSize="12" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center" />
+                <Label Text="|" FontSize="12" TextColor="{DynamicResource TextoTenue}" VerticalOptions="Center" />
+                <Label Text="Uniendo a las familias peruanas" FontSize="12" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center" />
+                <Label Text="|" FontSize="12" TextColor="{DynamicResource TextoTenue}" VerticalOptions="Center" />
+                <Label Text="Ica - Hyo. - viceversa" FontSize="12" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center" />
             </HorizontalStackLayout>
         </Grid>
     </Grid>

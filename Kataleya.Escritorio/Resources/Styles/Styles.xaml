@@ -7,36 +7,82 @@
     </ResourceDictionary.MergedDictionaries>
 
     <Style TargetType="ContentPage">
-        <Setter Property="BackgroundColor" Value="{StaticResource Fondo}" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource Fondo}" />
     </Style>
 
     <Style TargetType="Label">
         <Setter Property="FontFamily" Value="InterRegular" />
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="TextColor" Value="{StaticResource Texto}" />
+        <Setter Property="TextColor" Value="{DynamicResource Texto}" />
     </Style>
 
     <Style x:Key="TituloDePagina" TargetType="Label">
         <Setter Property="FontFamily" Value="InterSemiBold" />
         <Setter Property="FontSize" Value="22" />
-        <Setter Property="TextColor" Value="{StaticResource Texto}" />
+        <Setter Property="TextColor" Value="{DynamicResource Texto}" />
+    </Style>
+
+    <Style x:Key="SubtituloDePagina" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterRegular" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{DynamicResource TextoSuave}" />
+    </Style>
+
+    <Style x:Key="TituloDeSeccion" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterSemiBold" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{DynamicResource Texto}" />
     </Style>
 
     <Style x:Key="EtiquetaDeCampo" TargetType="Label">
         <Setter Property="FontFamily" Value="InterMedium" />
         <Setter Property="FontSize" Value="13" />
-        <Setter Property="TextColor" Value="{StaticResource TextoSuave}" />
+        <Setter Property="TextColor" Value="{DynamicResource TextoSuave}" />
     </Style>
 
     <Style x:Key="TextoDeError" TargetType="Label">
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="TextColor" Value="{StaticResource PeligroTexto}" />
+        <Setter Property="TextColor" Value="{DynamicResource PeligroTexto}" />
+    </Style>
+
+    <Style x:Key="Tarjeta" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{DynamicResource Superficie}" />
+        <Setter Property="Stroke" Value="{DynamicResource Borde}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+        <Setter Property="Padding" Value="20" />
+    </Style>
+
+    <Style x:Key="TarjetaCompacta" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{DynamicResource Superficie}" />
+        <Setter Property="Stroke" Value="{DynamicResource Borde}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+        <Setter Property="Padding" Value="13" />
+    </Style>
+
+    <Style x:Key="CampoDeFormulario" TargetType="Border">
+        <Setter Property="HeightRequest" Value="36" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource Superficie}" />
+        <Setter Property="Stroke" Value="{DynamicResource BordeControl}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+    </Style>
+
+    <Style x:Key="CampoSoloLectura" TargetType="Border">
+        <Setter Property="HeightRequest" Value="36" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource CampoSoloLectura}" />
+        <Setter Property="Stroke" Value="{DynamicResource Borde}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 6" />
     </Style>
 
     <Style TargetType="Entry">
         <Setter Property="BackgroundColor" Value="Transparent" />
-        <Setter Property="TextColor" Value="{StaticResource Texto}" />
-        <Setter Property="PlaceholderColor" Value="{StaticResource TextoTenue}" />
+        <Setter Property="TextColor" Value="{DynamicResource Texto}" />
+        <Setter Property="PlaceholderColor" Value="{DynamicResource TextoTenue}" />
         <Setter Property="FontFamily" Value="InterRegular" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="HeightRequest" Value="34" />
@@ -45,8 +91,8 @@
 
     <Style TargetType="Picker">
         <Setter Property="BackgroundColor" Value="Transparent" />
-        <Setter Property="TextColor" Value="{StaticResource Texto}" />
-        <Setter Property="TitleColor" Value="{StaticResource TextoTenue}" />
+        <Setter Property="TextColor" Value="{DynamicResource Texto}" />
+        <Setter Property="TitleColor" Value="{DynamicResource TextoTenue}" />
         <Setter Property="FontFamily" Value="InterRegular" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="HeightRequest" Value="36" />
@@ -59,9 +105,9 @@
         <Setter Property="HeightRequest" Value="36" />
         <Setter Property="CornerRadius" Value="6" />
         <Setter Property="Padding" Value="16,0" />
-        <Setter Property="BackgroundColor" Value="{StaticResource BotonOscuro}" />
-        <Setter Property="TextColor" Value="{StaticResource Texto}" />
-        <Setter Property="BorderColor" Value="{StaticResource BordeControl}" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource BotonOscuro}" />
+        <Setter Property="TextColor" Value="{DynamicResource Texto}" />
+        <Setter Property="BorderColor" Value="{DynamicResource BordeControl}" />
         <Setter Property="BorderWidth" Value="1" />
     </Style>
 
@@ -71,10 +117,12 @@
         <Setter Property="HeightRequest" Value="36" />
         <Setter Property="CornerRadius" Value="6" />
         <Setter Property="Padding" Value="16,0" />
-        <Setter Property="BackgroundColor" Value="{StaticResource BotonClaro}" />
-        <Setter Property="TextColor" Value="{StaticResource BotonClaroTexto}" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource BotonClaro}" />
+        <Setter Property="TextColor" Value="{DynamicResource BotonClaroTexto}" />
         <Setter Property="BorderWidth" Value="0" />
     </Style>
+
+    <Style x:Key="BotonPrimario" TargetType="Button" BasedOn="{StaticResource EstiloBotonClaro}" />
 
     <Style x:Key="BotonSecundario" TargetType="Button">
         <Setter Property="FontFamily" Value="InterSemiBold" />
@@ -82,9 +130,9 @@
         <Setter Property="HeightRequest" Value="36" />
         <Setter Property="CornerRadius" Value="6" />
         <Setter Property="Padding" Value="16,0" />
-        <Setter Property="BackgroundColor" Value="{StaticResource BotonOscuro}" />
-        <Setter Property="TextColor" Value="{StaticResource Texto}" />
-        <Setter Property="BorderColor" Value="{StaticResource BordeControl}" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource BotonOscuro}" />
+        <Setter Property="TextColor" Value="{DynamicResource Texto}" />
+        <Setter Property="BorderColor" Value="{DynamicResource BordeControl}" />
         <Setter Property="BorderWidth" Value="1" />
     </Style>
 
@@ -94,19 +142,23 @@
         <Setter Property="HeightRequest" Value="36" />
         <Setter Property="CornerRadius" Value="6" />
         <Setter Property="Padding" Value="16,0" />
-        <Setter Property="BackgroundColor" Value="{StaticResource BotonOscuro}" />
-        <Setter Property="TextColor" Value="{StaticResource PeligroTexto}" />
-        <Setter Property="BorderColor" Value="{StaticResource Peligro}" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource BotonOscuro}" />
+        <Setter Property="TextColor" Value="{DynamicResource PeligroTexto}" />
+        <Setter Property="BorderColor" Value="{DynamicResource Peligro}" />
         <Setter Property="BorderWidth" Value="1" />
     </Style>
 
+    <Style x:Key="BotonDeshabilitado" TargetType="Button">
+        <Setter Property="Opacity" Value="0.45" />
+    </Style>
+
     <Style TargetType="ActivityIndicator">
-        <Setter Property="Color" Value="{StaticResource TextoSuave}" />
+        <Setter Property="Color" Value="{DynamicResource TextoSuave}" />
     </Style>
 
     <Style TargetType="Path">
         <Setter Property="Fill" Value="Transparent" />
-        <Setter Property="Stroke" Value="{StaticResource TextoSuave}" />
+        <Setter Property="Stroke" Value="{DynamicResource TextoSuave}" />
         <Setter Property="StrokeThickness" Value="1.75" />
         <Setter Property="StrokeLineCap" Value="Round" />
         <Setter Property="StrokeLineJoin" Value="Round" />

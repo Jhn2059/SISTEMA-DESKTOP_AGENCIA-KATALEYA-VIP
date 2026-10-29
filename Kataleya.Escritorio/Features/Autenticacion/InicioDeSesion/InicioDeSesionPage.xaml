@@ -9,10 +9,11 @@
     x:DataType="vm:InicioDeSesionViewModel"
     ui:CicloDeVidaDePagina.AlAparecer="{Binding LimpiarCommand}"
     Shell.NavBarIsVisible="False">
-    <Grid BackgroundColor="{StaticResource Fondo}">
+    <Grid BackgroundColor="{DynamicResource Fondo}">
         <Image
             Source="fondo_oscuro.png"
             Aspect="AspectFill"
+            IsVisible="{AppThemeBinding Light=False, Dark=True}"
             InputTransparent="True"
             SemanticProperties.Description="" />
 
@@ -40,13 +41,13 @@
             Padding="40,32,40,36"
             HorizontalOptions="Center"
             VerticalOptions="Center"
-            BackgroundColor="{StaticResource Superficie}"
-            Stroke="{StaticResource Acento}"
+            BackgroundColor="{DynamicResource Superficie}"
+            Stroke="{DynamicResource Acento}"
             StrokeThickness="1"
             StrokeShape="RoundRectangle 14">
             <Border.Shadow>
                 <Shadow
-                    Brush="#ED1C24"
+                    Brush="{DynamicResource Acento}"
                     Offset="0,0"
                     Radius="18"
                     Opacity="0.35" />
@@ -65,7 +66,7 @@
                     WidthRequest="48"
                     HeightRequest="3"
                     Margin="0,16,0,0"
-                    Color="{StaticResource Acento}"
+                    Color="{DynamicResource Acento}"
                     HorizontalOptions="Center" />
 
                 <Label
@@ -73,7 +74,7 @@
                     FontFamily="InterSemiBold"
                     FontSize="24"
                     LineHeight="1.2"
-                    TextColor="{StaticResource Texto}"
+                    TextColor="{DynamicResource Texto}"
                     HorizontalTextAlignment="Center"
                     Margin="0,16,0,0" />
 
@@ -83,8 +84,8 @@
                     <Border
                         MinimumHeightRequest="87"
                         Padding="12,12,14,12"
-                        BackgroundColor="{StaticResource AcentoFondo}"
-                        Stroke="{StaticResource AcentoBorde}"
+                        BackgroundColor="{DynamicResource AcentoFondo}"
+                        Stroke="{DynamicResource AcentoBorde}"
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 8"
                         IsVisible="{Binding MensajeDeError, Converter={StaticResource TextoNoVacio}}">
@@ -97,13 +98,13 @@
                                 HorizontalOptions="Start"
                                 VerticalOptions="Start"
                                 Data="{StaticResource IconoAlerta}"
-                                Stroke="{StaticResource Peligro}"
+                                Stroke="{DynamicResource Peligro}"
                                 StrokeThickness="1.75"
                                 Aspect="Uniform" />
                             <Label
                                 Grid.Column="1"
                                 Text="{Binding MensajeDeError}"
-                                TextColor="{StaticResource PeligroTexto}"
+                                TextColor="{DynamicResource PeligroTexto}"
                                 FontFamily="InterMedium"
                                 FontSize="13"
                                 LineHeight="1.55"
@@ -141,7 +142,7 @@
                         HeightRequest="44"
                         Margin="0,18,0,0"
                         Padding="20,0"
-                        BackgroundColor="{StaticResource BotonClaro}"
+                        BackgroundColor="{DynamicResource BotonClaro}"
                         StrokeThickness="0"
                         StrokeShape="RoundRectangle 6"
                         IsEnabled="{Binding PuedeIngresar}"
@@ -178,13 +179,13 @@
                                     WidthRequest="20"
                                     HeightRequest="20"
                                     Data="{StaticResource IconoIngresar}"
-                                    Stroke="{StaticResource BotonClaroTexto}"
+                                    Stroke="{DynamicResource BotonClaroTexto}"
                                     StrokeThickness="1.75"
                                     Aspect="Uniform"
                                     VerticalOptions="Center" />
                                 <Label
                                     Text="Ingresar"
-                                    TextColor="{StaticResource BotonClaroTexto}"
+                                    TextColor="{DynamicResource BotonClaroTexto}"
                                     FontFamily="InterSemiBold"
                                     FontSize="16"
                                     VerticalOptions="Center" />
@@ -193,7 +194,7 @@
                             <ActivityIndicator
                                 WidthRequest="20"
                                 HeightRequest="20"
-                                Color="{StaticResource BotonClaroTexto}"
+                                Color="{DynamicResource BotonClaroTexto}"
                                 IsRunning="{Binding EstaCargando}"
                                 IsVisible="{Binding EstaCargando}"
                                 HorizontalOptions="Center"

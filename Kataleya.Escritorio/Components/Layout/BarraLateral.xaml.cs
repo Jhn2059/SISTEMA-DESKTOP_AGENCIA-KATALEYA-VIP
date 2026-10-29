@@ -1,4 +1,4 @@
-using Microsoft.Maui.Graphics;
+using Kataleya.Escritorio.UIHelpers;
 
 namespace Kataleya.Escritorio.Components.Layout;
 
@@ -24,7 +24,6 @@ public partial class BarraLateral : ContentView
         typeof(BarraLateral),
         true);
 
-    private static readonly Color FondoOpcionHover = Color.FromArgb("#1C2028");
     private readonly List<(Border Opcion, BoxView Acento)> _opciones;
 
     public BarraLateral()
@@ -38,12 +37,12 @@ public partial class BarraLateral : ContentView
             (OpcionPasajes, AcentoPasajes),
             (OpcionCuadre, AcentoCuadre),
             (OpcionDiferido, AcentoDiferido),
-            (OpcionTarifas, AcentoTarifas),
-            (OpcionUsuarios, AcentoUsuarios),
-            (OpcionBitacora, AcentoBitacora)
+            (OpcionBitacora, AcentoBitacora),
+            (OpcionConfiguracion, AcentoConfiguracion)
         ];
 
         ActualizarOpcionActiva();
+        ServicioDeTema.Cambio += AlCambiarTema;
     }
 
     public event EventHandler<OpcionSeleccionadaEventArgs>? OpcionSeleccionada;
@@ -62,12 +61,17 @@ public partial class BarraLateral : ContentView
         set => SetValue(EsAdministradorProperty, value);
     }
 
+    private void AlCambiarTema(object? remitente, EventArgs argumentos) =>
+        Dispatcher.Dispatch(ActualizarOpcionActiva);
+
     private void ActualizarOpcionActiva()
     {
         foreach (var (opcion, acento) in _opciones)
         {
             var activa = opcion.ClassId == OpcionActiva;
-            opcion.BackgroundColor = activa ? Colores.SuperficieActiva : Colors.Transparent;
+            opcion.BackgroundColor = activa
+                ? ServicioDeTema.Color("SuperficieActiva")
+                : Colors.Transparent;
             acento.IsVisible = activa;
         }
     }
@@ -91,7 +95,7 @@ public partial class BarraLateral : ContentView
     {
         if (remitente is Border borde && borde.ClassId != OpcionActiva)
         {
-            borde.BackgroundColor = FondoOpcionHover;
+            borde.BackgroundColor = ServicioDeTema.Color("SuperficieHover");
         }
     }
 
@@ -100,13 +104,8 @@ public partial class BarraLateral : ContentView
         if (remitente is Border borde)
         {
             borde.BackgroundColor = borde.ClassId == OpcionActiva
-                ? Colores.SuperficieActiva
+                ? ServicioDeTema.Color("SuperficieActiva")
                 : Colors.Transparent;
         }
-    }
-
-    private static class Colores
-    {
-        public static readonly Color SuperficieActiva = Color.FromArgb("#22262E");
     }
 }

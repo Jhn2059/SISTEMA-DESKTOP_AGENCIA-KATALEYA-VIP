@@ -10,7 +10,7 @@ public partial class App : Application
     public App(IServiceProvider servicios)
     {
         InitializeComponent();
-        UserAppTheme = AppTheme.Dark;
+        ServicioDeTema.Inicializar();
         _shell = servicios.GetRequiredService<AppShell>();
     }
 

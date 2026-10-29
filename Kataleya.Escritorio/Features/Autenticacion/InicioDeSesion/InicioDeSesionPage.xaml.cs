@@ -5,9 +5,6 @@ namespace Kataleya.Escritorio.Features.Autenticacion.InicioDeSesion;
 
 public partial class InicioDeSesionPage : ContentPage
 {
-    private static readonly Color FondoBoton = Color.FromArgb("#F1F2F4");
-    private static readonly Color FondoBotonHover = Color.FromArgb("#FFFFFF");
-
     public InicioDeSesionPage(InicioDeSesionViewModel modelo)
     {
         InitializeComponent();
@@ -26,13 +23,13 @@ public partial class InicioDeSesionPage : ContentPage
     {
         if (BotonIngresar.IsEnabled)
         {
-            BotonIngresar.BackgroundColor = FondoBotonHover;
+            BotonIngresar.BackgroundColor = ServicioDeTema.Color("BotonClaroHover");
         }
     }
 
     private void AlSalirBoton(object? remitente, PointerEventArgs argumentos)
     {
-        BotonIngresar.BackgroundColor = FondoBoton;
+        BotonIngresar.BackgroundColor = ServicioDeTema.Color("BotonClaro");
     }
 }
 

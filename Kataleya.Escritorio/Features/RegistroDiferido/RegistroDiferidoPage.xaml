@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<paginas:PaginaDeModulo
+    x:Class="Kataleya.Escritorio.Features.RegistroDiferido.RegistroDiferidoPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:paginas="clr-namespace:Kataleya.Escritorio.UIHelpers.Paginas"
+    xmlns:common="clr-namespace:Kataleya.Escritorio.Components.Common">
+    <ScrollView VerticalScrollBarVisibility="Never">
+        <VerticalStackLayout Padding="24,16,24,24" Spacing="0">
+
+            <HorizontalStackLayout Spacing="14" VerticalOptions="Center">
+                <Label Text="Registro diferido" Style="{StaticResource TituloDePagina}" VerticalOptions="Center" />
+                <Label Text="Pasajes emitidos con talonario durante una contingencia" Style="{StaticResource SubtituloDePagina}" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Border Style="{StaticResource Tarjeta}" Margin="0,12,0,0">
+                <VerticalStackLayout Spacing="14">
+
+                    <Label Text="Boleto del talonario" FontFamily="InterSemiBold" FontSize="15" />
+                    <Grid ColumnDefinitions="240,240,*" ColumnSpacing="12">
+                        <common:CampoDeTexto x:Name="CampoTalonario" Etiqueta="N.º de boleto del talonario *" Placeholder="T-0001" />
+                        <common:CampoDeTexto x:Name="CampoHoraEmision" Grid.Column="1" Etiqueta="Fecha y hora reales de emisión *" Placeholder="dd/MM/yyyy HH:mm" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="{DynamicResource Borde}" Margin="0,4" />
+
+                    <Label Text="Pasajero" FontFamily="InterSemiBold" FontSize="15" />
+                    <Grid ColumnDefinitions="*,190,180,180" ColumnSpacing="12">
+                        <common:CampoDeTexto x:Name="CampoNombre" Etiqueta="Nombre *" Placeholder="Nombre Apellido" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="Documento *" Style="{StaticResource EtiquetaDeCampo}" />
+                            <Border Style="{StaticResource CampoDeFormulario}">
+                                <Picker x:Name="SelectorTipoDocumento" Title="DNI">
+                                    <Picker.ItemsSource>
+                                        <x:Array Type="{x:Type x:String}">
+                                            <x:String>DNI</x:String>
+                                            <x:String>Pasaporte</x:String>
+                                        </x:Array>
+                                    </Picker.ItemsSource>
+                                </Picker>
+                            </Border>
+                        </VerticalStackLayout>
+                        <common:CampoDeTexto x:Name="CampoDocumento" Grid.Column="2" Etiqueta="N.º de documento *" Placeholder="12345678" />
+                        <common:CampoDeTexto x:Name="CampoTelefono" Grid.Column="3" Etiqueta="Teléfono" Placeholder="9XX XXX XXX" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="{DynamicResource Borde}" Margin="0,4" />
+
+                    <Label Text="Viaje" FontFamily="InterSemiBold" FontSize="15" />
+                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
+                        <common:CampoDeTexto x:Name="CampoDestino" Etiqueta="Destino *" Placeholder="Huancayo" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="Fecha de salida *" Style="{StaticResource EtiquetaDeCampo}" />
+                            <Border Style="{StaticResource CampoDeFormulario}">
+                                <DatePicker x:Name="FechaSalida" Format="dd/MM/yyyy" />
+                            </Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="2" Spacing="6">
+                            <Label Text="Horario *" Style="{StaticResource EtiquetaDeCampo}" />
+                            <Border Style="{StaticResource CampoDeFormulario}">
+                                <Picker x:Name="SelectorHora" Title="Seleccione horario" />
+                            </Border>
+                        </VerticalStackLayout>
+                        <common:CampoDeTexto x:Name="CampoEmbarque" Grid.Column="3" Etiqueta="Lugar de embarque *" Placeholder="Agencia" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                        <common:CampoDeTexto x:Name="CampoOrigen" Etiqueta="Origen *" Placeholder="Ica" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="Unidad *" Style="{StaticResource EtiquetaDeCampo}" />
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Border Style="{StaticResource CampoDeFormulario}">
+                                    <Picker x:Name="SelectorUnidad" Title="Sin unidades disponibles" />
+                                </Border>
+                                <Button Grid.Column="1" x:Name="BotonAbrirUnidad" Text="Abrir" Style="{StaticResource BotonSecundario}" FontSize="12" Padding="12,0" Clicked="AlAbrirUnidad" />
+                            </Grid>
+                        </VerticalStackLayout>
+                        <common:CampoDeTexto x:Name="CampoAsiento" Grid.Column="2" Etiqueta="Asiento *" Placeholder="1" Keyboard="Numeric" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="{DynamicResource Borde}" Margin="0,4" />
+
+                    <Label Text="Cobro" FontFamily="InterSemiBold" FontSize="15" />
+                    <Grid ColumnDefinitions="220,220,*" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Importe" Style="{StaticResource EtiquetaDeCampo}" />
+                            <Border Style="{StaticResource CampoSoloLectura}">
+                                <Label x:Name="LblImporte" Text="S/ 0.00" FontSize="14" VerticalOptions="Center" />
+                            </Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="Medio de pago" Style="{StaticResource EtiquetaDeCampo}" />
+                            <Border Style="{StaticResource CampoDeFormulario}">
+                                <Picker x:Name="SelectorMedio" Title="Seleccione medio">
+                                    <Picker.ItemsSource>
+                                        <x:Array Type="{x:Type x:String}">
+                                            <x:String>Efectivo</x:String>
+                                            <x:String>Yape</x:String>
+                                        </x:Array>
+                                    </Picker.ItemsSource>
+                                </Picker>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Border Padding="12" BackgroundColor="{DynamicResource InfoFondo}" Stroke="{DynamicResource InfoBorde}" StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                        <Grid ColumnDefinitions="18,*" ColumnSpacing="10">
+                            <Path Data="{StaticResource IconoInfo}" WidthRequest="18" HeightRequest="18" Stroke="{DynamicResource InfoTexto}" VerticalOptions="Start" Margin="0,1,0,0" />
+                            <Label Grid.Column="1" Text="El pasaje queda marcado como «registro diferido» y no se imprime boleto: el pasajero ya tiene el del talonario. El número de boleto no puede repetirse y la fecha de emisión no puede ser posterior al momento del registro." FontFamily="InterMedium" FontSize="13" TextColor="{DynamicResource InfoTexto}" LineHeight="1.23" />
+                        </Grid>
+                    </Border>
+
+                    <HorizontalStackLayout Spacing="12">
+                        <Button x:Name="BotonRegistrar" Text="Registrar pasaje diferido" Style="{StaticResource BotonPrimario}" Clicked="AlRegistrar" />
+                        <Button Text="Cancelar" Style="{StaticResource BotonSecundario}" Clicked="AlCancelar" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</paginas:PaginaDeModulo>

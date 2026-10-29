@@ -6,16 +6,12 @@ namespace Kataleya.Escritorio.UIHelpers;
 
 public static class BarraDeTitulo
 {
-    private static readonly Color Fondo = Color.FromArgb("#161A21");
-    private static readonly Color Texto = Color.FromArgb("#F1F2F4");
-    private static readonly Color TextoSuave = Color.FromArgb("#A9AFB9");
-    private static readonly Color SuperficieActiva = Color.FromArgb("#22262E");
-    private static readonly Color SuperficieHover = Color.FromArgb("#1C2028");
-
     private static TitleBar? _barra;
     private static Image? _logo;
     private static Border? _botonDeMenu;
     private static Border? _usuario;
+    private static Border? _avatar;
+    private static Label? _titulo;
     private static Label? _nombre;
     private static Label? _rol;
     private static Label? _sede;
@@ -36,12 +32,11 @@ public static class BarraDeTitulo
 
         _botonDeMenu = CrearBotonDeMenu();
 
-        var titulo = new Label
+        _titulo = new Label
         {
             Text = "Sistema de la Agencia Kataleya VIP",
             FontFamily = "InterSemiBold",
             FontSize = 14,
-            TextColor = Texto,
             VerticalOptions = LayoutOptions.Center,
             LineBreakMode = LineBreakMode.TailTruncation,
             MaxLines = 1,
@@ -55,18 +50,19 @@ public static class BarraDeTitulo
         };
         izquierda.Children.Add(_logo);
         izquierda.Children.Add(_botonDeMenu);
-        izquierda.Children.Add(titulo);
+        izquierda.Children.Add(_titulo);
 
         _usuario = CrearUsuario();
 
         _barra = new TitleBar
         {
             HeightRequest = 48,
-            BackgroundColor = Fondo,
-            ForegroundColor = Texto,
             LeadingContent = izquierda,
             TrailingContent = _usuario
         };
+
+        ServicioDeTema.Cambio += (_, _) => ActualizarTema();
+        ActualizarTema();
 
         return _barra;
     }
@@ -138,6 +134,45 @@ public static class BarraDeTitulo
         {
             _sede.Text = $"Sede: {sede}";
         }
+
+        ActualizarTema();
+    }
+
+    private static void ActualizarTema()
+    {
+        var texto = ServicioDeTema.Color("Texto");
+        var textoSuave = ServicioDeTema.Color("TextoSuave");
+
+        if (_barra is not null)
+        {
+            _barra.BackgroundColor = ServicioDeTema.Color("Superficie");
+            _barra.ForegroundColor = texto;
+        }
+
+        if (_titulo is not null)
+        {
+            _titulo.TextColor = texto;
+        }
+
+        if (_avatar is not null)
+        {
+            _avatar.BackgroundColor = ServicioDeTema.Color("SuperficieActiva");
+        }
+
+        if (_nombre is not null)
+        {
+            _nombre.TextColor = texto;
+        }
+
+        if (_rol is not null)
+        {
+            _rol.TextColor = textoSuave;
+        }
+
+        if (_sede is not null)
+        {
+            _sede.TextColor = textoSuave;
+        }
     }
 
     private static Border CrearBotonDeMenu()
@@ -166,7 +201,8 @@ public static class BarraDeTitulo
         };
 
         var puntero = new PointerGestureRecognizer();
-        puntero.PointerEntered += (_, _) => boton.BackgroundColor = SuperficieHover;
+        puntero.PointerEntered += (_, _) =>
+            boton.BackgroundColor = ServicioDeTema.Color("SuperficieHover");
         puntero.PointerExited += (_, _) => boton.BackgroundColor = Colors.Transparent;
         boton.GestureRecognizers.Add(puntero);
 
@@ -179,12 +215,11 @@ public static class BarraDeTitulo
 
     private static Border CrearUsuario()
     {
-        var avatar = new Border
+        _avatar = new Border
         {
             WidthRequest = 26,
             HeightRequest = 26,
             StrokeThickness = 0,
-            BackgroundColor = SuperficieActiva,
             StrokeShape = new RoundRectangle { CornerRadius = 13 },
             VerticalOptions = LayoutOptions.Center,
             Content = new Ruta
@@ -202,21 +237,18 @@ public static class BarraDeTitulo
         {
             FontFamily = "InterSemiBold",
             FontSize = 13,
-            TextColor = Texto,
             LineHeight = 1
         };
 
         _rol = new Label
         {
             FontSize = 11,
-            TextColor = TextoSuave,
             LineHeight = 1
         };
 
         _sede = new Label
         {
             FontSize = 11,
-            TextColor = TextoSuave,
             LineHeight = 1
         };
 
@@ -245,7 +277,7 @@ public static class BarraDeTitulo
             Spacing = 8,
             VerticalOptions = LayoutOptions.Center
         };
-        contenido.Children.Add(avatar);
+        contenido.Children.Add(_avatar);
         contenido.Children.Add(datos);
         contenido.Children.Add(chevron);
 
@@ -262,7 +294,8 @@ public static class BarraDeTitulo
         };
 
         var puntero = new PointerGestureRecognizer();
-        puntero.PointerEntered += (_, _) => bloque.BackgroundColor = SuperficieHover;
+        puntero.PointerEntered += (_, _) =>
+            bloque.BackgroundColor = ServicioDeTema.Color("SuperficieHover");
         puntero.PointerExited += (_, _) => bloque.BackgroundColor = Colors.Transparent;
         bloque.GestureRecognizers.Add(puntero);
 
@@ -279,5 +312,3 @@ public static class BarraDeTitulo
         return bloque;
     }
 }
-
-

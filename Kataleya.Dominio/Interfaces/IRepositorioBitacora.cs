@@ -7,4 +7,8 @@ public interface IRepositorioBitacora
     Task AgregarAsync(RegistroDeBitacora registro);
 
     Task<bool> ExisteClaveAsync(Guid clave);
+
+    Task<EntradaDeBitacora?> BuscarPorClaveAsync(Guid clave);
+
+    Task<IReadOnlyList<EntradaDeBitacora>> ConsultarAsync(FiltroDeBitacora filtro);
 }

@@ -3,6 +3,11 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
+    <!--
+        Valores oscuros por defecto. ServicioDeTema reemplaza estos valores
+        en tiempo de ejecución según la preferencia guardada (claro u oscuro).
+    -->
+
     <Color x:Key="Fondo">#0D0F13</Color>
     <Color x:Key="Superficie">#161A21</Color>
     <Color x:Key="SuperficieElevada">#1A1E25</Color>
@@ -13,10 +18,12 @@
     <Color x:Key="Borde">#2A2F38</Color>
     <Color x:Key="BordeControl">#646B78</Color>
     <Color x:Key="BordeControlHover">#8A909A</Color>
+    <Color x:Key="BordeDeshabilitado">#3A404A</Color>
 
     <Color x:Key="Texto">#F1F2F4</Color>
     <Color x:Key="TextoSuave">#A9AFB9</Color>
     <Color x:Key="TextoTenue">#646B78</Color>
+    <Color x:Key="TextoInverso">#16181D</Color>
 
     <Color x:Key="Acento">#ED1C24</Color>
     <Color x:Key="AcentoFondo">#2E0F11</Color>
@@ -24,6 +31,8 @@
 
     <Color x:Key="Peligro">#EF4444</Color>
     <Color x:Key="PeligroTexto">#FCA5A5</Color>
+    <Color x:Key="PeligroHover">#251014</Color>
+    <Color x:Key="PeligroBordeHover">#F87171</Color>
     <Color x:Key="Error">#FCA5A5</Color>
 
     <Color x:Key="Exito">#86EFAC</Color>
@@ -38,13 +47,23 @@
     <Color x:Key="Info">#3B82F6</Color>
     <Color x:Key="InfoFondo">#0E1D36</Color>
     <Color x:Key="InfoBorde">#1E4A8C</Color>
+    <Color x:Key="InfoTexto">#93C5FD</Color>
+
+    <Color x:Key="IconoVenta">#22C55E</Color>
+    <Color x:Key="IconoYape">#A855F7</Color>
 
     <Color x:Key="BotonClaro">#F1F2F4</Color>
     <Color x:Key="BotonClaroHover">#FFFFFF</Color>
     <Color x:Key="BotonClaroTexto">#16181D</Color>
     <Color x:Key="BotonOscuro">#1A1E25</Color>
     <Color x:Key="BotonOscuroHover">#232935</Color>
+    <Color x:Key="CerrarHover">#C42B1C</Color>
 
     <Color x:Key="Seleccion">#0E1D36</Color>
     <Color x:Key="SeleccionBorde">#4C8DFF</Color>
+
+    <Color x:Key="EncabezadoTabla">#22262E</Color>
+    <Color x:Key="CampoSoloLectura">#1A1E25</Color>
+    <Color x:Key="DeshabilitadoFondo">#22262E</Color>
+    <Color x:Key="DeshabilitadoTexto">#646B78</Color>
 </ResourceDictionary>

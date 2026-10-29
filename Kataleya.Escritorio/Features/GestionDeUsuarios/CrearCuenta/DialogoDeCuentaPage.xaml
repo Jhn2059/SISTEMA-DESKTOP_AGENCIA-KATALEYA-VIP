@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage
     x:Class="Kataleya.Escritorio.Features.GestionDeUsuarios.CrearCuenta.DialogoDeCuentaPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -21,7 +21,7 @@
                 MaxLength="100" />
             <Label
                 Text="{Binding ErrorNombre}"
-                TextColor="{StaticResource Error}"
+                TextColor="{DynamicResource Error}"
                 FontSize="12"
                 IsVisible="{Binding ErrorNombre, Converter={StaticResource TextoNoVacio}}" />
 
@@ -32,7 +32,7 @@
                 MaxLength="30" />
             <Label
                 Text="{Binding ErrorNombreUsuario}"
-                TextColor="{StaticResource Error}"
+                TextColor="{DynamicResource Error}"
                 FontSize="12"
                 IsVisible="{Binding ErrorNombreUsuario, Converter={StaticResource TextoNoVacio}}" />
 
@@ -43,7 +43,7 @@
                 IsPassword="True" />
             <Label
                 Text="{Binding ErrorContrasena}"
-                TextColor="{StaticResource Error}"
+                TextColor="{DynamicResource Error}"
                 FontSize="12"
                 IsVisible="{Binding ErrorContrasena, Converter={StaticResource TextoNoVacio}}" />
 
@@ -55,7 +55,7 @@
                 Title="Seleccione un rol" />
             <Label
                 Text="{Binding ErrorRol}"
-                TextColor="{StaticResource Error}"
+                TextColor="{DynamicResource Error}"
                 FontSize="12"
                 IsVisible="{Binding ErrorRol, Converter={StaticResource TextoNoVacio}}" />
 
@@ -67,13 +67,13 @@
                 Title="Seleccione una sede" />
             <Label
                 Text="{Binding ErrorSede}"
-                TextColor="{StaticResource Error}"
+                TextColor="{DynamicResource Error}"
                 FontSize="12"
                 IsVisible="{Binding ErrorSede, Converter={StaticResource TextoNoVacio}}" />
 
             <Label
                 Text="{Binding ErrorGeneral}"
-                TextColor="{StaticResource Error}"
+                TextColor="{DynamicResource Error}"
                 IsVisible="{Binding ErrorGeneral, Converter={StaticResource TextoNoVacio}}" />
 
             <HorizontalStackLayout HorizontalOptions="End" Spacing="8" Margin="0,8,0,0">

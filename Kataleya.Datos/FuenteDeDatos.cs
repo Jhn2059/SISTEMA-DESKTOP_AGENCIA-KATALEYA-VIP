@@ -4,6 +4,9 @@ namespace Kataleya.Datos;
 
 public sealed class FuenteDeDatos : IAsyncDisposable
 {
+    static FuenteDeDatos() =>
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
     private readonly NpgsqlDataSource _fuente;
 
     public FuenteDeDatos(string cadenaDeConexion)

@@ -1,8 +1,13 @@
 using Kataleya.Escritorio.Features.Autenticacion.InicioDeSesion;
+using Kataleya.Escritorio.Features.Bitacora;
+using Kataleya.Escritorio.Features.CuadreDeVentas;
 using Kataleya.Escritorio.Features.GestionDeUsuarios;
 using Kataleya.Escritorio.Features.GestionDeUsuarios.CrearCuenta;
 using Kataleya.Escritorio.Features.GestionDeUsuarios.RestablecerContrasena;
 using Kataleya.Escritorio.Features.PanelPrincipal;
+using Kataleya.Escritorio.Features.Pasajes;
+using Kataleya.Escritorio.Features.RegistroDePasajes;
+using Kataleya.Escritorio.Features.RegistroDiferido;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kataleya.Escritorio.UIHelpers.Extensions;
@@ -18,6 +23,12 @@ public static class RegistroDeVistasExtensions
         servicios.AddTransient<PanelPrincipalPage>();
         servicios.AddTransient<GestionDeUsuariosViewModel>();
         servicios.AddTransient<GestionDeUsuariosPage>();
+        servicios.AddTransient<RegistroDePasajesPage>();
+        servicios.AddTransient<ListaDePasajesPage>();
+        servicios.AddTransient<DetalleDePasajePage>();
+        servicios.AddTransient<CuadreDeVentasPage>();
+        servicios.AddTransient<RegistroDiferidoPage>();
+        servicios.AddTransient<BitacoraPage>();
         servicios.AddTransient<DialogoDeCuentaViewModel>();
         servicios.AddTransient<DialogoDeCuentaPage>();
         servicios.AddTransient<DialogoDeContrasenaViewModel>();

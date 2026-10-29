@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <ContentView
     x:Class="Kataleya.Escritorio.Components.Layout.BarraLateral"
     x:Name="RaizBarra"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
     <Border
-        BackgroundColor="{StaticResource Superficie}"
+        BackgroundColor="{DynamicResource Superficie}"
         StrokeThickness="0">
         <Grid RowDefinitions="Auto,*,Auto">
             <BoxView
                 WidthRequest="1"
                 HorizontalOptions="End"
                 VerticalOptions="Fill"
-                Color="{StaticResource Borde}" />
+                Color="{DynamicResource Borde}" />
 
             <Grid HeightRequest="126" Padding="0,14,0,0">
                 <Image
@@ -31,282 +31,99 @@
                 Spacing="6">
 
                 <Grid HeightRequest="40">
-                    <BoxView
-                        x:Name="AcentoPanel"
-                        WidthRequest="3"
-                        HeightRequest="40"
-                        HorizontalOptions="Start"
-                        Color="{StaticResource Acento}"
-                        IsVisible="False" />
-                    <Border
-                        x:Name="OpcionPanel"
-                        ClassId="panel"
-                        Margin="12,0"
-                        BackgroundColor="Transparent"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 8">
+                    <BoxView x:Name="AcentoPanel" WidthRequest="3" HeightRequest="40" HorizontalOptions="Start" Color="{DynamicResource Acento}" IsVisible="False" />
+                    <Border x:Name="OpcionPanel" ClassId="panel" Margin="12,0" BackgroundColor="Transparent" StrokeThickness="0" StrokeShape="RoundRectangle 8">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer CommandParameter="panel" Tapped="AlTocarOpcion" />
                             <PointerGestureRecognizer PointerEntered="AlEntrarOpcion" PointerExited="AlSalirOpcion" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="18,*" ColumnSpacing="14" Padding="12,0">
-                            <Path
-                                Data="{StaticResource IconoInicio}"
-                                WidthRequest="18"
-                                HeightRequest="18"
-                                Aspect="Uniform"
-                                VerticalOptions="Center" />
-                            <Label
-                                Grid.Column="1"
-                                Text="Panel principal"
-                                FontFamily="InterSemiBold"
-                                FontSize="14"
-                                VerticalOptions="Center" />
+                            <Path Data="{StaticResource IconoInicio}" WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Panel principal" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center" />
                         </Grid>
                     </Border>
                 </Grid>
 
                 <Grid HeightRequest="40">
-                    <BoxView
-                        x:Name="AcentoRegistrar"
-                        WidthRequest="3"
-                        HeightRequest="40"
-                        HorizontalOptions="Start"
-                        Color="{StaticResource Acento}"
-                        IsVisible="False" />
-                    <Border
-                        x:Name="OpcionRegistrar"
-                        ClassId="registrar-pasaje"
-                        Margin="12,0"
-                        BackgroundColor="Transparent"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 8">
+                    <BoxView x:Name="AcentoRegistrar" WidthRequest="3" HeightRequest="40" HorizontalOptions="Start" Color="{DynamicResource Acento}" IsVisible="False" />
+                    <Border x:Name="OpcionRegistrar" ClassId="registrar-pasaje" Margin="12,0" BackgroundColor="Transparent" StrokeThickness="0" StrokeShape="RoundRectangle 8">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer CommandParameter="registrar-pasaje" Tapped="AlTocarOpcion" />
                             <PointerGestureRecognizer PointerEntered="AlEntrarOpcion" PointerExited="AlSalirOpcion" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="18,*" ColumnSpacing="14" Padding="12,0">
-                            <Path
-                                Data="{StaticResource IconoPasaje}"
-                                WidthRequest="18"
-                                HeightRequest="18"
-                                Aspect="Uniform"
-                                VerticalOptions="Center" />
-                            <Label
-                                Grid.Column="1"
-                                Text="Registrar pasaje"
-                                FontSize="14"
-                                VerticalOptions="Center" />
+                            <Path Data="{StaticResource IconoPasaje}" WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Registrar pasaje" FontSize="14" VerticalOptions="Center" />
                         </Grid>
                     </Border>
                 </Grid>
 
                 <Grid HeightRequest="40">
-                    <BoxView
-                        x:Name="AcentoPasajes"
-                        WidthRequest="3"
-                        HeightRequest="40"
-                        HorizontalOptions="Start"
-                        Color="{StaticResource Acento}"
-                        IsVisible="False" />
-                    <Border
-                        x:Name="OpcionPasajes"
-                        ClassId="pasajes"
-                        Margin="12,0"
-                        BackgroundColor="Transparent"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 8">
+                    <BoxView x:Name="AcentoPasajes" WidthRequest="3" HeightRequest="40" HorizontalOptions="Start" Color="{DynamicResource Acento}" IsVisible="False" />
+                    <Border x:Name="OpcionPasajes" ClassId="pasajes" Margin="12,0" BackgroundColor="Transparent" StrokeThickness="0" StrokeShape="RoundRectangle 8">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer CommandParameter="pasajes" Tapped="AlTocarOpcion" />
                             <PointerGestureRecognizer PointerEntered="AlEntrarOpcion" PointerExited="AlSalirOpcion" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="18,*" ColumnSpacing="14" Padding="12,0">
-                            <Path
-                                Data="{StaticResource IconoLista}"
-                                WidthRequest="18"
-                                HeightRequest="18"
-                                Aspect="Uniform"
-                                VerticalOptions="Center" />
-                            <Label
-                                Grid.Column="1"
-                                Text="Pasajes"
-                                FontSize="14"
-                                VerticalOptions="Center" />
+                            <Path Data="{StaticResource IconoLista}" WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Pasajes" FontSize="14" VerticalOptions="Center" />
                         </Grid>
                     </Border>
                 </Grid>
 
                 <Grid HeightRequest="40">
-                    <BoxView
-                        x:Name="AcentoCuadre"
-                        WidthRequest="3"
-                        HeightRequest="40"
-                        HorizontalOptions="Start"
-                        Color="{StaticResource Acento}"
-                        IsVisible="False" />
-                    <Border
-                        x:Name="OpcionCuadre"
-                        ClassId="cuadre-ventas"
-                        Margin="12,0"
-                        BackgroundColor="Transparent"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 8">
+                    <BoxView x:Name="AcentoCuadre" WidthRequest="3" HeightRequest="40" HorizontalOptions="Start" Color="{DynamicResource Acento}" IsVisible="False" />
+                    <Border x:Name="OpcionCuadre" ClassId="cuadre-ventas" Margin="12,0" BackgroundColor="Transparent" StrokeThickness="0" StrokeShape="RoundRectangle 8">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer CommandParameter="cuadre-ventas" Tapped="AlTocarOpcion" />
                             <PointerGestureRecognizer PointerEntered="AlEntrarOpcion" PointerExited="AlSalirOpcion" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="18,*" ColumnSpacing="14" Padding="12,0">
-                            <Path
-                                Data="{StaticResource IconoCuadre}"
-                                WidthRequest="18"
-                                HeightRequest="18"
-                                Aspect="Uniform"
-                                VerticalOptions="Center" />
-                            <Label
-                                Grid.Column="1"
-                                Text="Cuadre de ventas"
-                                FontSize="14"
-                                VerticalOptions="Center" />
+                            <Path Data="{StaticResource IconoCuadre}" WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Cuadre de ventas" FontSize="14" VerticalOptions="Center" />
                         </Grid>
                     </Border>
                 </Grid>
 
-                <Grid HeightRequest="40">
-                    <BoxView
-                        x:Name="AcentoDiferido"
-                        WidthRequest="3"
-                        HeightRequest="40"
-                        HorizontalOptions="Start"
-                        Color="{StaticResource Acento}"
-                        IsVisible="False" />
-                    <Border
-                        x:Name="OpcionDiferido"
-                        ClassId="registro-diferido"
-                        Margin="12,0"
-                        BackgroundColor="Transparent"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 8">
+                <Grid HeightRequest="40" IsVisible="{Binding EsAdministrador, Source={x:Reference RaizBarra}}">
+                    <BoxView x:Name="AcentoDiferido" WidthRequest="3" HeightRequest="40" HorizontalOptions="Start" Color="{DynamicResource Acento}" IsVisible="False" />
+                    <Border x:Name="OpcionDiferido" ClassId="registro-diferido" Margin="12,0" BackgroundColor="Transparent" StrokeThickness="0" StrokeShape="RoundRectangle 8">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer CommandParameter="registro-diferido" Tapped="AlTocarOpcion" />
                             <PointerGestureRecognizer PointerEntered="AlEntrarOpcion" PointerExited="AlSalirOpcion" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="18,*" ColumnSpacing="14" Padding="12,0">
-                            <Path
-                                Data="{StaticResource IconoDiferido}"
-                                WidthRequest="18"
-                                HeightRequest="18"
-                                Aspect="Uniform"
-                                VerticalOptions="Center" />
-                            <Label
-                                Grid.Column="1"
-                                Text="Registro diferido"
-                                FontSize="14"
-                                VerticalOptions="Center" />
+                            <Path Data="{StaticResource IconoDiferido}" WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Registro diferido" FontSize="14" VerticalOptions="Center" />
                         </Grid>
                     </Border>
                 </Grid>
 
                 <Grid HeightRequest="40" IsVisible="{Binding EsAdministrador, Source={x:Reference RaizBarra}}">
-                    <BoxView
-                        x:Name="AcentoTarifas"
-                        WidthRequest="3"
-                        HeightRequest="40"
-                        HorizontalOptions="Start"
-                        Color="{StaticResource Acento}"
-                        IsVisible="False" />
-                    <Border
-                        x:Name="OpcionTarifas"
-                        ClassId="tarifas"
-                        Margin="12,0"
-                        BackgroundColor="Transparent"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 8">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer CommandParameter="tarifas" Tapped="AlTocarOpcion" />
-                            <PointerGestureRecognizer PointerEntered="AlEntrarOpcion" PointerExited="AlSalirOpcion" />
-                        </Border.GestureRecognizers>
-                        <Grid ColumnDefinitions="18,*" ColumnSpacing="14" Padding="12,0">
-                            <Path
-                                Data="{StaticResource IconoTarifas}"
-                                WidthRequest="18"
-                                HeightRequest="18"
-                                Aspect="Uniform"
-                                VerticalOptions="Center" />
-                            <Label
-                                Grid.Column="1"
-                                Text="Tarifas y parámetros"
-                                FontSize="14"
-                                VerticalOptions="Center" />
-                        </Grid>
-                    </Border>
-                </Grid>
-
-                <Grid HeightRequest="40" IsVisible="{Binding EsAdministrador, Source={x:Reference RaizBarra}}">
-                    <BoxView
-                        x:Name="AcentoUsuarios"
-                        WidthRequest="3"
-                        HeightRequest="40"
-                        HorizontalOptions="Start"
-                        Color="{StaticResource Acento}"
-                        IsVisible="False" />
-                    <Border
-                        x:Name="OpcionUsuarios"
-                        ClassId="usuarios"
-                        Margin="12,0"
-                        BackgroundColor="Transparent"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 8">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer CommandParameter="usuarios" Tapped="AlTocarOpcion" />
-                            <PointerGestureRecognizer PointerEntered="AlEntrarOpcion" PointerExited="AlSalirOpcion" />
-                        </Border.GestureRecognizers>
-                        <Grid ColumnDefinitions="18,*" ColumnSpacing="14" Padding="12,0">
-                            <Path
-                                Data="{StaticResource IconoUsuarios}"
-                                WidthRequest="18"
-                                HeightRequest="18"
-                                Aspect="Uniform"
-                                VerticalOptions="Center" />
-                            <Label
-                                Grid.Column="1"
-                                Text="Usuarios"
-                                FontSize="14"
-                                VerticalOptions="Center" />
-                        </Grid>
-                    </Border>
-                </Grid>
-
-                <Grid HeightRequest="40" IsVisible="{Binding EsAdministrador, Source={x:Reference RaizBarra}}">
-                    <BoxView
-                        x:Name="AcentoBitacora"
-                        WidthRequest="3"
-                        HeightRequest="40"
-                        HorizontalOptions="Start"
-                        Color="{StaticResource Acento}"
-                        IsVisible="False" />
-                    <Border
-                        x:Name="OpcionBitacora"
-                        ClassId="bitacora"
-                        Margin="12,0"
-                        BackgroundColor="Transparent"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 8">
+                    <BoxView x:Name="AcentoBitacora" WidthRequest="3" HeightRequest="40" HorizontalOptions="Start" Color="{DynamicResource Acento}" IsVisible="False" />
+                    <Border x:Name="OpcionBitacora" ClassId="bitacora" Margin="12,0" BackgroundColor="Transparent" StrokeThickness="0" StrokeShape="RoundRectangle 8">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer CommandParameter="bitacora" Tapped="AlTocarOpcion" />
                             <PointerGestureRecognizer PointerEntered="AlEntrarOpcion" PointerExited="AlSalirOpcion" />
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="18,*" ColumnSpacing="14" Padding="12,0">
-                            <Path
-                                Data="{StaticResource IconoBitacora}"
-                                WidthRequest="18"
-                                HeightRequest="18"
-                                Aspect="Uniform"
-                                VerticalOptions="Center" />
-                            <Label
-                                Grid.Column="1"
-                                Text="Bitácora"
-                                FontSize="14"
-                                VerticalOptions="Center" />
+                            <Path Data="{StaticResource IconoBitacora}" WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Bitácora" FontSize="14" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <Grid HeightRequest="40" IsVisible="{Binding EsAdministrador, Source={x:Reference RaizBarra}}">
+                    <BoxView x:Name="AcentoConfiguracion" WidthRequest="3" HeightRequest="40" HorizontalOptions="Start" Color="{DynamicResource Acento}" IsVisible="False" />
+                    <Border x:Name="OpcionConfiguracion" ClassId="configuracion" Margin="12,0" BackgroundColor="Transparent" StrokeThickness="0" StrokeShape="RoundRectangle 8">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer CommandParameter="configuracion" Tapped="AlTocarOpcion" />
+                            <PointerGestureRecognizer PointerEntered="AlEntrarOpcion" PointerExited="AlSalirOpcion" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="18,*" ColumnSpacing="14" Padding="12,0">
+                            <Path Data="{StaticResource IconoConfiguracion}" WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Configuración" FontSize="14" VerticalOptions="Center" />
                         </Grid>
                     </Border>
                 </Grid>
@@ -334,13 +151,13 @@
                                 WidthRequest="18"
                                 HeightRequest="18"
                                 Aspect="Uniform"
-                                Stroke="{StaticResource TextoSuave}"
+                                Stroke="{DynamicResource TextoSuave}"
                                 VerticalOptions="Center" />
                             <Label
                                 Grid.Column="1"
                                 Text="Cerrar sesión"
                                 FontSize="14"
-                                TextColor="{StaticResource TextoSuave}"
+                                TextColor="{DynamicResource TextoSuave}"
                                 VerticalOptions="Center" />
                         </Grid>
                     </Border>

@@ -4,9 +4,16 @@ using System.Net.Http.Json;
 using System.Net.NetworkInformation;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Globalization;
+using Kataleya.Contratos.Bitacora;
+using Kataleya.Contratos.Configuracion;
+using Kataleya.Contratos.Cuadre;
 using Kataleya.Contratos.Cuentas;
+using Kataleya.Contratos.Panel;
+using Kataleya.Contratos.Pasajes;
 using Kataleya.Contratos.Session;
 using Kataleya.Dominio.DataObjects;
+using Kataleya.Dominio.Enums;
 using Kataleya.Dominio.Interfaces;
 
 namespace Kataleya.Cliente;
@@ -210,6 +217,263 @@ public sealed class ClienteApi
             "sedes",
             null,
             "Consultar sedes");
+
+    public Task<ResultadoDeLaApi<List<DatosDePasaje>>> ObtenerPasajesAsync(
+        FiltroDePasajes? filtro = null) =>
+        EnviarAsync<List<DatosDePasaje>>(
+            HttpMethod.Get,
+            $"pasajes{CrearConsulta(filtro)}",
+            null,
+            "Consultar pasajes");
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> ObtenerPasajeAsync(long id) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Get,
+            $"pasajes/{id}",
+            null,
+            "Consultar pasaje");
+
+    public Task<ResultadoDeLaApi<DatosDeGrupo>> ObtenerGrupoAsync(long id) =>
+        EnviarAsync<DatosDeGrupo>(
+            HttpMethod.Get,
+            $"pasajes/grupos/{id}",
+            null,
+            "Consultar grupo");
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> RegistrarReservaAsync(
+        SolicitudDePasaje solicitud) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            "pasajes/reservas",
+            solicitud,
+            "Registrar reserva",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> RegistrarVentaAsync(
+        SolicitudDePasaje solicitud) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            "pasajes/ventas",
+            solicitud,
+            "Registrar venta",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> RegistrarDiferidoAsync(
+        SolicitudDePasaje solicitud) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            "pasajes/diferidos",
+            solicitud,
+            "Registrar pasaje diferido",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDeGrupo>> RegistrarGrupoReservaAsync(
+        SolicitudDeGrupo solicitud) =>
+        EnviarAsync<DatosDeGrupo>(
+            HttpMethod.Post,
+            "pasajes/grupos/reservas",
+            solicitud,
+            "Registrar reserva de grupo",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDeGrupo>> RegistrarGrupoVentaAsync(
+        SolicitudDeGrupo solicitud) =>
+        EnviarAsync<DatosDeGrupo>(
+            HttpMethod.Post,
+            "pasajes/grupos/ventas",
+            solicitud,
+            "Registrar venta de grupo",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<RevisionDeAnulacion>> RevisarAnulacionAsync(long id) =>
+        EnviarAsync<RevisionDeAnulacion>(
+            HttpMethod.Get,
+            $"pasajes/{id}/revision-de-anulacion",
+            null,
+            "Revisar anulación");
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> AnularAsync(long id, string motivo) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            $"pasajes/{id}/anulacion",
+            new SolicitudDeAnulacion { Motivo = motivo },
+            "Anular pasaje",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> RegistrarCobroAsync(
+        long id,
+        SolicitudDeCobro solicitud) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            $"pasajes/{id}/cobros",
+            solicitud,
+            "Registrar cobro",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<ResultadoDeRevision>> ModificarAsync(
+        long id,
+        CambiosDelPasaje cambios) =>
+        EnviarAsync<ResultadoDeRevision>(
+            HttpMethod.Post,
+            $"pasajes/{id}/modificacion",
+            cambios,
+            "Modificar pasaje",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> MarcarNoPresentadoAsync(long id) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            $"pasajes/{id}/no-presentado",
+            null,
+            "Marcar no presentado",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDeBoleto>> ReimprimirBoletoAsync(
+        string serie,
+        long numero) =>
+        EnviarAsync<DatosDeBoleto>(
+            HttpMethod.Post,
+            $"boletos/{Uri.EscapeDataString(serie)}/{numero}/reimpresiones",
+            null,
+            "Reimprimir boleto",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi> RegistrarFallaDeBoletoAsync(
+        string serie,
+        long numero,
+        string descripcion) =>
+        EnviarSinDatosAsync(
+            HttpMethod.Post,
+            $"boletos/{Uri.EscapeDataString(serie)}/{numero}/fallas",
+            new SolicitudDeFallaDeBoleto { Descripcion = descripcion },
+            "Registrar falla de boleto",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<List<DatosDeUnidad>>> ObtenerUnidadesAsync(
+        DateOnly fecha,
+        TimeOnly hora) =>
+        EnviarAsync<List<DatosDeUnidad>>(
+            HttpMethod.Get,
+            $"inventario/unidades{CrearConsulta(new { fecha, hora })}",
+            null,
+            "Consultar unidades");
+
+    public Task<ResultadoDeLaApi<DatosDeUnidad>> AbrirUnidadAsync(
+        SolicitudDeUnidad solicitud) =>
+        EnviarAsync<DatosDeUnidad>(
+            HttpMethod.Post,
+            "inventario/unidades",
+            solicitud,
+            "Abrir unidad",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<List<short>>> ObtenerAsientosOcupadosAsync(long idUnidad) =>
+        EnviarAsync<List<short>>(
+            HttpMethod.Get,
+            $"inventario/unidades/{idUnidad}/asientos",
+            null,
+            "Consultar asientos ocupados");
+
+    public Task<ResultadoDeLaApi<List<DatosDeTarifa>>> ObtenerTarifasAsync() =>
+        EnviarAsync<List<DatosDeTarifa>>(
+            HttpMethod.Get,
+            "configuracion/tarifas",
+            null,
+            "Consultar tarifas");
+
+    public Task<ResultadoDeLaApi<DatosDeTarifa>> ObtenerTarifaVigenteAsync(
+        DateOnly? fecha = null,
+        SentidoDelViaje? sentido = null) =>
+        EnviarAsync<DatosDeTarifa>(
+            HttpMethod.Get,
+            $"configuracion/tarifas/vigente{CrearConsulta(new { fecha, sentido })}",
+            null,
+            "Consultar tarifa vigente");
+
+    public Task<ResultadoDeLaApi<DatosDeTarifa>> GuardarTarifaAsync(
+        int? id,
+        SolicitudDeTarifa solicitud) =>
+        EnviarAsync<DatosDeTarifa>(
+            id is null ? HttpMethod.Post : HttpMethod.Put,
+            id is null ? "configuracion/tarifas" : $"configuracion/tarifas/{id}",
+            solicitud,
+            "Guardar tarifa",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi> EliminarTarifaAsync(int id) =>
+        EnviarSinDatosAsync(
+            HttpMethod.Delete,
+            $"configuracion/tarifas/{id}",
+            null,
+            "Eliminar tarifa",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<List<DatosDeTipoDeVehiculo>>> ObtenerTiposDeVehiculoAsync() =>
+        EnviarAsync<List<DatosDeTipoDeVehiculo>>(
+            HttpMethod.Get,
+            "configuracion/tipos-de-vehiculo",
+            null,
+            "Consultar tipos de vehículo");
+
+    public Task<ResultadoDeLaApi<DatosDeTipoDeVehiculo>> GuardarTipoDeVehiculoAsync(
+        int? id,
+        SolicitudDeTipoDeVehiculo solicitud) =>
+        EnviarAsync<DatosDeTipoDeVehiculo>(
+            id is null ? HttpMethod.Post : HttpMethod.Put,
+            id is null
+                ? "configuracion/tipos-de-vehiculo"
+                : $"configuracion/tipos-de-vehiculo/{id}",
+            solicitud,
+            "Guardar tipo de vehículo",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi> EliminarTipoDeVehiculoAsync(int id) =>
+        EnviarSinDatosAsync(
+            HttpMethod.Delete,
+            $"configuracion/tipos-de-vehiculo/{id}",
+            null,
+            "Eliminar tipo de vehículo",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<List<DatosDeParametro>>> ObtenerParametrosAsync() =>
+        EnviarAsync<List<DatosDeParametro>>(
+            HttpMethod.Get,
+            "configuracion/parametros",
+            null,
+            "Consultar parámetros");
+
+    public Task<ResultadoDeLaApi<DatosDeParametro>> GuardarParametroAsync(
+        string nombre,
+        string valor) =>
+        EnviarAsync<DatosDeParametro>(
+            HttpMethod.Put,
+            $"configuracion/parametros/{Uri.EscapeDataString(nombre)}",
+            new SolicitudDeParametro { Valor = valor },
+            "Guardar parámetro",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDelCuadre>> ObtenerCuadreAsync(
+        FiltroDeCuadre? filtro = null) =>
+        EnviarAsync<DatosDelCuadre>(
+            HttpMethod.Get,
+            $"cuadre{CrearConsulta(filtro)}",
+            null,
+            "Consultar cuadre");
+
+    public Task<ResultadoDeLaApi<DatosDelPanel>> ObtenerPanelAsync(DateOnly? fecha = null) =>
+        EnviarAsync<DatosDelPanel>(
+            HttpMethod.Get,
+            $"panel{CrearConsulta(new { fecha })}",
+            null,
+            "Consultar panel");
+
+    public Task<ResultadoDeLaApi<List<DatosDeBitacora>>> ObtenerBitacoraAsync(
+        FiltroDeBitacora? filtro = null) =>
+        EnviarAsync<List<DatosDeBitacora>>(
+            HttpMethod.Get,
+            $"bitacora{CrearConsulta(filtro)}",
+            null,
+            "Consultar bitácora");
 
     public void CerrarSesion()
     {
@@ -436,6 +700,36 @@ public sealed class ClienteApi
 
         return $"{metodo} {ruta} {cuerpo}";
     }
+
+    private static string CrearConsulta(object? filtro)
+    {
+        if (filtro is null)
+        {
+            return string.Empty;
+        }
+
+        var partes = filtro
+            .GetType()
+            .GetProperties()
+            .Select(propiedad => (propiedad.Name, Valor: propiedad.GetValue(filtro)))
+            .Where(campo => campo.Valor is not null)
+            .Select(campo =>
+                $"{Uri.EscapeDataString(campo.Name)}={Uri.EscapeDataString(FormatearValor(campo.Valor!))}")
+            .ToList();
+
+        return partes.Count == 0 ? string.Empty : $"?{string.Join("&", partes)}";
+    }
+
+    private static string FormatearValor(object valor) =>
+        valor switch
+        {
+            DateOnly fecha => fecha.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            TimeOnly hora => hora.ToString("HH:mm", CultureInfo.InvariantCulture),
+            DateTime fechaHora => fechaHora.ToString("O", CultureInfo.InvariantCulture),
+            bool booleano => booleano ? "true" : "false",
+            IFormattable formateable => formateable.ToString(null, CultureInfo.InvariantCulture) ?? string.Empty,
+            _ => valor.ToString() ?? string.Empty
+        };
 
     private static ResultadoDeLaApi<T> Error<T>(string codigo) =>
         new() { CodigoDeError = codigo };

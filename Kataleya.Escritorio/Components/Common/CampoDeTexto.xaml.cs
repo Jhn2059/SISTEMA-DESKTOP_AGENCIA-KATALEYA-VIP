@@ -1,4 +1,5 @@
-using System.Windows.Input;
+﻿using System.Windows.Input;
+using Kataleya.Escritorio.UIHelpers;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Graphics;
 
@@ -6,11 +7,6 @@ namespace Kataleya.Escritorio.Components.Common;
 
 public partial class CampoDeTexto : ContentView
 {
-    private static readonly Color ColorBorde = Color.FromArgb("#646B78");
-    private static readonly Color ColorBordeHover = Color.FromArgb("#8A909A");
-    private static readonly Color ColorAcento = Color.FromArgb("#ED1C24");
-    private static readonly Color ColorPeligro = Color.FromArgb("#EF4444");
-
     private bool _enfocado;
     private bool _punteroEncima;
     private bool _hayError;
@@ -77,6 +73,7 @@ public partial class CampoDeTexto : ContentView
     public CampoDeTexto()
     {
         InitializeComponent();
+        ServicioDeTema.Cambio += (_, _) => ActualizarBorde();
     }
 
     public string Etiqueta
@@ -248,22 +245,22 @@ public partial class CampoDeTexto : ContentView
     private void ActualizarBorde()
     {
         var color = _hayError
-            ? ColorPeligro
+            ? ServicioDeTema.Color("Peligro")
             : _enfocado
-                ? ColorAcento
+                ? ServicioDeTema.Color("Acento")
                 : _punteroEncima
-                    ? ColorBordeHover
-                    : ColorBorde;
+                    ? ServicioDeTema.Color("BordeControlHover")
+                    : ServicioDeTema.Color("BordeControl");
 
         Caja.Stroke = new SolidColorBrush(color);
 
         if (_hayError)
         {
-            Caja.Shadow = CrearSombra(ColorPeligro, 0.3f);
+            Caja.Shadow = CrearSombra(ServicioDeTema.Color("Peligro"), 0.3f);
         }
         else if (_enfocado)
         {
-            Caja.Shadow = CrearSombra(ColorAcento, 0.45f);
+            Caja.Shadow = CrearSombra(ServicioDeTema.Color("Acento"), 0.45f);
         }
         else
         {

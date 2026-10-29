@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<paginas:PaginaDeModulo
+    x:Class="Kataleya.Escritorio.Features.RegistroDePasajes.RegistroDePasajesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:paginas="clr-namespace:Kataleya.Escritorio.UIHelpers.Paginas"
+    xmlns:common="clr-namespace:Kataleya.Escritorio.Components.Common">
+    <ScrollView VerticalScrollBarVisibility="Never">
+        <VerticalStackLayout Padding="24,16,24,24" Spacing="0">
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                <Label Text="Registro de pasaje" Style="{StaticResource TituloDePagina}" VerticalOptions="Center" />
+                <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                    <Label Text="Tipo de pasaje" FontSize="13" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center" />
+                    <Border x:Name="BotonIndividual" HeightRequest="32" Padding="14,0" BackgroundColor="{DynamicResource Info}" StrokeThickness="0" StrokeShape="RoundRectangle 6">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="AlElegirIndividual" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="7" VerticalOptions="Center">
+                            <Path Data="{StaticResource IconoPersona}" WidthRequest="16" HeightRequest="16" Stroke="White" VerticalOptions="Center" />
+                            <Label Text="Individual" FontFamily="InterSemiBold" FontSize="13" TextColor="White" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                    <Border x:Name="BotonGrupo" HeightRequest="32" Padding="14,0" BackgroundColor="{DynamicResource Superficie}" Stroke="{DynamicResource Borde}" StrokeThickness="1" StrokeShape="RoundRectangle 6">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="AlElegirGrupo" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="7" VerticalOptions="Center">
+                            <Path Data="{StaticResource IconoUsuarios}" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                            <Label x:Name="LblGrupo" Text="Grupo" FontFamily="InterSemiBold" FontSize="13" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </HorizontalStackLayout>
+            </Grid>
+
+            <Grid ColumnDefinitions="*,360" ColumnSpacing="16" Margin="0,12,0,0">
+
+                <Border Style="{StaticResource Tarjeta}" Padding="20,16">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Pasajero" FontFamily="InterSemiBold" FontSize="15" />
+
+                        <Grid ColumnDefinitions="*,118,150,150" ColumnSpacing="12">
+                            <common:CampoDeTexto x:Name="CampoNombre" Grid.Column="0" Etiqueta="Nombre *" Placeholder="Nombre Apellido" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="6">
+                                <Label Text="Documento *" Style="{StaticResource EtiquetaDeCampo}" />
+                                <Border Style="{StaticResource CampoDeFormulario}">
+                                    <Picker x:Name="SelectorTipoDocumento" Title="DNI">
+                                        <Picker.ItemsSource>
+                                            <x:Array Type="{x:Type x:String}">
+                                                <x:String>DNI</x:String>
+                                                <x:String>Pasaporte</x:String>
+                                            </x:Array>
+                                        </Picker.ItemsSource>
+                                    </Picker>
+                                </Border>
+                            </VerticalStackLayout>
+                            <common:CampoDeTexto x:Name="CampoDocumento" Grid.Column="2" Etiqueta="N.º de documento *" Placeholder="12345678" />
+                            <common:CampoDeTexto x:Name="CampoTelefono" Grid.Column="3" Etiqueta="Teléfono" Placeholder="9XX XXX XXX" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*,*,*" ColumnSpacing="12">
+                            <HorizontalStackLayout Spacing="8" VerticalOptions="End" Margin="0,0,0,8">
+                                <CheckBox x:Name="MenorDeEdad" Color="{DynamicResource Info}" />
+                                <Label Text="Menor sin sus padres" FontSize="13" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                            <common:CampoDeTexto x:Name="CampoPadre" Grid.Column="1" Etiqueta="Nombre del padre" Placeholder="Nombre Apellido" />
+                            <common:CampoDeTexto x:Name="CampoMadre" Grid.Column="2" Etiqueta="Nombre de la madre" Placeholder="Nombre Apellido" />
+                            <common:CampoDeTexto x:Name="CampoMotivo" Grid.Column="3" Etiqueta="Motivo del viaje" Placeholder="Descripción" />
+                        </Grid>
+
+                        <BoxView HeightRequest="1" Color="{DynamicResource Borde}" Margin="0,4" />
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                            <Label Text="Viaje" FontFamily="InterSemiBold" FontSize="15" VerticalOptions="Center" />
+                            <common:CampoDeTexto x:Name="CampoGrupo" Grid.Column="1" WidthRequest="180" Etiqueta="Cantidad de personas *" Placeholder="N.º de pasajeros" IsVisible="False" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                            <common:CampoDeTexto x:Name="CampoOrigen" Etiqueta="Origen *" Placeholder="Ica" />
+                            <common:CampoDeTexto x:Name="CampoDestino" Grid.Column="1" Etiqueta="Destino *" Placeholder="Huancayo" />
+                            <common:CampoDeTexto x:Name="CampoEmbarque" Grid.Column="2" Etiqueta="Lugar de embarque *" Placeholder="Agencia" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="180,180,*" ColumnSpacing="12">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="Fecha de salida *" Style="{StaticResource EtiquetaDeCampo}" />
+                                <Border Style="{StaticResource CampoDeFormulario}">
+                                    <DatePicker x:Name="FechaSalida" Format="dd/MM/yyyy" />
+                                </Border>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="6">
+                                <Label Text="Horario *" Style="{StaticResource EtiquetaDeCampo}" />
+                                <Border Style="{StaticResource CampoDeFormulario}">
+                                    <Picker x:Name="SelectorHora" Title="Seleccione horario" />
+                                </Border>
+                            </VerticalStackLayout>
+                            <HorizontalStackLayout Grid.Column="2" Spacing="7" VerticalOptions="End" Margin="0,0,0,10">
+                                <Path Data="{StaticResource IconoReloj}" WidthRequest="15" HeightRequest="15" VerticalOptions="Center" />
+                                <Label Text="Hasta 7 días de anticipación." FontSize="12" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Grid>
+
+                        <BoxView HeightRequest="1" Color="{DynamicResource Borde}" Margin="0,4" />
+
+                        <Label Text="Importe y cobro" FontFamily="InterSemiBold" FontSize="15" />
+
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="Tarifa vigente" Style="{StaticResource EtiquetaDeCampo}" />
+                                <Border Style="{StaticResource CampoSoloLectura}">
+                                    <Label x:Name="LblTarifa" Text="—" FontSize="14" VerticalOptions="Center" />
+                                </Border>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="6">
+                                <Label Text="Medio de pago" Style="{StaticResource EtiquetaDeCampo}" />
+                                <Border Style="{StaticResource CampoDeFormulario}">
+                                    <Picker x:Name="SelectorMedio" Title="Seleccione medio">
+                                        <Picker.ItemsSource>
+                                            <x:Array Type="{x:Type x:String}">
+                                                <x:String>Efectivo</x:String>
+                                                <x:String>Yape</x:String>
+                                            </x:Array>
+                                        </Picker.ItemsSource>
+                                    </Picker>
+                                </Border>
+                            </VerticalStackLayout>
+                            <common:CampoDeTexto x:Name="CampoMonto" Grid.Column="2" Etiqueta="Monto a cobrar" Placeholder="S/ 0.00" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                            <VerticalStackLayout x:Name="BloquePrecioGrupo" Spacing="6" IsVisible="False">
+                                <Label Text="Precio acordado del grupo *" Style="{StaticResource EtiquetaDeCampo}" />
+                                <Border Style="{StaticResource CampoDeFormulario}">
+                                    <Entry x:Name="CampoPrecioGrupo" Placeholder="S/ 0.00" Keyboard="Numeric" />
+                                </Border>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="6">
+                                <Label Text="Emisor" Style="{StaticResource EtiquetaDeCampo}" />
+                                <Border Style="{StaticResource CampoSoloLectura}">
+                                    <Label x:Name="LblEmisor" Text="—" FontSize="14" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center" />
+                                </Border>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <HorizontalStackLayout Spacing="12" Margin="0,4,0,0">
+                            <Button x:Name="BotonReserva" Text="Guardar reserva" Style="{StaticResource BotonSecundario}" Clicked="AlGuardarReserva" />
+                            <Button x:Name="BotonVenta" Text="Registrar venta" Style="{StaticResource BotonPrimario}" Clicked="AlGuardarVenta" />
+                            <Button Text="Cancelar" Style="{StaticResource BotonSecundario}" Clicked="AlCancelar" />
+                        </HorizontalStackLayout>
+
+                        <Label x:Name="LblMensaje" FontSize="12" TextColor="{DynamicResource TextoSuave}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource Tarjeta}" Padding="20,16">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Unidad y asiento" FontFamily="InterSemiBold" FontSize="15" />
+
+                        <VerticalStackLayout Spacing="6">
+                            <Label x:Name="LblUnidad" Text="Unidad de la salida *" Style="{StaticResource EtiquetaDeCampo}" />
+                            <Border Style="{StaticResource CampoDeFormulario}">
+                                <Picker x:Name="SelectorUnidad" Title="Sin unidades disponibles" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <Button x:Name="BotonAbrirUnidad" Text="+  Abrir otra unidad" Style="{StaticResource BotonSecundario}" Clicked="AlAbrirUnidad" />
+
+                        <Border x:Name="PanelAsientos" Style="{StaticResource TarjetaCompacta}" Padding="16" HorizontalOptions="Center" Margin="0,8,0,0" WidthRequest="260">
+                            <VerticalStackLayout Spacing="10">
+                                <FlexLayout x:Name="MapaAsientos" Direction="Row" Wrap="Wrap" JustifyContent="Start" AlignItems="Start" />
+                                <Label Text="Libre" FontSize="11" TextColor="{DynamicResource TextoSuave}" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Label x:Name="LblAsiento" Text="Asiento elegido: —" FontFamily="InterSemiBold" FontSize="13" HorizontalTextAlignment="Center" />
+                        <Label Text="Elija el asiento con un clic." FontSize="11" TextColor="{DynamicResource TextoSuave}" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</paginas:PaginaDeModulo>

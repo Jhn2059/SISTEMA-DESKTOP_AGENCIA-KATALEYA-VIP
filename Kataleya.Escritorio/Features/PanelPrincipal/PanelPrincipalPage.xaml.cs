@@ -2,18 +2,14 @@ using System.Globalization;
 using Kataleya.Cliente;
 using Kataleya.Escritorio.Components.Layout;
 using Kataleya.Escritorio.UIHelpers;
+using Kataleya.Escritorio.UIHelpers.Paginas;
 using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Controls.Shapes;
 
 namespace Kataleya.Escritorio.Features.PanelPrincipal;
 
 public partial class PanelPrincipalPage : ContentPage
 {
-    private static readonly Color FondoBotonClaro = Color.FromArgb("#F1F2F4");
-    private static readonly Color FondoBotonClaroHover = Color.FromArgb("#FFFFFF");
-    private static readonly Color FondoBotonOscuro = Color.FromArgb("#1A1E25");
-    private static readonly Color FondoBotonOscuroHover = Color.FromArgb("#232935");
-    private static readonly Color BordeBotonOscuro = Color.FromArgb("#646B78");
-    private static readonly Color BordeBotonOscuroHover = Color.FromArgb("#8A909A");
     private static readonly CultureInfo Cultura = CultureInfo.GetCultureInfo("es-PE");
 
     private readonly ClienteApi _cliente;
@@ -26,7 +22,7 @@ public partial class PanelPrincipalPage : ContentPage
         BindingContext = modelo;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
 
@@ -44,6 +40,8 @@ public partial class PanelPrincipalPage : ContentPage
             modelo.Sede,
             AlternarLateral,
             ConfirmarCierreDeSesionAsync);
+
+        await modelo.CargarAsync();
     }
 
     private void ActualizarEncabezado(string nombre)
@@ -72,71 +70,32 @@ public partial class PanelPrincipalPage : ContentPage
         Lateral.IsVisible = _lateralVisible;
     }
 
-    private async void AlTocarOpcion(object? remitente, OpcionSeleccionadaEventArgs argumentos)
-    {
-        var opcion = argumentos.Opcion;
-
-        if (opcion == "panel")
-        {
-            return;
-        }
-
-        if (opcion == "usuarios")
-        {
-            if (BindingContext is PanelPrincipalViewModel modelo)
-            {
-                await modelo.AbrirGestionDeUsuariosCommand.ExecuteAsync(null);
-            }
-
-            return;
-        }
-
-        await DisplayAlertAsync(
-            "Próximamente",
-            $"La pantalla «{NombreDeOpcion(opcion)}» se implementará en la siguiente entrega.",
-            "Entendido");
-    }
-
-    private static string NombreDeOpcion(string opcion) => opcion switch
-    {
-        "registrar-pasaje" => "Registrar pasaje",
-        "pasajes" => "Pasajes",
-        "cuadre-ventas" => "Cuadre de ventas",
-        "registro-diferido" => "Registro diferido",
-        "tarifas" => "Tarifas y parámetros",
-        "bitacora" => "Bitácora",
-        _ => opcion
-    };
+    private async void AlTocarOpcion(object? remitente, OpcionSeleccionadaEventArgs argumentos) =>
+        await NavegacionDeModulos.IrAsync(argumentos.Opcion);
 
     private void AlEntrarBotonClaro(object? remitente, PointerEventArgs argumentos) =>
-        BotonRegistrarPasaje.BackgroundColor = FondoBotonClaroHover;
+        BotonRegistrarPasaje.BackgroundColor = ServicioDeTema.Color("BotonClaroHover");
 
     private void AlSalirBotonClaro(object? remitente, PointerEventArgs argumentos) =>
-        BotonRegistrarPasaje.BackgroundColor = FondoBotonClaro;
+        BotonRegistrarPasaje.BackgroundColor = ServicioDeTema.Color("BotonClaro");
 
     private void AlEntrarBotonOscuro(object? remitente, PointerEventArgs argumentos)
     {
-        BotonVerPasajes.BackgroundColor = FondoBotonOscuroHover;
-        BotonVerPasajes.Stroke = new SolidColorBrush(BordeBotonOscuroHover);
+        BotonVerPasajes.BackgroundColor = ServicioDeTema.Color("BotonOscuroHover");
+        BotonVerPasajes.Stroke = new SolidColorBrush(ServicioDeTema.Color("BordeControlHover"));
     }
 
     private void AlSalirBotonOscuro(object? remitente, PointerEventArgs argumentos)
     {
-        BotonVerPasajes.BackgroundColor = FondoBotonOscuro;
-        BotonVerPasajes.Stroke = new SolidColorBrush(BordeBotonOscuro);
+        BotonVerPasajes.BackgroundColor = ServicioDeTema.Color("BotonOscuro");
+        BotonVerPasajes.Stroke = new SolidColorBrush(ServicioDeTema.Color("BordeControl"));
     }
 
     private async void AlTocarRegistrarPasaje(object? remitente, TappedEventArgs argumentos) =>
-        await DisplayAlertAsync(
-            "Próximamente",
-            "El registro de pasajes se implementará en la siguiente entrega.",
-            "Entendido");
+        await NavegacionDeModulos.IrAsync("registrar-pasaje");
 
     private async void AlTocarVerPasajes(object? remitente, TappedEventArgs argumentos) =>
-        await DisplayAlertAsync(
-            "Próximamente",
-            "La consulta de pasajes se implementará en la siguiente entrega.",
-            "Entendido");
+        await NavegacionDeModulos.IrAsync("pasajes");
 
     private void AlSolicitarCierreDeSesion(object? remitente, EventArgs argumentos) =>
         _ = ConfirmarCierreDeSesionAsync();

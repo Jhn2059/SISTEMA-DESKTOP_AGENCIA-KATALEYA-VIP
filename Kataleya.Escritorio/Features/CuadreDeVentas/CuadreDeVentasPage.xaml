@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<paginas:PaginaDeModulo
+    x:Class="Kataleya.Escritorio.Features.CuadreDeVentas.CuadreDeVentasPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:cuadre="clr-namespace:Kataleya.Contratos.Cuadre;assembly=Kataleya.Contratos"
+    xmlns:paginas="clr-namespace:Kataleya.Escritorio.UIHelpers.Paginas">
+    <ScrollView VerticalScrollBarVisibility="Never">
+        <VerticalStackLayout Padding="24,16,24,24" Spacing="0">
+
+            <HorizontalStackLayout Spacing="14" VerticalOptions="Center">
+                <Label Text="Cuadre de ventas" Style="{StaticResource TituloDePagina}" VerticalOptions="Center" />
+                <Label Text="Totales cobrados por emisor y por medio de pago" Style="{StaticResource SubtituloDePagina}" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Border Style="{StaticResource Tarjeta}" Padding="14,10" Margin="0,12,0,0">
+                <Grid ColumnDefinitions="150,150,190,190,*,Auto" ColumnSpacing="10">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Desde" Style="{StaticResource EtiquetaDeCampo}" />
+                        <Border Style="{StaticResource CampoDeFormulario}">
+                            <DatePicker x:Name="FechaDesde" Format="dd/MM/yyyy" />
+                        </Border>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Text="Hasta" Style="{StaticResource EtiquetaDeCampo}" />
+                        <Border Style="{StaticResource CampoDeFormulario}">
+                            <DatePicker x:Name="FechaHasta" Format="dd/MM/yyyy" />
+                        </Border>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="2" Spacing="4">
+                        <Label Text="Emisor" Style="{StaticResource EtiquetaDeCampo}" />
+                        <Border Style="{StaticResource CampoDeFormulario}">
+                            <Picker Title="Todos" />
+                        </Border>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="3" Spacing="4">
+                        <Label Text="Sede" Style="{StaticResource EtiquetaDeCampo}" />
+                        <Border Style="{StaticResource CampoDeFormulario}">
+                            <Picker Title="Todas" />
+                        </Border>
+                    </VerticalStackLayout>
+                    <Border Grid.Column="5" HeightRequest="36" Padding="16,0" BackgroundColor="{DynamicResource BotonClaro}" StrokeThickness="0" StrokeShape="RoundRectangle 6" VerticalOptions="End">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="AlGenerar" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                            <Path Data="{StaticResource IconoCuadre}" WidthRequest="17" HeightRequest="17" Stroke="{DynamicResource BotonClaroTexto}" VerticalOptions="Center" />
+                            <Label Text="Generar" FontFamily="InterSemiBold" FontSize="14" TextColor="{DynamicResource BotonClaroTexto}" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource Tarjeta}" Padding="0" Margin="0,12,0,0">
+                <VerticalStackLayout Spacing="0">
+                    <Grid HeightRequest="40" Padding="12,0" BackgroundColor="{DynamicResource EncabezadoTabla}" ColumnDefinitions="1.4*,0.7*,1*,1*,1.5*,1.2*,1*" ColumnSpacing="0">
+                        <Label Text="Emisor" FontFamily="InterSemiBold" FontSize="13" VerticalTextAlignment="Center" />
+                        <Label Grid.Column="1" Text="Pasajes" FontFamily="InterSemiBold" FontSize="13" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                        <Label Grid.Column="2" Text="Efectivo" FontFamily="InterSemiBold" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                        <Label Grid.Column="3" Text="Yape" FontFamily="InterSemiBold" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                        <Label Grid.Column="4" Text="Adelantos por cobrar" FontFamily="InterSemiBold" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                        <Label Grid.Column="5" Text="Anulados" FontFamily="InterSemiBold" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                        <Label Grid.Column="6" Text="Total neto" FontFamily="InterSemiBold" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="{DynamicResource Borde}" />
+
+                    <CollectionView x:Name="TablaCuadre" SelectionMode="Single" SelectionChanged="AlSeleccionarFila">
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout HeightRequest="140" Spacing="8" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,22,0,0">
+                                <Path Data="{StaticResource IconoLupa}" WidthRequest="28" HeightRequest="28" Stroke="{DynamicResource TextoTenue}" HorizontalOptions="Center" />
+                                <Label Text="Aún no hay ventas registradas para estos filtros." FontSize="14" TextColor="{DynamicResource TextoSuave}" HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="cuadre:DatosDeFilaDeCuadre">
+                                <Grid HeightRequest="38" Padding="12,0" ColumnDefinitions="1.4*,0.7*,1*,1*,1.5*,1.2*,1*">
+                                    <Label Text="{Binding Emisor}" FontSize="13" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="1" Text="{Binding Pasajes}" FontSize="13" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="2" Text="{Binding Efectivo, StringFormat='S/ {0:N2}'}" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="3" Text="{Binding Yape, StringFormat='S/ {0:N2}'}" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="4" Text="{Binding AdelantosPorCobrar, StringFormat='S/ {0:N2}'}" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="5" Text="{Binding Anulados}" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                    <Label Grid.Column="6" Text="{Binding TotalNeto, StringFormat='S/ {0:N2}'}" FontSize="13" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label x:Name="LblResumen" Text="Sin cuadre generado." FontSize="12" TextColor="{DynamicResource TextoSuave}" Margin="0,10,0,0" />
+
+            <HorizontalStackLayout Spacing="12" Margin="0,12,0,0">
+                <Button x:Name="BotonVerDetalle" Text="Ver detalle" Style="{StaticResource BotonSecundario}" IsEnabled="False" Opacity="0.45" Clicked="AlVerDetalle" />
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="7" Margin="0,12,0,0">
+                <Path Data="{StaticResource IconoInfo}" WidthRequest="14" HeightRequest="14" Stroke="{DynamicResource TextoTenue}" VerticalOptions="Center" />
+                <Label Text="Los pasajes anulados no suman al total. Elija un emisor y pulse «Ver detalle» para ver los pasajes y pagos que lo componen." FontSize="12" TextColor="{DynamicResource TextoSuave}" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</paginas:PaginaDeModulo>

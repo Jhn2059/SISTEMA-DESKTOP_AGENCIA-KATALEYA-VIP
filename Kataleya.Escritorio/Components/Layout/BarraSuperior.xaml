@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <ContentView
     x:Class="Kataleya.Escritorio.Components.Layout.BarraSuperior"
     x:Name="RaizBarra"
@@ -6,9 +6,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     HeightRequest="58">
     <Grid
-        BackgroundColor="{StaticResource Superficie}"
+        BackgroundColor="{DynamicResource Superficie}"
         ColumnDefinitions="Auto,*,Auto"
-        Padding="12,0,184,0">
+        Padding="12,0,0,0">
 
         <Border
             x:Name="BotonMenu"
@@ -34,20 +34,48 @@
         <Grid
             x:Name="ZonaArrastre"
             Grid.Column="1"
-            BackgroundColor="{StaticResource Superficie}">
+            BackgroundColor="{DynamicResource Superficie}">
             <Label
                 Text="Sistema de la Agencia Kataleya VIP"
                 FontFamily="InterSemiBold"
                 FontSize="14"
-                TextColor="{StaticResource Texto}"
+                TextColor="{DynamicResource Texto}"
                 VerticalOptions="Center"
                 LineBreakMode="TailTruncation"
                 MaxLines="1" />
         </Grid>
 
+        <HorizontalStackLayout
+            Grid.Column="2"
+            Spacing="10"
+            VerticalOptions="Center">
+
+        <Border
+            x:Name="BotonTema"
+            WidthRequest="40"
+            HeightRequest="40"
+            BackgroundColor="Transparent"
+            StrokeThickness="0"
+            StrokeShape="RoundRectangle 6"
+            AutomationProperties.Name="Cambiar tema"
+            VerticalOptions="Center">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="AlTocarTema" />
+                <PointerGestureRecognizer PointerEntered="AlEntrarTema" PointerExited="AlSalirTema" />
+            </Border.GestureRecognizers>
+            <Path
+                x:Name="IconoTema"
+                Data="{StaticResource IconoLuna}"
+                WidthRequest="20"
+                HeightRequest="20"
+                Aspect="Uniform"
+                Stroke="{DynamicResource Texto}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Border>
+
         <Border
             x:Name="BloqueUsuario"
-            Grid.Column="2"
             BackgroundColor="Transparent"
             StrokeThickness="0"
             StrokeShape="RoundRectangle 8"
@@ -62,7 +90,7 @@
                     WidthRequest="26"
                     HeightRequest="26"
                     StrokeThickness="0"
-                    BackgroundColor="{StaticResource SuperficieActiva}"
+                    BackgroundColor="{DynamicResource SuperficieActiva}"
                     StrokeShape="RoundRectangle 13"
                     VerticalOptions="Center">
                     <Path
@@ -78,17 +106,17 @@
                         x:Name="LblNombre"
                         FontFamily="InterSemiBold"
                         FontSize="13"
-                        TextColor="{StaticResource Texto}"
+                        TextColor="{DynamicResource Texto}"
                         LineHeight="1" />
                     <Label
                         x:Name="LblRol"
                         FontSize="11"
-                        TextColor="{StaticResource TextoSuave}"
+                        TextColor="{DynamicResource TextoSuave}"
                         LineHeight="1" />
                     <Label
                         x:Name="LblSede"
                         FontSize="11"
-                        TextColor="{StaticResource TextoSuave}"
+                        TextColor="{DynamicResource TextoSuave}"
                         LineHeight="1" />
                 </VerticalStackLayout>
                 <Path
@@ -100,5 +128,78 @@
                     VerticalOptions="Center" />
             </HorizontalStackLayout>
         </Border>
+
+        <Border
+            x:Name="BotonMinimizar"
+            WidthRequest="46"
+            HeightRequest="58"
+            BackgroundColor="Transparent"
+            StrokeThickness="0"
+            AutomationProperties.Name="Minimizar"
+            VerticalOptions="Center">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="AlTocarMinimizar" />
+                <PointerGestureRecognizer PointerEntered="AlEntrarControl" PointerExited="AlSalirControl" />
+            </Border.GestureRecognizers>
+            <Path
+                x:Name="IconoMinimizar"
+                Data="{StaticResource IconoMinimizar}"
+                WidthRequest="12"
+                HeightRequest="12"
+                Aspect="Uniform"
+                Stroke="{DynamicResource Texto}"
+                StrokeThickness="1.2"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Border>
+
+        <Border
+            x:Name="BotonMaximizar"
+            WidthRequest="46"
+            HeightRequest="58"
+            BackgroundColor="Transparent"
+            StrokeThickness="0"
+            AutomationProperties.Name="Maximizar"
+            VerticalOptions="Center">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="AlTocarMaximizar" />
+                <PointerGestureRecognizer PointerEntered="AlEntrarControl" PointerExited="AlSalirControl" />
+            </Border.GestureRecognizers>
+            <Path
+                x:Name="IconoMaximizar"
+                Data="{StaticResource IconoMaximizar}"
+                WidthRequest="12"
+                HeightRequest="12"
+                Aspect="Uniform"
+                Stroke="{DynamicResource Texto}"
+                StrokeThickness="1.2"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Border>
+
+        <Border
+            x:Name="BotonCerrar"
+            WidthRequest="46"
+            HeightRequest="58"
+            BackgroundColor="Transparent"
+            StrokeThickness="0"
+            AutomationProperties.Name="Cerrar"
+            VerticalOptions="Center">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="AlTocarCerrar" />
+                <PointerGestureRecognizer PointerEntered="AlEntrarCerrar" PointerExited="AlSalirCerrar" />
+            </Border.GestureRecognizers>
+            <Path
+                x:Name="IconoCerrar"
+                Data="{StaticResource IconoCerrar}"
+                WidthRequest="12"
+                HeightRequest="12"
+                Aspect="Uniform"
+                Stroke="{DynamicResource Texto}"
+                StrokeThickness="1.2"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Border>
+        </HorizontalStackLayout>
     </Grid>
 </ContentView>
