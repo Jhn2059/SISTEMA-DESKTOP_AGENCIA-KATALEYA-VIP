@@ -1,12 +1,16 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.NetworkInformation;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Kataleya.Contratos;
+using Kataleya.Contratos.Configuracion;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Session;
 using Kataleya.Dominio.DataObjects;
+using Kataleya.Dominio.Enums;
 using Kataleya.Dominio.Interfaces;
 
 namespace Kataleya.Cliente;
@@ -210,6 +214,129 @@ public sealed class ClienteApi
             "sedes",
             null,
             "Consultar sedes");
+
+    public Task<ResultadoDeLaApi<DatosDeTarifa>> ObtenerTarifaVigenteAsync(
+        DateOnly fecha,
+        Sentido sentido) =>
+        EnviarAsync<DatosDeTarifa>(
+            HttpMethod.Get,
+            $"tarifas/vigente?fecha={fecha.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}&sentido={sentido}",
+            null,
+            "Consultar tarifa vigente");
+
+    public Task<ResultadoDeLaApi<List<DatosDeTarifa>>> ObtenerTarifasAsync() =>
+        EnviarAsync<List<DatosDeTarifa>>(
+            HttpMethod.Get,
+            "tarifas",
+            null,
+            "Consultar tarifas");
+
+    public Task<ResultadoDeLaApi> FijarTarifaRegularAsync(
+        Sentido sentido,
+        decimal importe) =>
+        EnviarSinDatosAsync(
+            HttpMethod.Put,
+            $"tarifas/regular/{sentido}",
+            new SolicitudDeTarifaRegular(importe),
+            "Fijar tarifa regular",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDeTarifa>> GuardarTarifaAsync(
+        SolicitudDeTarifa solicitud) =>
+        EnviarAsync<DatosDeTarifa>(
+            HttpMethod.Post,
+            "tarifas",
+            solicitud,
+            "Guardar tarifa programada",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDeTarifa>> ActualizarTarifaAsync(
+        int idTarifa,
+        SolicitudDeTarifa solicitud) =>
+        EnviarAsync<DatosDeTarifa>(
+            HttpMethod.Put,
+            $"tarifas/{idTarifa}",
+            solicitud,
+            "Editar tarifa programada",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi> QuitarTarifaAsync(int idTarifa) =>
+        EnviarSinDatosAsync(
+            HttpMethod.Delete,
+            $"tarifas/{idTarifa}",
+            null,
+            "Quitar tarifa programada",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<List<DatosDeParametro>>> ObtenerParametrosAsync() =>
+        EnviarAsync<List<DatosDeParametro>>(
+            HttpMethod.Get,
+            "parametros",
+            null,
+            "Consultar parámetros");
+
+    public Task<ResultadoDeLaApi> GuardarParametroAsync(
+        string nombre,
+        string valor) =>
+        EnviarSinDatosAsync(
+            HttpMethod.Put,
+            $"parametros/{Uri.EscapeDataString(nombre)}",
+            new SolicitudDeParametro(valor),
+            "Guardar parámetro",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi> AgregarHorarioAsync(TimeOnly hora) =>
+        EnviarSinDatosAsync(
+            HttpMethod.Post,
+            "parametros/horarios",
+            new SolicitudDeHorario(hora.ToString("HH:mm", CultureInfo.InvariantCulture)),
+            "Agregar horario",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi> QuitarHorarioAsync(TimeOnly hora) =>
+        EnviarSinDatosAsync(
+            HttpMethod.Delete,
+            $"parametros/horarios/{hora.ToString("HH:mm", CultureInfo.InvariantCulture)}",
+            null,
+            "Quitar horario",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<int>> ContarPasajesDelHorarioAsync(TimeOnly hora) =>
+        EnviarAsync<int>(
+            HttpMethod.Get,
+            $"pasajes/cantidad?hora={Uri.EscapeDataString(hora.ToString("HH:mm", CultureInfo.InvariantCulture))}",
+            null,
+            "Consultar cantidad de pasajes");
+
+    public Task<ResultadoDeLaApi<List<DatosDeTipoDeVehiculo>>> ObtenerTiposDeVehiculoAsync() =>
+        EnviarAsync<List<DatosDeTipoDeVehiculo>>(
+            HttpMethod.Get,
+            "tipos-de-vehiculo",
+            null,
+            "Consultar tipos de vehículo");
+
+    public Task<ResultadoDeLaApi<List<DatosDeUnidadSalida>>> ObtenerUnidadesDisponiblesAsync(DateOnly fecha) =>
+        EnviarAsync<List<DatosDeUnidadSalida>>(
+            HttpMethod.Get,
+            $"pasajes/disponibles?fecha={fecha:yyyy-MM-dd}",
+            null,
+            "Consultar unidades disponibles");
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> RegistrarPasajeAsync(
+        SolicitudDeRegistroPasaje solicitud) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            "pasajes",
+            solicitud,
+            "Registrar pasaje",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> ObtenerPasajeAsync(long idPasaje) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Get,
+            $"pasajes/{idPasaje}",
+            null,
+            "Consultar pasaje");
 
     public void CerrarSesion()
     {

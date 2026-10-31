@@ -1,14 +1,19 @@
+using System.Globalization;
 using System.Text.Json.Serialization;
 using Kataleya.Api.Session;
 using Kataleya.Aplicacion;
 using Kataleya.Aplicacion.Excepciones;
 using Kataleya.Aplicacion.Services;
 using Kataleya.Aplicacion.Time;
+using Kataleya.Contratos;
+using Kataleya.Contratos.Configuracion;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Session;
 using Kataleya.Datos;
 using Kataleya.Datos.Repositories;
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Entities;
+using Kataleya.Dominio.Enums;
 using Kataleya.Dominio.Interfaces;
 using Microsoft.AspNetCore.Diagnostics;
 
@@ -41,10 +46,18 @@ builder.Services.AddScoped<ContextoDeOperacion>();
 builder.Services.AddScoped<IRepositorioUsuarios, RepositorioUsuarios>();
 builder.Services.AddScoped<IRepositorioCatalogos, RepositorioCatalogos>();
 builder.Services.AddScoped<IRepositorioBitacora, RepositorioBitacora>();
+builder.Services.AddScoped<IRepositorioTarifas, RepositorioTarifas>();
+builder.Services.AddScoped<IRepositorioParametros, RepositorioParametros>();
+builder.Services.AddScoped<IRepositorioPasajes, RepositorioPasajes>();
+builder.Services.AddScoped<IRepositorioUnidadesSalida, RepositorioUnidadesSalida>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 builder.Services.AddScoped<ServicioBitacora>();
 builder.Services.AddScoped<ServicioSesion>();
 builder.Services.AddScoped<ServicioCuentas>();
+builder.Services.AddScoped<ServicioTarifas>();
+builder.Services.AddScoped<ServicioParametros>();
+builder.Services.AddScoped<ServicioConsultas>();
+builder.Services.AddScoped<ServicioPasajes>();
 builder.Services.AddOptions<OpcionesDeSesion>()
     .Bind(builder.Configuration.GetSection(OpcionesDeSesion.Seccion));
 builder.Services.AddSingleton<ServicioDeLlaves>();
@@ -238,7 +251,190 @@ sedes.MapGet("", async (IRepositorioCatalogos catalogos) =>
     return Results.Ok(lista.Select(MapearSede).ToList());
 });
 
+app.MapGet("/tarifas/vigente", async (
+    DateOnly fecha,
+    Sentido sentido,
+    ServicioTarifas servicio) =>
+{
+    var tarifa = await servicio.ObtenerTarifaVigenteAsync(fecha, sentido);
+    return Results.Ok(MapearTarifa(tarifa));
+});
+
+app.MapGet("/tipos-de-vehiculo", async (ServicioParametros servicio) =>
+{
+    var tipos = await servicio.ObtenerTiposDeVehiculoAsync();
+    return Results.Ok(tipos.Select(MapearTipoDeVehiculo).ToList());
+});
+
+var tarifas = app.MapGroup("/tarifas")
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
+tarifas.MapGet("", async (ServicioTarifas servicio) =>
+{
+    var lista = await servicio.ListarTarifasAsync();
+    return Results.Ok(lista.Select(MapearTarifa).ToList());
+});
+
+tarifas.MapPut("/regular/{sentido}", async (
+    Sentido sentido,
+    SolicitudDeTarifaRegular solicitud,
+    ServicioTarifas servicio) =>
+{
+    await servicio.FijarTarifaRegularAsync(sentido, solicitud.Importe);
+    return Results.NoContent();
+});
+
+tarifas.MapPost("", async (SolicitudDeTarifa solicitud, ServicioTarifas servicio) =>
+{
+    var tarifa = await servicio.GuardarTarifaAsync(solicitud);
+    return Results.Ok(MapearTarifa(tarifa));
+});
+
+tarifas.MapPut("/{id:int}", async (
+    int id,
+    SolicitudDeTarifa solicitud,
+    ServicioTarifas servicio) =>
+{
+    var tarifa = await servicio.ActualizarTarifaAsync(id, solicitud);
+    return Results.Ok(MapearTarifa(tarifa));
+});
+
+tarifas.MapDelete("/{id:int}", async (int id, ServicioTarifas servicio) =>
+{
+    await servicio.QuitarTarifaAsync(id);
+    return Results.NoContent();
+});
+
+var parametros = app.MapGroup("/parametros")
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
+parametros.MapGet("", async (ServicioParametros servicio) =>
+{
+    var lista = await servicio.ListarParametrosAsync();
+    return Results.Ok(lista.Select(MapearParametro).ToList());
+});
+
+parametros.MapPut("/{nombre}", async (
+    string nombre,
+    SolicitudDeParametro solicitud,
+    ServicioParametros servicio) =>
+{
+    await servicio.GuardarParametroAsync(nombre, solicitud.Valor);
+    return Results.NoContent();
+});
+
+parametros.MapPost("/horarios", async (
+    SolicitudDeHorario solicitud,
+    ServicioParametros servicio) =>
+{
+    if (!IntentarLeerHora(solicitud.Hora, out var hora))
+    {
+        return HoraInvalida();
+    }
+
+    await servicio.AgregarHorarioAsync(hora);
+    return Results.NoContent();
+});
+
+parametros.MapDelete("/horarios/{hora}", async (
+    string hora,
+    ServicioParametros servicio) =>
+{
+    if (!IntentarLeerHora(hora, out var valor))
+    {
+        return HoraInvalida();
+    }
+
+    await servicio.QuitarHorarioAsync(valor);
+    return Results.NoContent();
+});
+
+var pasajes = app.MapGroup("/pasajes")
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
+pasajes.MapGet("/cantidad", async (string hora, ServicioConsultas servicio) =>
+{
+    if (!IntentarLeerHora(hora, out var valor))
+    {
+        return HoraInvalida();
+    }
+
+    var cantidad = await servicio.ContarPasajesDelHorarioAsync(valor);
+    return Results.Ok(cantidad);
+});
+
+pasajes.MapGet("/disponibles", async (string fecha, ServicioPasajes servicio) =>
+{
+    if (!DateOnly.TryParse(fecha, out var valor))
+    {
+        return Results.ValidationProblem(new Dictionary<string, string[]>
+        {
+            ["fecha"] = ["Escriba la fecha en formato aaaa-MM-dd."]
+        });
+    }
+
+    var unidades = await servicio.ListarUnidadesDisponiblesAsync(valor);
+    return Results.Ok(unidades.Select(MapearUnidadSalida));
+});
+
+pasajes.MapPost("", async (SolicitudDeRegistroPasaje solicitud, ServicioPasajes servicio) =>
+{
+    var id = await servicio.RegistrarPasajeAsync(solicitud);
+    return Results.Ok(new { id });
+});
+
+pasajes.MapGet("/{id:long}", async (long id, ServicioPasajes servicio) =>
+{
+    var pasaje = await servicio.ObtenerPasajeAsync(id);
+    if (pasaje is null)
+    {
+        return NoEncontradaPasaje();
+    }
+
+    return Results.Ok(MapearPasaje(pasaje));
+});
+
 app.Run();
+
+static DatosDeUnidadSalida MapearUnidadSalida(UnidadSalidaDisponible unidad) => new()
+{
+    Id = unidad.Id,
+    Sentido = unidad.Sentido,
+    TipoVehiculoId = unidad.TipoVehiculoId,
+    TipoVehiculoNombre = unidad.TipoVehiculoNombre,
+    CantidadAsientos = unidad.CantidadAsientos,
+    AsientosOcupados = unidad.AsientosOcupados,
+    FechaHoraSalida = unidad.FechaHoraSalida,
+    Estado = unidad.Estado,
+    VendidaPor = unidad.VendidaPor
+};
+
+static DatosDePasaje MapearPasaje(Pasaje pasaje) => new()
+{
+    Id = pasaje.Id,
+    UnidadSalidaId = pasaje.UnidadSalidaId,
+    NumeroAsiento = pasaje.NumeroAsiento,
+    NombrePasajero = pasaje.NombrePasajero,
+    TipoDocumento = pasaje.TipoDocumento,
+    NumeroDocumento = pasaje.NumeroDocumento,
+    Celular = pasaje.Celular,
+    Origen = pasaje.Origen,
+    Destino = pasaje.Destino,
+    LugarEmbarque = pasaje.LugarEmbarque,
+    FechaHoraSalida = pasaje.FechaHoraSalida,
+    FechaVenta = pasaje.FechaVenta,
+    Adelanto = pasaje.Adelanto,
+    Estado = pasaje.Estado,
+    VendidaPor = pasaje.VendidaPor,
+    EsMenor = pasaje.EsMenor,
+    NombrePadreMadre = pasaje.NombrePadreMadre,
+    MotivoMenor = pasaje.MotivoMenor
+};
+
+static IResult NoEncontradaPasaje() =>
+    Results.Problem(
+        statusCode: StatusCodes.Status404NotFound,
+        title: "No se encontró el pasaje.");
 
 static Dictionary<string, string[]> ValidarCuenta(SolicitudDeCuenta solicitud)
 {
@@ -314,3 +510,54 @@ static DatosDeSede MapearSede(Sede sede) =>
         Id = sede.Id,
         Nombre = sede.Nombre
     };
+
+static DatosDeTarifa MapearTarifa(Tarifa tarifa) => tarifa switch
+{
+    TarifaRegular regular => new DatosDeTarifa
+    {
+        Id = regular.Id,
+        Nombre = null,
+        Importe = regular.Importe,
+        Vigencia = null,
+        FijadaPor = regular.FijadaPor,
+        Sentido = regular.Sentido.ToString()
+    },
+    TarifaProgramada programada => new DatosDeTarifa
+    {
+        Id = programada.Id,
+        Nombre = programada.Nombre,
+        Importe = programada.Importe,
+        Vigencia = programada.Vigencia,
+        FijadaPor = programada.FijadaPor,
+        Sentido = programada.Sentido?.ToString()
+    },
+    _ => throw new ArgumentOutOfRangeException(nameof(tarifa), "El tipo de tarifa no es válido.")
+};
+
+static DatosDeParametro MapearParametro(ParametroDelNegocio parametro) =>
+    new()
+    {
+        Nombre = parametro.Nombre,
+        Valor = parametro.Valor
+    };
+
+static DatosDeTipoDeVehiculo MapearTipoDeVehiculo(TipoDeVehiculo tipo) =>
+    new()
+    {
+        Nombre = tipo.Nombre,
+        CantidadDeAsientos = tipo.CantidadDeAsientos
+    };
+
+static bool IntentarLeerHora(string? texto, out TimeOnly hora) =>
+    TimeOnly.TryParseExact(
+        texto?.Trim(),
+        ["H:mm", "HH:mm"],
+        CultureInfo.InvariantCulture,
+        DateTimeStyles.None,
+        out hora);
+
+static IResult HoraInvalida() =>
+    Results.ValidationProblem(new Dictionary<string, string[]>
+    {
+        ["hora"] = ["Escriba la hora en formato de 24 horas, por ejemplo 07:30."]
+    });
