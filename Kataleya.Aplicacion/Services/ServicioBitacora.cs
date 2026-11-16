@@ -1,4 +1,7 @@
 using Kataleya.Aplicacion;
+using Kataleya.Aplicacion.Excepciones;
+using Kataleya.Aplicacion.Time;
+using Kataleya.Dominio.DataObjects;
 using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Interfaces;
 
@@ -31,4 +34,32 @@ public sealed class ServicioBitacora
 
     public Task<bool> ExisteAsync(Guid clave) =>
         _repositorio.ExisteClaveAsync(clave);
+
+    public Task<IReadOnlyList<RegistroDeBitacora>> ConsultarAsync(
+        ConsultaDeBitacora consulta)
+    {
+        ArgumentNullException.ThrowIfNull(consulta);
+
+        if (consulta.Desde > consulta.Hasta)
+        {
+            throw new ReglaDeNegocioException(
+                "La fecha 'Desde' no puede ser posterior a 'Hasta'.",
+                "desde");
+        }
+
+        var usuario = _contexto.Usuario
+            ?? throw new InvalidOperationException("No hay un usuario autenticado.");
+        var usuarioId = string.Equals(
+            usuario.Rol.Nombre,
+            "Administrador",
+            StringComparison.OrdinalIgnoreCase)
+            ? (int?)null
+            : usuario.Id;
+        var desdeUtc = ZonaHorariaLima.ALocalAUtc(
+            consulta.Desde.ToDateTime(TimeOnly.MinValue));
+        var hastaUtc = ZonaHorariaLima.ALocalAUtc(
+            consulta.Hasta.AddDays(1).ToDateTime(TimeOnly.MinValue));
+
+        return _repositorio.ListarAsync(desdeUtc, hastaUtc, usuarioId);
+    }
 }

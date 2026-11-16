@@ -9,7 +9,8 @@ public sealed class RegistroDeBitacora
         Usuario usuario,
         string? valorAnterior = null,
         string? valorNuevo = null,
-        Guid? claveDeOperacion = null)
+        Guid? claveDeOperacion = null,
+        long? pasajeId = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(operacion);
         ArgumentNullException.ThrowIfNull(usuario);
@@ -21,6 +22,7 @@ public sealed class RegistroDeBitacora
         ValorAnterior = valorAnterior;
         ValorNuevo = valorNuevo;
         ClaveDeOperacion = claveDeOperacion;
+        PasajeId = pasajeId;
     }
 
     public long Id { get; }
@@ -36,6 +38,8 @@ public sealed class RegistroDeBitacora
     public string? ValorNuevo { get; }
 
     public Guid? ClaveDeOperacion { get; private set; }
+
+    public long? PasajeId { get; }
 
     public void FijarClaveDeOperacion(Guid? clave) =>
         ClaveDeOperacion = clave;

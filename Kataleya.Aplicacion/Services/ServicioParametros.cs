@@ -61,6 +61,23 @@ public sealed class ServicioParametros
     public Task<IReadOnlyList<TipoDeVehiculo>> ObtenerTiposDeVehiculoAsync() =>
         _parametros.ListarTiposDeVehiculoAsync();
 
+    public async Task<IReadOnlyList<TimeOnly>> ObtenerHorariosAsync() =>
+        await ListarHorariosAsync();
+
+    public async Task<int> ObtenerPlazoDeReservaAsync()
+    {
+        var parametro = await _parametros.BuscarAsync(PlazoDeReserva);
+
+        return int.TryParse(
+                   parametro?.Valor,
+                   NumberStyles.Integer,
+                   CultureInfo.InvariantCulture,
+                   out var dias) &&
+               dias is >= 1 and <= 30
+            ? dias
+            : 7;
+    }
+
     public async Task<TimeSpan> ObtenerAvisoPrevioAsync()
     {
         var parametro = await _parametros.BuscarAsync(AvisoPrevio);

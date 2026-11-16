@@ -11,4 +11,6 @@ public interface IRepositorioParametros
     Task GuardarAsync(ParametroDelNegocio parametro);
 
     Task<IReadOnlyList<TipoDeVehiculo>> ListarTiposDeVehiculoAsync();
+
+    Task<TipoDeVehiculo?> BuscarTipoDeVehiculoAsync(short id);
 }

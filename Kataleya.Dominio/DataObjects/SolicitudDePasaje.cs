@@ -1,9 +1,10 @@
 using Kataleya.Dominio.Enums;
+using Kataleya.Dominio.ValueObjects;
 
 namespace Kataleya.Dominio.DataObjects;
 
-public sealed record SolicitudDeRegistroPasaje(
-    long UnidadSalidaId,
+public sealed record SolicitudDePasaje(
+    long UnidadDeSalidaId,
     int NumeroAsiento,
     string NombrePasajero,
     TipoDocumento TipoDocumento,
@@ -12,8 +13,10 @@ public sealed record SolicitudDeRegistroPasaje(
     string Origen,
     string Destino,
     string LugarEmbarque,
-    DateTime FechaHoraSalida,
-    decimal Adelanto,
     bool EsMenor,
     string? NombrePadreMadre,
-    string? MotivoMenor);
+    string? MotivoMenor,
+    decimal? MontoDelPago,
+    MedioPago? MedioDePago,
+    NumeroDeBoleto? Talonario = null,
+    DateTime? FechaHoraEmisionTalonario = null);

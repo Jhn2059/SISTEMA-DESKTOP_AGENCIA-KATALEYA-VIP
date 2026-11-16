@@ -6,7 +6,9 @@ using System.Net.NetworkInformation;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Kataleya.Contratos;
+using Kataleya.Contratos.Bitacora;
 using Kataleya.Contratos.Configuracion;
+using Kataleya.Contratos.Cuadre;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Session;
 using Kataleya.Dominio.DataObjects;
@@ -315,28 +317,162 @@ public sealed class ClienteApi
             null,
             "Consultar tipos de vehículo");
 
-    public Task<ResultadoDeLaApi<List<DatosDeUnidadSalida>>> ObtenerUnidadesDisponiblesAsync(DateOnly fecha) =>
-        EnviarAsync<List<DatosDeUnidadSalida>>(
+    public Task<ResultadoDeLaApi<List<DatosDeUnidad>>> ObtenerAsientosAsync(
+        Sentido sentido,
+        DateTime fechaHoraSalida) =>
+        EnviarAsync<List<DatosDeUnidad>>(
             HttpMethod.Get,
-            $"pasajes/disponibles?fecha={fecha:yyyy-MM-dd}",
+            $"salidas/{sentido}/{FormatearFechaHora(fechaHoraSalida)}/unidades",
             null,
-            "Consultar unidades disponibles");
+            "Consultar unidades de salida");
 
-    public Task<ResultadoDeLaApi<DatosDePasaje>> RegistrarPasajeAsync(
-        SolicitudDeRegistroPasaje solicitud) =>
-        EnviarAsync<DatosDePasaje>(
+    public Task<ResultadoDeLaApi<DatosDeUnidad>> AbrirUnidadAsync(
+        Sentido sentido,
+        DateTime fechaHoraSalida,
+        short tipoVehiculoId) =>
+        EnviarAsync<DatosDeUnidad>(
             HttpMethod.Post,
-            "pasajes",
-            solicitud,
-            "Registrar pasaje",
+            $"salidas/{sentido}/{FormatearFechaHora(fechaHoraSalida)}/unidades",
+            new SolicitudDeUnidadDeSalida(tipoVehiculoId),
+            "Abrir unidad de salida",
             idempotente: true);
 
-    public Task<ResultadoDeLaApi<DatosDePasaje>> ObtenerPasajeAsync(long idPasaje) =>
+    public Task<ResultadoDeLaApi<DatosDePasaje>> RegistrarReservaAsync(
+        SolicitudDePasaje solicitud) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            "reservas",
+            solicitud,
+            "Registrar reserva",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> RegistrarVentaAsync(
+        SolicitudDePasaje solicitud) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            "ventas",
+            solicitud,
+            "Registrar venta",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDeGrupo>> RegistrarGrupoAsync(
+        SolicitudDeGrupo solicitud) =>
+        EnviarAsync<DatosDeGrupo>(
+            HttpMethod.Post,
+            "grupos",
+            solicitud,
+            "Registrar grupo",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> RegistrarDiferidoAsync(
+        SolicitudDePasaje solicitud) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            "pasajes-diferidos",
+            solicitud,
+            "Registrar pasaje diferido",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<List<DatosDePasaje>>> ConsultarPasajesAsync(
+        FiltroDePasajes filtro)
+    {
+        ArgumentNullException.ThrowIfNull(filtro);
+
+        var ruta = new System.Text.StringBuilder("pasajes")
+            .Append("?fecha=")
+            .Append(filtro.Fecha.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+
+        if (filtro.Hora is not null)
+        {
+            ruta.Append("&hora=")
+                .Append(filtro.Hora.Value.ToString("HH:mm", CultureInfo.InvariantCulture));
+        }
+
+        if (filtro.Sentido is not null)
+        {
+            ruta.Append("&sentido=").Append(filtro.Sentido.Value);
+        }
+
+        if (filtro.Estado is not null)
+        {
+            ruta.Append("&estado=").Append(filtro.Estado.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filtro.NumeroDocumento))
+        {
+            ruta.Append("&documento=")
+                .Append(Uri.EscapeDataString(filtro.NumeroDocumento.Trim()));
+        }
+
+        return EnviarAsync<List<DatosDePasaje>>(
+            HttpMethod.Get,
+            ruta.ToString(),
+            null,
+            "Consultar pasajes");
+    }
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> RegistrarCobroDelSaldoAsync(
+        long idPasaje,
+        SolicitudDeCobro solicitud) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            $"pasajes/{idPasaje}/cobros",
+            solicitud,
+            "Cobrar saldo del pasaje",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> ObtenerDetalleAsync(long idPasaje) =>
         EnviarAsync<DatosDePasaje>(
             HttpMethod.Get,
             $"pasajes/{idPasaje}",
             null,
             "Consultar pasaje");
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> ModificarPasajeAsync(
+        long idPasaje,
+        SolicitudDeModificacionDePasaje solicitud) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Put,
+            $"pasajes/{idPasaje}",
+            solicitud,
+            "Modificar pasaje",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> AnularPasajeAsync(
+        long idPasaje,
+        SolicitudDeAnulacionDePasaje solicitud) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            $"pasajes/{idPasaje}/anulacion",
+            solicitud,
+            "Anular pasaje",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDePasaje>> MarcarNoSePresentoAsync(long idPasaje) =>
+        EnviarAsync<DatosDePasaje>(
+            HttpMethod.Post,
+            $"pasajes/{idPasaje}/no-se-presento",
+            null,
+            "Marcar No se presentó",
+            idempotente: true);
+
+    public Task<ResultadoDeLaApi<DatosDeCuadre>> ObtenerCuadreAsync(
+        DateOnly desde,
+        DateOnly hasta) =>
+        EnviarAsync<DatosDeCuadre>(
+            HttpMethod.Get,
+            $"cuadre?desde={desde.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}&hasta={hasta.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}",
+            null,
+            "Consultar cuadre de ventas");
+
+    public Task<ResultadoDeLaApi<List<DatosDeRegistroDeBitacora>>> ConsultarBitacoraAsync(
+        DateOnly desde,
+        DateOnly hasta) =>
+        EnviarAsync<List<DatosDeRegistroDeBitacora>>(
+            HttpMethod.Get,
+            $"bitacora?desde={desde.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}&hasta={hasta.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}",
+            null,
+            "Consultar bitácora");
 
     public void CerrarSesion()
     {
@@ -554,6 +690,9 @@ public sealed class ClienteApi
 
         return clave;
     }
+
+    private static string FormatearFechaHora(DateTime fechaHora) =>
+        fechaHora.ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture);
 
     private static string CrearHuella(HttpMethod metodo, string ruta, object? contenido)
     {

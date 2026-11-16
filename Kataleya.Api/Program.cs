@@ -6,7 +6,9 @@ using Kataleya.Aplicacion.Excepciones;
 using Kataleya.Aplicacion.Services;
 using Kataleya.Aplicacion.Time;
 using Kataleya.Contratos;
+using Kataleya.Contratos.Bitacora;
 using Kataleya.Contratos.Configuracion;
+using Kataleya.Contratos.Cuadre;
 using Kataleya.Contratos.Cuentas;
 using Kataleya.Contratos.Session;
 using Kataleya.Datos;
@@ -16,6 +18,7 @@ using Kataleya.Dominio.Entities;
 using Kataleya.Dominio.Enums;
 using Kataleya.Dominio.Interfaces;
 using Microsoft.AspNetCore.Diagnostics;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,14 +53,22 @@ builder.Services.AddScoped<IRepositorioTarifas, RepositorioTarifas>();
 builder.Services.AddScoped<IRepositorioParametros, RepositorioParametros>();
 builder.Services.AddScoped<IRepositorioPasajes, RepositorioPasajes>();
 builder.Services.AddScoped<IRepositorioUnidadesSalida, RepositorioUnidadesSalida>();
+builder.Services.AddScoped<IRepositorioGrupos, RepositorioGrupos>();
+builder.Services.AddScoped<IRepositorioPagos, RepositorioPagos>();
+builder.Services.AddScoped<IRepositorioBoletos, RepositorioBoletos>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 builder.Services.AddScoped<ServicioBitacora>();
 builder.Services.AddScoped<ServicioSesion>();
 builder.Services.AddScoped<ServicioCuentas>();
 builder.Services.AddScoped<ServicioTarifas>();
 builder.Services.AddScoped<ServicioParametros>();
+builder.Services.AddScoped<HidratadorDePasajes>();
 builder.Services.AddScoped<ServicioConsultas>();
-builder.Services.AddScoped<ServicioPasajes>();
+builder.Services.AddScoped<ServicioAsientos>();
+builder.Services.AddScoped<ServicioReservasYVentas>();
+builder.Services.AddScoped<ServicioCobros>();
+builder.Services.AddScoped<ServicioGestionDePasajes>();
+builder.Services.AddScoped<ServicioCuadre>();
 builder.Services.AddOptions<OpcionesDeSesion>()
     .Bind(builder.Configuration.GetSection(OpcionesDeSesion.Seccion));
 builder.Services.AddSingleton<ServicioDeLlaves>();
@@ -92,6 +103,12 @@ app.UseExceptionHandler(manejador =>
         {
             estado = solicitud.StatusCode;
             titulo = "La solicitud no es válida.";
+        }
+        else if (excepcion is PostgresException postgres &&
+                 postgres.SqlState == PostgresErrorCodes.UniqueViolation)
+        {
+            estado = StatusCodes.Status409Conflict;
+            titulo = "La operación ya fue registrada. Actualice los datos e intente de nuevo.";
         }
 
         contexto.Response.StatusCode = estado;
@@ -349,10 +366,10 @@ parametros.MapDelete("/horarios/{hora}", async (
     return Results.NoContent();
 });
 
-var pasajes = app.MapGroup("/pasajes")
+var soloAdministrador = app.MapGroup("/pasajes")
     .AddEndpointFilter<FiltroDeAdministrador>();
 
-pasajes.MapGet("/cantidad", async (string hora, ServicioConsultas servicio) =>
+soloAdministrador.MapGet("/cantidad", async (string hora, ServicioConsultas servicio) =>
 {
     if (!IntentarLeerHora(hora, out var valor))
     {
@@ -363,9 +380,111 @@ pasajes.MapGet("/cantidad", async (string hora, ServicioConsultas servicio) =>
     return Results.Ok(cantidad);
 });
 
-pasajes.MapGet("/disponibles", async (string fecha, ServicioPasajes servicio) =>
+soloAdministrador.MapPut("/{id:long}", async (
+    long id,
+    SolicitudDeModificacionDePasaje solicitud,
+    ServicioGestionDePasajes servicio) =>
 {
-    if (!DateOnly.TryParse(fecha, out var valor))
+    var resultado = await servicio.ModificarAsync(id, solicitud);
+    var datos = MapearPasaje(resultado.Pasaje);
+    datos.RequiereReimpresion = resultado.RequiereReimpresion;
+    return Results.Ok(datos);
+});
+
+soloAdministrador.MapPost("/{id:long}/anulacion", async (
+    long id,
+    SolicitudDeAnulacionDePasaje solicitud,
+    ServicioGestionDePasajes servicio) =>
+{
+    var pasaje = await servicio.AnularAsync(id, solicitud);
+    return Results.Ok(MapearPasaje(pasaje));
+});
+
+soloAdministrador.MapPost("/{id:long}/no-se-presento", async (
+    long id,
+    ServicioGestionDePasajes servicio) =>
+{
+    var pasaje = await servicio.MarcarNoSePresentoAsync(id);
+    return Results.Ok(MapearPasaje(pasaje));
+});
+
+var pasajesDiferidos = app.MapGroup("/pasajes-diferidos")
+    .AddEndpointFilter<FiltroDeAdministrador>();
+
+pasajesDiferidos.MapPost("", async (
+    SolicitudDePasaje solicitud,
+    ServicioReservasYVentas servicio) =>
+{
+    var pasaje = await servicio.RegistrarDiferidoAsync(solicitud);
+    return Results.Ok(MapearPasaje(pasaje));
+});
+
+var ventas = app.MapGroup("")
+    .AddEndpointFilter<FiltroDeVentas>();
+
+ventas.MapGet("/salidas/{sentido}/{fechaHora}/unidades", async (
+    Sentido sentido,
+    string fechaHora,
+    ServicioAsientos servicio) =>
+{
+    if (!IntentarLeerFechaHora(fechaHora, out var valor))
+    {
+        return FechaHoraInvalida();
+    }
+
+    var unidades = await servicio.ObtenerAsientosAsync(sentido, valor);
+    return Results.Ok(unidades.Select(MapearUnidad));
+});
+
+ventas.MapPost("/salidas/{sentido}/{fechaHora}/unidades", async (
+    Sentido sentido,
+    string fechaHora,
+    SolicitudDeUnidadDeSalida solicitud,
+    ServicioAsientos servicio) =>
+{
+    if (!IntentarLeerFechaHora(fechaHora, out var valor))
+    {
+        return FechaHoraInvalida();
+    }
+
+    var unidad = await servicio.AbrirUnidadAsync(sentido, valor, solicitud);
+    return Results.Ok(MapearUnidad(unidad));
+});
+
+ventas.MapPost("/reservas", async (SolicitudDePasaje solicitud, ServicioReservasYVentas servicio) =>
+{
+    var pasaje = await servicio.RegistrarReservaAsync(solicitud);
+    return Results.Ok(MapearPasaje(pasaje));
+});
+
+ventas.MapPost("/ventas", async (SolicitudDePasaje solicitud, ServicioReservasYVentas servicio) =>
+{
+    var pasaje = await servicio.RegistrarVentaAsync(solicitud);
+    return Results.Ok(MapearPasaje(pasaje));
+});
+
+ventas.MapPost("/grupos", async (
+    SolicitudDeGrupo solicitud,
+    ServicioReservasYVentas servicio,
+    IRepositorioParametros parametros) =>
+{
+    var grupo = await servicio.RegistrarGrupoAsync(solicitud);
+    var tipos = await parametros.ListarTiposDeVehiculoAsync();
+    return Results.Ok(MapearGrupo(grupo, tipos));
+});
+
+ventas.MapGet("/pasajes", async (
+    string? fecha,
+    string? hora,
+    Sentido? sentido,
+    EstadoPasaje? estado,
+    string? documento,
+    ServicioConsultas servicio,
+    IReloj reloj) =>
+{
+    var fechaFiltro = ZonaHorariaLima.FechaLocal(reloj.Ahora);
+
+    if (!string.IsNullOrWhiteSpace(fecha) && !DateOnly.TryParse(fecha, out fechaFiltro))
     {
         return Results.ValidationProblem(new Dictionary<string, string[]>
         {
@@ -373,19 +492,30 @@ pasajes.MapGet("/disponibles", async (string fecha, ServicioPasajes servicio) =>
         });
     }
 
-    var unidades = await servicio.ListarUnidadesDisponiblesAsync(valor);
-    return Results.Ok(unidades.Select(MapearUnidadSalida));
+    TimeOnly? horaFiltro = null;
+    if (!string.IsNullOrWhiteSpace(hora))
+    {
+        if (!IntentarLeerHora(hora, out var valor))
+        {
+            return HoraInvalida();
+        }
+
+        horaFiltro = valor;
+    }
+
+    var pasajes = await servicio.ConsultarAsync(new FiltroDePasajes(
+        fechaFiltro,
+        horaFiltro,
+        sentido,
+        estado,
+        documento));
+
+    return Results.Ok(pasajes.Select(MapearPasaje).ToList());
 });
 
-pasajes.MapPost("", async (SolicitudDeRegistroPasaje solicitud, ServicioPasajes servicio) =>
+ventas.MapGet("/pasajes/{id:long}", async (long id, ServicioConsultas servicio) =>
 {
-    var id = await servicio.RegistrarPasajeAsync(solicitud);
-    return Results.Ok(new { id });
-});
-
-pasajes.MapGet("/{id:long}", async (long id, ServicioPasajes servicio) =>
-{
-    var pasaje = await servicio.ObtenerPasajeAsync(id);
+    var pasaje = await servicio.ObtenerDetalleAsync(id);
     if (pasaje is null)
     {
         return NoEncontradaPasaje();
@@ -394,25 +524,159 @@ pasajes.MapGet("/{id:long}", async (long id, ServicioPasajes servicio) =>
     return Results.Ok(MapearPasaje(pasaje));
 });
 
+ventas.MapPost("/pasajes/{id:long}/cobros", async (
+    long id,
+    SolicitudDeCobro solicitud,
+    ServicioCobros servicio) =>
+{
+    var pasaje = await servicio.RegistrarCobroDelSaldoAsync(id, solicitud);
+    return Results.Ok(MapearPasaje(pasaje));
+});
+
+var cuadre = app.MapGroup("/cuadre")
+    .AddEndpointFilter<FiltroDeCuadre>();
+
+cuadre.MapGet("", async (
+    string? desde,
+    string? hasta,
+    ServicioCuadre servicio) =>
+{
+    var errores = new Dictionary<string, string[]>();
+
+    if (string.IsNullOrWhiteSpace(desde))
+    {
+        errores["desde"] = ["Elija la fecha 'Desde'."];
+    }
+
+    if (string.IsNullOrWhiteSpace(hasta))
+    {
+        errores["hasta"] = ["Elija la fecha 'Hasta'."];
+    }
+
+    if (errores.Count > 0)
+    {
+        return Results.ValidationProblem(errores);
+    }
+
+    if (!DateOnly.TryParseExact(
+            desde!.Trim(),
+            "yyyy-MM-dd",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out var fechaDesde))
+    {
+        return Results.ValidationProblem(new Dictionary<string, string[]>
+        {
+            ["desde"] = ["Escriba la fecha 'Desde' en formato aaaa-MM-dd."]
+        });
+    }
+
+    if (!DateOnly.TryParseExact(
+            hasta!.Trim(),
+            "yyyy-MM-dd",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out var fechaHasta))
+    {
+        return Results.ValidationProblem(new Dictionary<string, string[]>
+        {
+            ["hasta"] = ["Escriba la fecha 'Hasta' en formato aaaa-MM-dd."]
+        });
+    }
+
+    var resultado = await servicio.ObtenerAsync(new ConsultaDeCuadre(fechaDesde, fechaHasta));
+    return Results.Ok(MapearCuadre(resultado));
+});
+
+var bitacora = app.MapGroup("/bitacora")
+    .AddEndpointFilter<FiltroDeBitacora>();
+
+bitacora.MapGet("", async (
+    string? desde,
+    string? hasta,
+    ServicioBitacora servicio) =>
+{
+    var errores = new Dictionary<string, string[]>();
+
+    if (string.IsNullOrWhiteSpace(desde))
+    {
+        errores["desde"] = ["Elija la fecha 'Desde'."];
+    }
+
+    if (string.IsNullOrWhiteSpace(hasta))
+    {
+        errores["hasta"] = ["Elija la fecha 'Hasta'."];
+    }
+
+    if (errores.Count > 0)
+    {
+        return Results.ValidationProblem(errores);
+    }
+
+    if (!DateOnly.TryParseExact(
+            desde!.Trim(),
+            "yyyy-MM-dd",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out var fechaDesde))
+    {
+        return Results.ValidationProblem(new Dictionary<string, string[]>
+        {
+            ["desde"] = ["Escriba la fecha 'Desde' en formato aaaa-MM-dd."]
+        });
+    }
+
+    if (!DateOnly.TryParseExact(
+            hasta!.Trim(),
+            "yyyy-MM-dd",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out var fechaHasta))
+    {
+        return Results.ValidationProblem(new Dictionary<string, string[]>
+        {
+            ["hasta"] = ["Escriba la fecha 'Hasta' en formato aaaa-MM-dd."]
+        });
+    }
+
+    var resultado = await servicio.ConsultarAsync(
+        new ConsultaDeBitacora(fechaDesde, fechaHasta));
+    return Results.Ok(resultado.Select(MapearRegistroDeBitacora).ToList());
+});
+
 app.Run();
 
-static DatosDeUnidadSalida MapearUnidadSalida(UnidadSalidaDisponible unidad) => new()
+static DatosDeUnidad MapearUnidad(UnidadDeSalidaDisponible unidad)
 {
-    Id = unidad.Id,
-    Sentido = unidad.Sentido,
-    TipoVehiculoId = unidad.TipoVehiculoId,
-    TipoVehiculoNombre = unidad.TipoVehiculoNombre,
-    CantidadAsientos = unidad.CantidadAsientos,
-    AsientosOcupados = unidad.AsientosOcupados,
-    FechaHoraSalida = unidad.FechaHoraSalida,
-    Estado = unidad.Estado,
-    VendidaPor = unidad.VendidaPor
-};
+    var ocupados = unidad.AsientosOcupados.ToHashSet();
+
+    return new DatosDeUnidad
+    {
+        Id = unidad.Id,
+        Numero = unidad.Numero,
+        Sentido = unidad.Sentido,
+        TipoVehiculoId = unidad.TipoVehiculoId,
+        TipoVehiculoNombre = unidad.TipoVehiculoNombre,
+        CantidadAsientos = unidad.CantidadAsientos,
+        FechaHoraSalida = unidad.FechaHoraSalida,
+        Estado = unidad.Estado.ToString(),
+        AbiertaPor = unidad.AbiertaPor,
+        Asientos = Enumerable.Range(1, unidad.CantidadAsientos)
+            .Select(numero => new DatosDeAsiento
+            {
+                Numero = numero,
+                Ocupado = ocupados.Contains(numero)
+            })
+            .ToList()
+    };
+}
 
 static DatosDePasaje MapearPasaje(Pasaje pasaje) => new()
 {
     Id = pasaje.Id,
-    UnidadSalidaId = pasaje.UnidadSalidaId,
+    UnidadDeSalidaId = pasaje.UnidadDeSalidaId,
+    GrupoId = pasaje.GrupoId,
+    CodigoDeGrupo = pasaje.CodigoDeGrupo,
     NumeroAsiento = pasaje.NumeroAsiento,
     NombrePasajero = pasaje.NombrePasajero,
     TipoDocumento = pasaje.TipoDocumento,
@@ -423,12 +687,202 @@ static DatosDePasaje MapearPasaje(Pasaje pasaje) => new()
     LugarEmbarque = pasaje.LugarEmbarque,
     FechaHoraSalida = pasaje.FechaHoraSalida,
     FechaVenta = pasaje.FechaVenta,
-    Adelanto = pasaje.Adelanto,
-    Estado = pasaje.Estado,
-    VendidaPor = pasaje.VendidaPor,
+    Importe = pasaje.Importe,
+    Adelanto = pasaje.Pagos
+        .Where(pago => pago.Tipo == TipoDePago.Adelanto)
+        .Sum(pago => pago.Monto),
+    Pagado = pasaje.Pagado,
+    Saldo = pasaje.Saldo,
+    Estado = pasaje.Estado.ToString(),
+    TipoRegistro = pasaje.TipoRegistro.ToString(),
+    EsDiferido = pasaje.EsDiferido,
+    EsResponsable = pasaje.EsResponsable,
+    Emisor = pasaje.Emisor,
     EsMenor = pasaje.EsMenor,
     NombrePadreMadre = pasaje.NombrePadreMadre,
-    MotivoMenor = pasaje.MotivoMenor
+    MotivoMenor = pasaje.MotivoMenor,
+    MotivoAnulacion = pasaje.MotivoDeAnulacion,
+    FechaAnulacion = pasaje.FechaDeAnulacion,
+    Boleto = pasaje.Boleto is null
+        ? null
+        : new DatosDeBoleto
+        {
+            Serie = pasaje.Boleto.Numero.Serie,
+            Correlativo = pasaje.Boleto.Numero.Correlativo,
+            Numero = pasaje.Boleto.Numero.Texto,
+            FechaEmision = pasaje.Boleto.FechaEmision,
+            EmitidoPor = pasaje.Boleto.EmitidoPor,
+            Grupo = pasaje.CodigoDeGrupo
+        },
+    Pagos = pasaje.Pagos
+        .Select(pago => new DatosDePago
+        {
+            Monto = pago.Monto,
+            MedioDePago = pago.MedioDePago,
+            Tipo = pago.Tipo.ToString(),
+            FechaPago = pago.FechaPago,
+            Cobrador = pago.Cobrador
+        })
+        .ToList()
+};
+
+static DatosDeRegistroDeBitacora MapearRegistroDeBitacora(
+    RegistroDeBitacora registro) => new()
+{
+    Id = registro.Id,
+    FechaHora = registro.FechaHora,
+    UsuarioId = registro.Usuario.Id,
+    Usuario = registro.Usuario.Nombre,
+    Operacion = registro.Operacion,
+    PasajeId = registro.PasajeId,
+    ValorAnterior = registro.ValorAnterior,
+    ValorNuevo = registro.ValorNuevo,
+    ClaveDeOperacion = registro.ClaveDeOperacion
+};
+
+static DatosDeCuadre MapearCuadre(Cuadre cuadre) => new()
+{
+    Desde = cuadre.Desde,
+    Hasta = cuadre.Hasta,
+    Totales = MapearTotalesDeCuadre(cuadre.Totales),
+    Emisores = cuadre.Emisores
+        .Select(emisor => new DatosDeCuadrePorEmisor
+        {
+            EmisorId = emisor.EmisorId,
+            Emisor = emisor.Emisor,
+            Totales = MapearTotalesDeCuadre(emisor.Totales),
+            Movimientos = emisor.Movimientos
+                .Select(MapearMovimientoDeCuadre)
+                .ToList(),
+            PasajesAnulados = emisor.PasajesAnulados
+                .Select(MapearPasajeAnuladoDeCuadre)
+                .ToList(),
+            AdelantosPendientes = emisor.AdelantosPendientes
+                .Select(MapearAdelantoPendienteDeCuadre)
+                .ToList()
+        })
+        .ToList()
+};
+
+static DatosDeTotalesDeCuadre MapearTotalesDeCuadre(TotalesDeCuadre totales) => new()
+{
+    CobradoEfectivo = totales.CobradoEfectivo,
+    CobradoYape = totales.CobradoYape,
+    Devoluciones = totales.Devoluciones,
+    TotalNeto = totales.TotalNeto,
+    AdelantosRetenidos = totales.AdelantosRetenidos,
+    CantidadPasajesAnulados = totales.CantidadPasajesAnulados,
+    ImportePasajesAnulados = totales.ImportePasajesAnulados,
+    CantidadAdelantosPendientes = totales.CantidadAdelantosPendientes,
+    ImporteAdelantosPendientes = totales.ImporteAdelantosPendientes
+};
+
+static DatosDeMovimientoDeCuadre MapearMovimientoDeCuadre(
+    MovimientoDeCuadre movimiento) => new()
+{
+    PagoId = movimiento.PagoId,
+    PasajeId = movimiento.PasajeId,
+    GrupoId = movimiento.GrupoId,
+    CodigoDeGrupo = movimiento.CodigoDeGrupo,
+    FechaPago = movimiento.FechaPago,
+    Monto = movimiento.Monto,
+    MedioDePago = movimiento.MedioDePago,
+    Tipo = movimiento.Tipo.ToString(),
+    Cobrador = movimiento.Cobrador,
+    Emisor = movimiento.Emisor,
+    NombrePasajero = movimiento.NombrePasajero,
+    NumeroDocumento = movimiento.NumeroDocumento,
+    NumeroAsiento = movimiento.NumeroAsiento,
+    Origen = movimiento.Origen,
+    Destino = movimiento.Destino,
+    FechaHoraSalida = movimiento.FechaHoraSalida,
+    Importe = movimiento.Importe,
+    Estado = movimiento.Estado.ToString(),
+    MotivoAnulacion = movimiento.MotivoDeAnulacion,
+    FechaAnulacion = movimiento.FechaDeAnulacion
+};
+
+static DatosDePasajeAnuladoCuadre MapearPasajeAnuladoDeCuadre(
+    PasajeDeCuadre pasaje) => new()
+{
+    PasajeId = pasaje.Id,
+    GrupoId = pasaje.GrupoId,
+    CodigoDeGrupo = pasaje.CodigoDeGrupo,
+    NumeroAsiento = pasaje.NumeroAsiento,
+    NombrePasajero = pasaje.NombrePasajero,
+    NumeroDocumento = pasaje.NumeroDocumento,
+    Origen = pasaje.Origen,
+    Destino = pasaje.Destino,
+    FechaHoraSalida = pasaje.FechaHoraSalida,
+    Importe = pasaje.Importe,
+    Pagado = pasaje.Pagado,
+    AdelantoRetenido = Math.Max(0, pasaje.Pagado),
+    FechaAnulacion = pasaje.FechaDeAnulacion,
+    MotivoAnulacion = pasaje.MotivoDeAnulacion
+};
+
+static DatosDeAdelantoPendienteCuadre MapearAdelantoPendienteDeCuadre(
+    PasajeDeCuadre pasaje) => new()
+{
+    PasajeId = pasaje.Id,
+    GrupoId = pasaje.GrupoId,
+    CodigoDeGrupo = pasaje.CodigoDeGrupo,
+    NumeroAsiento = pasaje.NumeroAsiento,
+    NombrePasajero = pasaje.NombrePasajero,
+    NumeroDocumento = pasaje.NumeroDocumento,
+    Origen = pasaje.Origen,
+    Destino = pasaje.Destino,
+    FechaHoraSalida = pasaje.FechaHoraSalida,
+    Importe = pasaje.Importe,
+    Pagado = pasaje.Pagado,
+    Saldo = pasaje.Saldo,
+    Estado = pasaje.Estado.ToString()
+};
+
+static DatosDeGrupo MapearGrupo(
+    Grupo grupo,
+    IReadOnlyList<TipoDeVehiculo> tipos) => new()
+{
+    Id = grupo.Id,
+    Codigo = grupo.Codigo,
+    Origen = grupo.Origen,
+    Destino = grupo.Destino,
+    LugarDeRecojo = grupo.LugarDeRecojo,
+    FechaHoraSalida = grupo.FechaHoraSalida,
+    PrecioAcordado = grupo.PrecioAcordado,
+    Pagado = grupo.Pagado,
+    Saldo = grupo.Saldo,
+    Estado = grupo.Estado.ToString(),
+    TelefonoContacto = grupo.TelefonoContacto,
+    Responsable = grupo.Responsable,
+    Unidades = grupo.Unidades
+        .Select(unidad =>
+        {
+            var tipo = tipos.FirstOrDefault(item => item.Id == unidad.TipoVehiculoId);
+            return new DatosDeUnidadDelGrupo
+            {
+                Id = unidad.Id,
+                Numero = unidad.Numero,
+                TipoVehiculoId = unidad.TipoVehiculoId,
+                TipoVehiculoNombre = tipo?.Nombre ?? string.Empty,
+                CantidadAsientos = tipo?.CantidadDeAsientos ?? 0,
+                FechaHoraSalida = unidad.FechaHoraSalida,
+                Estado = unidad.Estado.ToString(),
+                AbiertaPor = unidad.AbiertaPor
+            };
+        })
+        .ToList(),
+    Pasajes = grupo.Pasajes.Select(MapearPasaje).ToList(),
+    Pagos = grupo.Pagos
+        .Select(pago => new DatosDePago
+        {
+            Monto = pago.Monto,
+            MedioDePago = pago.MedioDePago,
+            Tipo = pago.Tipo.ToString(),
+            FechaPago = pago.FechaPago,
+            Cobrador = pago.Cobrador
+        })
+        .ToList()
 };
 
 static IResult NoEncontradaPasaje() =>
@@ -560,4 +1014,19 @@ static IResult HoraInvalida() =>
     Results.ValidationProblem(new Dictionary<string, string[]>
     {
         ["hora"] = ["Escriba la hora en formato de 24 horas, por ejemplo 07:30."]
+    });
+
+static bool IntentarLeerFechaHora(string? texto, out DateTime valor) =>
+    DateTime.TryParseExact(
+        texto?.Trim(),
+        ["yyyy-MM-ddTHH:mm", "yyyy-MM-ddTHH:mm:ss"],
+        CultureInfo.InvariantCulture,
+        DateTimeStyles.None,
+        out valor);
+
+static IResult FechaHoraInvalida() =>
+    Results.ValidationProblem(new Dictionary<string, string[]>
+    {
+        ["fechaHora"] =
+            ["Escriba la fecha y hora en formato aaaa-MM-ddTHH:mm, por ejemplo 2026-11-20T06:00."]
     });

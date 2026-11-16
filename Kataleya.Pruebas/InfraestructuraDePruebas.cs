@@ -90,6 +90,23 @@ internal sealed class RepositorioBitacoraFalso : IRepositorioBitacora
 
     public Task<bool> ExisteClaveAsync(Guid clave) =>
         Task.FromResult(Registros.Any(registro => registro.ClaveDeOperacion == clave));
+
+    public Task<IReadOnlyList<RegistroDeBitacora>> ListarAsync(
+        DateTime desdeUtc,
+        DateTime hastaUtcExclusivo,
+        int? usuarioId)
+    {
+        IReadOnlyList<RegistroDeBitacora> resultado = Registros
+            .Where(registro =>
+                registro.FechaHora >= desdeUtc &&
+                registro.FechaHora < hastaUtcExclusivo &&
+                (usuarioId is null || registro.Usuario.Id == usuarioId))
+            .OrderByDescending(registro => registro.FechaHora)
+            .ThenByDescending(registro => registro.Id)
+            .ToList();
+
+        return Task.FromResult(resultado);
+    }
 }
 
 internal sealed class UnidadDeTrabajoFalsa : IUnidadDeTrabajo

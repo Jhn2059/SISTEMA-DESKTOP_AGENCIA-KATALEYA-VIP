@@ -113,6 +113,31 @@ public sealed class RepositorioParametros : IRepositorioParametros
         return tipos;
     }
 
+    public async Task<TipoDeVehiculo?> BuscarTipoDeVehiculoAsync(short id)
+    {
+        var conexion = await _contexto.ObtenerConexionAsync();
+        await using var comando = new NpgsqlCommand(
+            """
+            SELECT id, nombre, cantidad_asientos, distribucion
+            FROM tipo_vehiculo
+            WHERE id = @id
+            """,
+            conexion)
+        {
+            Transaction = _contexto.TransaccionActual
+        };
+        comando.Parameters.Add("id", NpgsqlDbType.Smallint).Value = id;
+
+        await using var lector = await comando.ExecuteReaderAsync();
+        return await lector.ReadAsync()
+            ? TipoDeVehiculo.Reconstruir(new TipoDeVehiculoGuardado(
+                lector.GetInt16(0),
+                lector.GetString(1),
+                lector.GetInt16(2),
+                lector.IsDBNull(3) ? null : lector.GetString(3)))
+            : null;
+    }
+
     private static ParametroDelNegocio LeerParametro(NpgsqlDataReader lector) =>
         ParametroDelNegocio.Reconstruir(new ParametroDelNegocioGuardado(
             lector.GetString(0),

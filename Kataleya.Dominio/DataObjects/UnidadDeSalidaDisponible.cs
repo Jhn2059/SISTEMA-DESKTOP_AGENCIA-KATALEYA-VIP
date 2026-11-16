@@ -2,13 +2,15 @@ using Kataleya.Dominio.Enums;
 
 namespace Kataleya.Dominio.DataObjects;
 
-public sealed record UnidadSalidaDisponible(
+public sealed record UnidadDeSalidaDisponible(
     long Id,
+    int Numero,
+    long? GrupoId,
     Sentido Sentido,
     short TipoVehiculoId,
     string TipoVehiculoNombre,
     int CantidadAsientos,
-    int AsientosOcupados,
+    IReadOnlyList<int> AsientosOcupados,
     DateTime FechaHoraSalida,
-    string Estado,
-    string VendidaPor);
+    EstadoUnidadDeSalida Estado,
+    string AbiertaPor);
