@@ -34,6 +34,8 @@ try {
     }
 
     Write-Host "API lista. Abriendo el escritorio (Windows 10 1809 o superior)..." -ForegroundColor Cyan
+    $env:KATALEYA_API = "http://localhost:$PuertoApi/"
+    $env:KATALEYA_PERMITIR_HTTP = "true"
     $argumentosEscritorio = @("run", "--project", "Kataleya.Escritorio", "-f", "net10.0-windows10.0.19041.0")
     if ($SinCompilar) {
         $argumentosEscritorio += "--no-build"

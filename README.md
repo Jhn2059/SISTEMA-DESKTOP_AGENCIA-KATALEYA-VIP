@@ -95,6 +95,9 @@ Si la API va a correr en otra PC o servidor:
   compilar. `ejecutar.ps1` cierra la API al cerrar el escritorio.
 - **No conecta con la API**: verificar que esté levantada y que el puerto 5080 esté libre
   (`Get-NetTCPConnection -LocalPort 5080`). Si está en otra PC, revisar `KATALEYA_API`.
+  Si `KATALEYA_API` quedó apuntando a otro puerto (por ejemplo `5081`), corregirla o borrarla:
+  el valor predeterminado es `http://localhost:5080/`. `ejecutar.ps1` fija esa dirección
+  para el escritorio que abre.
 - **Falta la carga de trabajo MAUI**: `dotnet workload install maui`.
 - **Error de conexión a PostgreSQL**: revisar el servicio, la base `kataleya`, el usuario
   `kataleya` y la cadena `ConnectionStrings:Kataleya`.
