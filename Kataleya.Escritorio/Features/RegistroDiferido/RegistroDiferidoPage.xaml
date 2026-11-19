@@ -119,7 +119,7 @@
                     <Grid ColumnDefinitions="200,200,*" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="6">
                             <Label Text="Importe" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}">
+                            <Border Style="{StaticResource EstiloCampoSoloLectura}">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <Label Text="{Binding Importe}" FontSize="14" VerticalOptions="Center" />
                                     <Path Grid.Column="1" Data="{StaticResource IconoCandado}" WidthRequest="15" HeightRequest="15" Stroke="{DynamicResource TextoSuave}" VerticalOptions="Center" />

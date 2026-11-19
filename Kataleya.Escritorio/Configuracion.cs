@@ -1,4 +1,4 @@
-namespace Kataleya.Escritorio;
+    namespace Kataleya.Escritorio;
 
 public static class Configuracion
 {

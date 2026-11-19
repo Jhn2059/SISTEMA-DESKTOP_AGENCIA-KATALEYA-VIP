@@ -270,16 +270,16 @@ public partial class CuentasDeUsuarioViewModel : ObservableObject
     private void Seleccionar(CuentaEnLista? cuenta) =>
         CuentaSeleccionada = cuenta;
 
-    partial void OnCuentaSeleccionadaChanged(CuentaEnLista? valorAnterior, CuentaEnLista? valorNuevo)
+    partial void OnCuentaSeleccionadaChanged(CuentaEnLista? oldValue, CuentaEnLista? newValue)
     {
-        if (valorAnterior is not null)
+        if (oldValue is not null)
         {
-            valorAnterior.EsSeleccionada = false;
+            oldValue.EsSeleccionada = false;
         }
 
-        if (valorNuevo is not null)
+        if (newValue is not null)
         {
-            valorNuevo.EsSeleccionada = true;
+            newValue.EsSeleccionada = true;
         }
 
         OnPropertyChanged(nameof(TieneSeleccion));

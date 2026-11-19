@@ -46,7 +46,7 @@ public partial class RegistroDePasajesViewModel : ObservableObject
 
     public ObservableCollection<string> Unidades { get; } = [];
 
-    public ObservableCollection<AsientoVisible> Asientos { get; } = [];
+    public ObservableCollection<FilaDeAsientosVisible> FilasDeAsientos { get; } = [];
 
     public ObservableCollection<string> TiposDeVehiculo { get; } = [];
 
@@ -361,7 +361,7 @@ public partial class RegistroDePasajesViewModel : ObservableObject
 
     private void MostrarAsientos()
     {
-        Asientos.Clear();
+        FilasDeAsientos.Clear();
 
         if (UnidadElegida < 0 || UnidadElegida >= _unidades.Count)
         {
@@ -378,13 +378,38 @@ public partial class RegistroDePasajesViewModel : ObservableObject
             AsientoElegido = 0;
         }
 
-        Asientos.Add(AsientoVisible.Conductor());
-        for (short numero = 1; numero <= unidad.NumeroAsientos; numero++)
+        AsientoVisible Asiento(short numero) =>
+            AsientoVisible.Asiento(numero, unidad.AsientosOcupados.Contains(numero), numero == AsientoElegido);
+
+        FilasDeAsientos.Add(FilaDeAsientosVisible.ConConductor(Asiento(1)));
+
+        var numero = (short)2;
+        var restantes = unidad.NumeroAsientos - 1;
+        while (restantes > 0)
         {
-            Asientos.Add(AsientoVisible.Asiento(
-                numero,
-                unidad.AsientosOcupados.Contains(numero),
-                numero == AsientoElegido));
+            if (restantes >= 5 || restantes == 3)
+            {
+                FilasDeAsientos.Add(FilaDeAsientosVisible.DeTres(
+                    Asiento(numero),
+                    Asiento((short)(numero + 1)),
+                    Asiento((short)(numero + 2))));
+                numero += 3;
+                restantes -= 3;
+            }
+            else if (restantes == 1)
+            {
+                FilasDeAsientos.Add(FilaDeAsientosVisible.DeUna(Asiento(numero)));
+                numero += 1;
+                restantes -= 1;
+            }
+            else
+            {
+                FilasDeAsientos.Add(FilaDeAsientosVisible.DeDos(
+                    Asiento(numero),
+                    Asiento((short)(numero + 1))));
+                numero += 2;
+                restantes -= 2;
+            }
         }
 
         TextoDelAsiento = AsientoElegido > 0 ? $"Asiento elegido: {AsientoElegido}" : "Asiento elegido: —";

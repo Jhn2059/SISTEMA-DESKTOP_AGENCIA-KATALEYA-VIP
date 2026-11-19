@@ -155,7 +155,7 @@
                             <Grid ColumnDefinitions="220,170,170" ColumnSpacing="12">
                                 <VerticalStackLayout Spacing="6">
                                     <Label Text="Tarifa vigente" Style="{StaticResource EtiquetaDeCampo}" />
-                                    <Border Style="{StaticResource CampoSoloLectura}">
+                                    <Border Style="{StaticResource EstiloCampoSoloLectura}">
                                         <Label Text="{Binding TarifaVigente}" FontSize="14" VerticalOptions="Center" />
                                     </Border>
                                 </VerticalStackLayout>
@@ -170,19 +170,19 @@
                             <Grid ColumnDefinitions="150,150,150" ColumnSpacing="12">
                                 <VerticalStackLayout Spacing="6">
                                     <Label Text="Pagado" Style="{StaticResource EtiquetaDeCampo}" />
-                                    <Border Style="{StaticResource CampoSoloLectura}">
+                                    <Border Style="{StaticResource EstiloCampoSoloLectura}">
                                         <Label Text="{Binding Pagado}" FontSize="14" VerticalOptions="Center" />
                                     </Border>
                                 </VerticalStackLayout>
                                 <VerticalStackLayout Grid.Column="1" Spacing="6">
                                     <Label Text="Saldo" Style="{StaticResource EtiquetaDeCampo}" />
-                                    <Border Style="{StaticResource CampoSoloLectura}">
+                                    <Border Style="{StaticResource EstiloCampoSoloLectura}">
                                         <Label Text="{Binding Saldo}" FontSize="14" VerticalOptions="Center" />
                                     </Border>
                                 </VerticalStackLayout>
                                 <VerticalStackLayout Grid.Column="2" Spacing="6">
                                     <Label Text="Emisor" Style="{StaticResource EtiquetaDeCampo}" />
-                                    <Border Style="{StaticResource CampoSoloLectura}">
+                                    <Border Style="{StaticResource EstiloCampoSoloLectura}">
                                         <Label Text="{Binding Emisor}" FontSize="14" VerticalOptions="Center" />
                                     </Border>
                                 </VerticalStackLayout>
@@ -306,30 +306,63 @@
                             <Label Text="{Binding AvisoDeUnidades}" FontSize="12" TextColor="{DynamicResource InfoTexto}" LineBreakMode="WordWrap" />
                         </Border>
 
-                        <Border Style="{StaticResource TarjetaCompacta}" Padding="16" HorizontalOptions="Center" WidthRequest="260" StrokeShape="RoundRectangle 24">
-                            <VerticalStackLayout Spacing="10">
+                        <Border Style="{StaticResource TarjetaCompacta}" Padding="16,14" HorizontalOptions="Center" WidthRequest="260" StrokeShape="RoundRectangle 24">
+                            <VerticalStackLayout Spacing="14">
                                 <Label Text="{Binding NombreDeLaUnidad}" FontSize="12" TextColor="{DynamicResource TextoSuave}" HorizontalTextAlignment="Center" />
-                                <FlexLayout Direction="Row" Wrap="Wrap" JustifyContent="Start" BindableLayout.ItemsSource="{Binding Asientos}">
+                                <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding FilasDeAsientos}">
                                     <BindableLayout.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:AsientoVisible">
-                                            <Border
-                                                WidthRequest="52"
-                                                HeightRequest="40"
-                                                Margin="3"
-                                                StrokeThickness="1"
-                                                StrokeShape="RoundRectangle 6"
-                                                BackgroundColor="{Binding Fondo}"
-                                                Stroke="{Binding Borde}">
-                                                <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer
-                                                        Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.ElegirAsientoCommand}"
-                                                        CommandParameter="{Binding .}" />
-                                                </Border.GestureRecognizers>
-                                                <Label Text="{Binding Texto}" TextColor="{Binding ColorDelTexto}" FontSize="13" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                            </Border>
+                                        <DataTemplate x:DataType="vm:FilaDeAsientosVisible">
+                                            <HorizontalStackLayout Spacing="12" HorizontalOptions="Center" BindableLayout.ItemsSource="{Binding Asientos}">
+                                                <BindableLayout.ItemTemplate>
+                                                    <DataTemplate x:DataType="vm:AsientoVisible">
+                                                        <Border
+                                                            WidthRequest="52"
+                                                            HeightRequest="48"
+                                                            StrokeThickness="1"
+                                                            StrokeShape="RoundRectangle 8"
+                                                            BackgroundColor="{Binding Fondo}"
+                                                            Stroke="{Binding Borde}">
+                                                            <Border.Triggers>
+                                                                <DataTrigger TargetType="Border" Binding="{Binding EsHueco}" Value="True">
+                                                                    <Setter Property="Opacity" Value="0" />
+                                                                    <Setter Property="InputTransparent" Value="True" />
+                                                                </DataTrigger>
+                                                            </Border.Triggers>
+                                                            <Border.GestureRecognizers>
+                                                                <TapGestureRecognizer
+                                                                    Command="{Binding Source={x:Reference PaginaActiva}, Path=BindingContext.ElegirAsientoCommand}"
+                                                                    CommandParameter="{Binding .}" />
+                                                            </Border.GestureRecognizers>
+                                                            <Grid>
+                                                                <Label Text="{Binding Texto}" TextColor="{Binding ColorDelTexto}" FontSize="13" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                                <Path
+                                                                    Data="{StaticResource IconoPersona}"
+                                                                    IsVisible="{Binding Ocupado}"
+                                                                    WidthRequest="10"
+                                                                    HeightRequest="10"
+                                                                    Stroke="{Binding ColorDelTexto}"
+                                                                    StrokeThickness="1.4"
+                                                                    HorizontalOptions="End"
+                                                                    VerticalOptions="Start"
+                                                                    Margin="0,4,4,0" />
+                                                                <Path
+                                                                    Data="{StaticResource IconoCheck}"
+                                                                    IsVisible="{Binding Elegido}"
+                                                                    WidthRequest="10"
+                                                                    HeightRequest="10"
+                                                                    Stroke="{Binding ColorDelTexto}"
+                                                                    StrokeThickness="1.6"
+                                                                    HorizontalOptions="End"
+                                                                    VerticalOptions="Start"
+                                                                    Margin="0,4,4,0" />
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </BindableLayout.ItemTemplate>
+                                            </HorizontalStackLayout>
                                         </DataTemplate>
                                     </BindableLayout.ItemTemplate>
-                                </FlexLayout>
+                                </VerticalStackLayout>
                             </VerticalStackLayout>
                         </Border>
                         <Label Text="{Binding ErrorAsiento}" Style="{StaticResource TextoDeError}" IsVisible="{Binding ErrorAsiento, Converter={StaticResource TextoNoVacio}}" />

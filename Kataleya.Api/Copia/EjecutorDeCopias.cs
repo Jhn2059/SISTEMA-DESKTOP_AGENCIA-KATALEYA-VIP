@@ -37,7 +37,7 @@ public sealed class EjecutorDeCopias : BackgroundService
     {
         try
         {
-            using var ambito = _ambitos.CreateScope();
+            await using var ambito = _ambitos.CreateAsyncScope();
             var servicio = ambito.ServiceProvider.GetRequiredService<ServicioCopiaDeDatos>();
 
             if (soloSiEstaConfigurada && !servicio.PuedeCopiar)

@@ -23,25 +23,25 @@
                     <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="14">
                         <VerticalStackLayout Spacing="5">
                             <Label Text="Pasajero" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}">
+                            <Border Style="{StaticResource EstiloCampoSoloLectura}">
                                 <Label Text="{Binding Pasajero}" FontSize="14" VerticalOptions="Center" />
                             </Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="1" Spacing="5">
                             <Label Text="Documento" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}">
+                            <Border Style="{StaticResource EstiloCampoSoloLectura}">
                                 <Label Text="{Binding Documento}" FontSize="14" VerticalOptions="Center" />
                             </Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="2" Spacing="5">
                             <Label Text="Teléfono" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}">
+                            <Border Style="{StaticResource EstiloCampoSoloLectura}">
                                 <Label Text="{Binding Telefono}" FontSize="14" VerticalOptions="Center" />
                             </Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="3" Spacing="5">
                             <Label Text="N.º de boleto" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}">
+                            <Border Style="{StaticResource EstiloCampoSoloLectura}">
                                 <Label Text="{Binding Boleto}" FontSize="14" VerticalOptions="Center" />
                             </Border>
                         </VerticalStackLayout>
@@ -50,23 +50,23 @@
                     <Grid ColumnDefinitions="2*,1.2*,1.2*,0.9*,1.6*" ColumnSpacing="14">
                         <VerticalStackLayout Spacing="5">
                             <Label Text="Salida" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}"><Label Text="{Binding Salida}" FontSize="14" VerticalOptions="Center" /></Border>
+                            <Border Style="{StaticResource EstiloCampoSoloLectura}"><Label Text="{Binding Salida}" FontSize="14" VerticalOptions="Center" /></Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="1" Spacing="5">
                             <Label Text="Unidad y asiento" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}"><Label Text="{Binding UnidadYAsiento}" FontSize="14" VerticalOptions="Center" /></Border>
+                            <Border Style="{StaticResource EstiloCampoSoloLectura}"><Label Text="{Binding UnidadYAsiento}" FontSize="14" VerticalOptions="Center" /></Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="2" Spacing="5">
                             <Label Text="Lugar de embarque" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}"><Label Text="{Binding Embarque}" FontSize="14" VerticalOptions="Center" /></Border>
+                            <Border Style="{StaticResource EstiloCampoSoloLectura}"><Label Text="{Binding Embarque}" FontSize="14" VerticalOptions="Center" /></Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="3" Spacing="5">
                             <Label Text="Grupo" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}"><Label Text="{Binding Grupo}" FontSize="14" VerticalOptions="Center" /></Border>
+                            <Border Style="{StaticResource EstiloCampoSoloLectura}"><Label Text="{Binding Grupo}" FontSize="14" VerticalOptions="Center" /></Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="4" Spacing="5">
                             <Label Text="Emisor" Style="{StaticResource EtiquetaDeCampo}" />
-                            <Border Style="{StaticResource CampoSoloLectura}"><Label Text="{Binding Emisor}" FontSize="14" VerticalOptions="Center" /></Border>
+                            <Border Style="{StaticResource EstiloCampoSoloLectura}"><Label Text="{Binding Emisor}" FontSize="14" VerticalOptions="Center" /></Border>
                         </VerticalStackLayout>
                     </Grid>
                 </VerticalStackLayout>
